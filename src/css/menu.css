@@ -1,0 +1,58 @@
+﻿#menuWidget {	
+	box-shadow: 0 0 5px #171717;
+}
+
+.menu {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.menu li {
+    float: left;
+}
+
+.menu > li > * {
+    display: block;
+	text-decoration: none;
+	color: #fff;
+	font-size: 1em;
+}
+
+.menu.small > li > * {
+	padding: 5px;
+}
+
+.menu.big > li > * {
+	padding: 10px;
+}
+
+.menu a {
+	background: linear-gradient(#628297, #4f6b81);
+	
+	border: 1px solid #1e222b;
+	border-bottom: 0;
+
+	box-shadow: inset 0px 1px 1px #8b9db3;
+}
+
+.menu a:hover {
+	background: linear-gradient(#3b3f48, #3c434d);
+	box-shadow: inset 0px 1px 1px #475059;
+}
+
+/*
+we'll also show an arrow on hover. we can use
+an image for this task, or make a css icon too.
+But i am just going to keep it simple and use
+a unicode character.
+*/
+/*.menu a:hover::after {
+	content: '❱';
+	float: right;
+	color: gray;
+}*/
+
+.menu a:active {
+	background: linear-gradient(#2b442d, #2d4630);
+}

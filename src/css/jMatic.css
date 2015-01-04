@@ -19,6 +19,21 @@
     cursor: pointer;
 }
 
+.app-content-loading {
+  text-align: center;
+  height: 100%;
+  width: 100%;
+  background: #fff;
+  position: relative;
+}
+
+.centered-loading-spinner {
+  position: absolute;
+  font-size: 50px;
+  left: 50%;
+  margin-left: -25px;
+}
+
 /* angular mobile overrides */
 .section-break.section {
     -webkit-box-shadow: 0 -1px rgba(0, 0, 0, .08), 0 1px rgba(0, 0, 0, .07), 0 10px 30px rgba(0, 0, 0, .05);

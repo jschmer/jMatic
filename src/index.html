@@ -76,7 +76,7 @@
         <div ui-content-for="title">
             <span>Device Config</span>
         </div>
-        <div>
+        <div class="scrollable-content">
             <div class="configPane">
                 <div>Total number of registered devices: {{ registeredDevices.length }}</div>
                 <ul>
@@ -103,37 +103,43 @@
             <span>Battery Check</span>
         </div>
 
-        <ul>
-            <li class="progress" ng-show="loading"><div>Loading…</div></li>
-            <li ng-repeat="state in deviceStates | orderBy:'name'" class="device" ng-hide="loading">
-                {{state.name}}
-                <img ng-show="state.lowBat==true" class="batteryWarning" src="./img/error.png">
-                <img ng-show="state.lowBat==false" class="batteryOK" src="./img/ok.png">
-                <ul>
-                    <li class="channel"
-                        ng-repeat="channel in state.channels"
-                        ng-class="'jmatic_channel_'+channel.propname">
-                        <span class="channel_title">{{channel.displayName}}: </span><span class="channel_value">{{channel.value}}</span><span class="channel_unit">{{channel.unit}}</span>
-                    </li>
-                </ul>
-            </li>
-        </ul>
+        <div class="scrollable-content">
+
+            <ul>
+                <li class="progress" ng-show="loading"><div>Loading…</div></li>
+                <li ng-repeat="state in deviceStates | orderBy:'name'" class="device" ng-hide="loading">
+                    {{state.name}}
+                    <img ng-show="state.lowBat==true" class="batteryWarning" src="./img/error.png">
+                    <img ng-show="state.lowBat==false" class="batteryOK" src="./img/ok.png">
+                    <ul>
+                        <li class="channel"
+                            ng-repeat="channel in state.channels"
+                            ng-class="'jmatic_channel_'+channel.propname">
+                            <span class="channel_title">{{channel.displayName}}: </span><span class="channel_value">{{channel.value}}</span><span class="channel_unit">{{channel.unit}}</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
     </script>
     <script type="text/ng-template" id="c_systemVariables.html">
         <div ui-content-for="title">
             <span>System variables</span>
         </div>
 
-        <div class="progress" ng-show="loading"><div>Loading…</div></div>
-        <table class="systemVariables">
-            <tbody>
-                <tr ng-repeat="var in systemVars | orderBy:'name'" ng-hide="loading">
-                    <td class="title">{{var.name}}</td>
-                    <td>=</td>
-                    <td class="value pointable" ng-click="ShowInputDialog(var)">{{var.displayValue}}</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="scrollable-content">
+
+            <div class="progress" ng-show="loading"><div>Loading…</div></div>
+            <table class="systemVariables">
+                <tbody>
+                    <tr ng-repeat="var in systemVars | orderBy:'name'" ng-hide="loading">
+                        <td class="title">{{var.name}}</td>
+                        <td>=</td>
+                        <td class="value pointable" ng-click="ShowInputDialog(var)">{{var.displayValue}}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </script>
     <script type="text/ng-template" id="c_systemVariables_input_template">
         <style>

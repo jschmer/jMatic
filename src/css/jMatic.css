@@ -1,36 +1,4 @@
 ﻿/* general styles */
-body {
-    color: white;
-    font-size: 1.3em;
-}
-
-.background {
-    background-color: #00002e;
-    color: white;
-    position: fixed !important;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: -1;
-}
-
-h4 {
-    margin: 10px 0px 10px 0px;
-}
-
-.appViews {
-    clear: both;
-}
-
-.lastLoadTime {
-    white-space: nowrap;
-}
-
-#content {
-    overflow: auto;
-}
-
 #errorMessageBox {
     display: none;
     text-align: center;
@@ -49,14 +17,6 @@ h4 {
 
 .pointable {
     cursor: pointer
-}
-
-.configPane > ul {
-    margin: 8px 0px 16px 0px;
-}
-
-ul ul {
-    padding-left: 10px;
 }
 
 /* view styles */

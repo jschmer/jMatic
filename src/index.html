@@ -19,7 +19,7 @@
     <script src="./lib/angular/modules/route/angular-route.min.js"></script>
     <script src="./lib/angular/mobile-ui/js/mobile-angular-ui.min.js"></script>
     <script src="./lib/angular/modules/ngDialog/js/ngDialog.min.js"></script>
-    
+
     <!-- own sources -->
     <link rel="stylesheet" type="text/css" href="./css/jMatic.css">
     <link rel="stylesheet" type="text/css" href="./css/loadingSpinner.css">
@@ -35,39 +35,41 @@
         <div ui-content-for="title">
             <span>Device State</span>
         </div>
-        <div class="scrollable">
-            <div class="scrollable-header">
-                <ul class="menu small">
-                    <li><a href="javascript: void(0)" ng-click="loadStates()">Refresh</a></li>
-                    <li><a href="javascript: void(0)" ng-click="toggleChannelNames()">Hide/Show Channel Names</a></li>
-                    <li><span class="lastLoadTime" style="margin-left:10px">{{lastRefreshTime}}</span></li>
-                </ul>
+        <div class="scrollable-header" ui-state='channelNames'>
+            <div class="section section-break blueBackgound">
+                <a href="" class="btn btn-default" ng-click="loadStates()">Refresh</a>
+                <a href="" class="btn btn-default" ng-click="toggleChannelNames()" ui-toggle='channelNames'>
+                    <span ui-hide="channelNames">Show</span>
+                    <span ui-show="channelNames">Hide</span>
+                    Names
+                </a>
+                <span>{{lastRefreshTime}}</span>
             </div>
-            <div class="scrollable-content">
-                <p ng-show="registeredDevices.length==0">No registered devices!</p>
-                <ul>
-                    <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
-                        {{device.name}} [{{device.type}}] <div class="small progress" ng-show="loading"><div>Loading…</div></div>
+        </div>
+        <div class="scrollable-content">
+            <p ng-show="registeredDevices.length==0">No registered devices!</p>
+            <ul>
+                <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
+                    {{device.name}} [{{device.type}}] <div class="small progress" ng-show="loading"><div>Loading…</div></div>
 
-                        <ul>
-                            <li class="channel"
-                                ng-hide="data.hide"
-                                ng-repeat="(propname, data) in device.state"
-                                ng-class="['jmatic_channel_'+propname,
+                    <ul>
+                        <li class="channel"
+                            ng-hide="data.hide"
+                            ng-repeat="(propname, data) in device.state"
+                            ng-class="['jmatic_channel_'+propname,
                     (propname=='STATE' && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
                     (propname=='STATE' && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
                     (data.thresholdExceeded==true ? 'threshold' : ''),
                     (data.changed==true ? 'changed' : ''),
                     ]">
-                                <span ng-hide="hideChannelName" class="channel_title">{{data.displayName}}: </span><span class="channel_value">{{data.value}}</span><span class="channel_unit">{{data.unit}}</span>
-                            </li>
-                            <li ng-show="device.state==null">
-                                <span>No data fetched yet!</span>
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
+                            <span ng-hide="hideChannelName" class="channel_title">{{data.displayName}}: </span><span class="channel_value">{{data.value}}</span><span class="channel_unit">{{data.unit}}</span>
+                        </li>
+                        <li ng-show="device.state==null">
+                            <span>No data fetched yet!</span>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </div>
     </script>
     <script type="text/ng-template" id="c_deviceConfig.html">
@@ -87,7 +89,7 @@
                     Total number of available devices: {{ availableDevices.length }}
                     <div class="progress" ng-show="loading"><div>Loading…</div></div>
                 </div>
-                
+
                 <ul ng-hide="loading">
                     <li ng-repeat="device in availableDevices | orderBy:'name'">
                         <span class="pointable" ng-click="registerDevice(device.id)">{{device.name}} ({{device.id}}) | {{device.type}}</span>
@@ -105,13 +107,12 @@
             <li class="progress" ng-show="loading"><div>Loading…</div></li>
             <li ng-repeat="state in deviceStates | orderBy:'name'" class="device" ng-hide="loading">
                 {{state.name}}
-                <img ng-show="state.lowBat==true"  class="batteryWarning" src="./img/error.png">
-                <img ng-show="state.lowBat==false" class="batteryOK"      src="./img/ok.png">
+                <img ng-show="state.lowBat==true" class="batteryWarning" src="./img/error.png">
+                <img ng-show="state.lowBat==false" class="batteryOK" src="./img/ok.png">
                 <ul>
                     <li class="channel"
                         ng-repeat="channel in state.channels"
-                        ng-class="'jmatic_channel_'+channel.propname"
-                        >
+                        ng-class="'jmatic_channel_'+channel.propname">
                         <span class="channel_title">{{channel.displayName}}: </span><span class="channel_value">{{channel.value}}</span><span class="channel_unit">{{channel.unit}}</span>
                     </li>
                 </ul>
@@ -122,7 +123,7 @@
         <div ui-content-for="title">
             <span>System variables</span>
         </div>
-        
+
         <div class="progress" ng-show="loading"><div>Loading…</div></div>
         <table class="systemVariables">
             <tbody>
@@ -162,7 +163,7 @@
     <!-- Sidebars -->
     <div ui-track-as-search-param='true' class="sidebar sidebar-left">
         <div class="scrollable">
-            <h1 class="scrollable-header app-name">jMatic</h1>
+            <h3 class="scrollable-header app-name">jMatic</h3>
             <div class="scrollable-content">
                 <div class="list-group" ui-turn-off='uiSidebarLeft'>
                     <a class="list-group-item" href="#/deviceState">Device State <i class="fa fa-chevron-right pull-right"></i></a>
@@ -181,15 +182,14 @@
             <div class="navbar-brand navbar-brand-center" ui-yield-to="title">
                 jMatic
             </div>
+
             <div class="btn-group pull-left">
                 <div ui-toggle="uiSidebarLeft" class="btn sidebar-toggle">
                     <i class="fa fa-bars"></i> Menu
                 </div>
             </div>
-            <div class="btn-group pull-right">
-                <div class="btn" style="text-transform: none !important;">
-                    jMatic
-                </div>
+            <div class="navbar-brand pull-right">
+                jMatic
             </div>
         </div>
 
@@ -198,11 +198,11 @@
             <div ng-show="loading" class="app-content-loading">
                 <i class="fa fa-spinner fa-spin loading-spinner"></i>
             </div>
-            <div class="app-content">
-                <ng-view></ng-view>
+            <div class="app-content blueBackgound">
+                <div class="scrollable section" ng-view>
+                </div>
             </div>
-        </div>
-    </div><!-- ~ .app -->
-    <div ui-yield-to="modals"></div>
+        </div><!-- ~ .app -->
+        <div ui-yield-to="modals"></div>
 </body>
 </html>

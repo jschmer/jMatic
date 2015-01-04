@@ -48,10 +48,10 @@
         </div>
         <div class="scrollable-content">
             <p ng-show="registeredDevices.length==0">No registered devices!</p>
-            <ul>
+            <ul class="condensed">
                 <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
                     {{device.name}} [{{device.type}}] <i ng-show="loading" class="fa fa-spinner fa-spin loading-spinner"></i>
-                    <ul>
+                    <ul class="condensed">
                         <li class="channel"
                             ng-hide="data.hide"
                             ng-repeat="(propname, data) in device.state"
@@ -106,12 +106,12 @@
             <div ng-show="loading" class="app-content-loading">
                 <i class="fa fa-spinner fa-spin centered-loading-spinner fa-3x"></i>
             </div>
-            <ul ng-hide="loading">
+            <ul ng-hide="loading" class="condensed">
                 <li ng-repeat="state in deviceStates | orderBy:'name'" class="device">
                     {{state.name}}
                     <img ng-show="state.lowBat==true" class="batteryWarning" src="./img/error.png">
                     <img ng-show="state.lowBat==false" class="batteryOK" src="./img/ok.png">
-                    <ul>
+                    <ul class="condensed">
                         <li class="channel"
                             ng-repeat="channel in state.channels"
                             ng-class="'jmatic_channel_'+channel.propname">

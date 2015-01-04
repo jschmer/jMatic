@@ -19,6 +19,12 @@
     cursor: pointer
 }
 
+/* angular mobile overrides */
+.section-break.section {
+    -webkit-box-shadow: 0 -1px rgba(0, 0, 0, .08), 0 1px rgba(0, 0, 0, .07), 0 10px 30px rgba(0, 0, 0, .05);
+    box-shadow: 0px -1px rgba(0,0,0,0.08), 0px 1px rgba(0,0,0,0.07), 0px 10px 30px rgba(0,0,0,0.05);
+}
+
 /* view styles */
 .ngdialog-content {
     width: 200px !important; /* override ngDialog default */

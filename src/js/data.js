@@ -9,6 +9,7 @@ function Device() {
     this.id = -1;
     this.name = "Unknown";
     this.type = 'Unknown';
+    this.subscribed = false;
     this.state = null;
 }
 

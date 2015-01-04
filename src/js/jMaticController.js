@@ -29,15 +29,16 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
         localStorage.showChannelNames = SharedState.get("showChannelNames");;
     };
 
-    $scope.registeredDevices = loadDeviceDataFromLocalStorage();
+    $scope.devices = loadDeviceDataFromLocalStorage();
     $scope.lastRefreshTime = localStorage.lastRefreshTime;
 
     $scope.loadStates = function () {
 
         var deviceIds = []
-        for (i = 0; i < $scope.registeredDevices.length; ++i)
+        for (i = 0; i < $scope.devices.length; ++i)
         {
-            deviceIds.push($scope.registeredDevices[i].id);
+            if ($scope.devices[i].subscribed)
+                deviceIds.push($scope.devices[i].id);
         }
 
         startLoading($scope);
@@ -95,7 +96,7 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
 
     finishLoading($scope);
 
-    $scope.registeredDevices = loadDeviceDataFromLocalStorage();
+    $scope.devices = loadDeviceDataFromLocalStorage();
 
     $scope.loadDevices = function () {
         startLoading($scope);
@@ -108,21 +109,20 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
                      var deviceArray = x2js.xml_str2json(response).deviceList.device;
                      console.log("OK converting to json!");
 
-                     $scope.availableDevices = [];
-
                      console.log(deviceArray.length + " devices loaded!");
                      for (var i = 0; i < deviceArray.length; i += 1) {
                          device = deviceArray[i];
                          device = createDeviceModel(device);
 
-                         var registeredDeviceIndex = findDevice($scope.registeredDevices, device.id);
-                         if (registeredDeviceIndex != -1) {
+                         var deviceIndex = findDevice($scope.devices, device.id);
+                         if (deviceIndex != -1) {
                              // got a registered device, update it (and keep the state!)
-                             device.state = $scope.registeredDevices[registeredDeviceIndex].state;
-                             $scope.registeredDevices[registeredDeviceIndex] = device;
+                             device.state = $scope.devices[deviceIndex].state;
+                             device.subscribed = $scope.devices[deviceIndex].subscribed;
+                             $scope.devices[deviceIndex] = device;
                          }
                          else {
-                             $scope.availableDevices.push(device);
+                             $scope.devices.push(device);
                          }
                      }
                  }
@@ -141,24 +141,17 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
              });
     }
 
-    $scope.registerDevice = function (deviceId) {
-        var deviceIndex = findDevice($scope.availableDevices, deviceId);
-        if (deviceIndex != -1) {
-            var device = $scope.availableDevices[deviceIndex];
-            $scope.registeredDevices.push(device);
-            removeDevice($scope.availableDevices, deviceId);
-
-            saveDeviceDataToLocalStorage($scope.registeredDevices);
-        }
+    $scope.persistDeviceConfig = function () {
+        saveDeviceDataToLocalStorage($scope.devices);
     }
 
-    $scope.unregisterDevice = function (deviceId) {
-        var deviceIndex = findDevice($scope.registeredDevices, deviceId);
+    $scope.toggleSubscription = function (deviceId) {
+        var deviceIndex = findDevice($scope.devices, deviceId);
         if (deviceIndex != -1) {
-            $scope.availableDevices.push($scope.registeredDevices[deviceIndex]);
-            removeDevice($scope.registeredDevices, deviceId);
+            var device = $scope.devices[deviceIndex];
+            device.subscribed = !device.subscribed;
 
-            saveDeviceDataToLocalStorage($scope.registeredDevices);
+            $scope.persistDeviceConfig();
         }
     }
 

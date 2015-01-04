@@ -17,6 +17,7 @@
 
 .pointable {
     cursor: pointer;
+    user-select: none;
 }
 
 .app-content-loading {
@@ -53,6 +54,19 @@ ul.condensed {
 }
 
 /* view styles */
+.config-list-item-state {
+    width: 15px;
+    display: inline-block;
+}
+
+.green {
+    color: green;
+}
+
+.red {
+    color: red;
+}
+
 .ngdialog-content {
     width: 200px !important; /* override ngDialog default */
 }
@@ -131,14 +145,4 @@ table.systemVariables .value {
 
 .threshold {
     color: red;
-}
-
-.batteryWarning, .batteryOK {
-    display: inline-block;
-}
-
-.batteryWarning, .batteryOK {
-    width:  17px;
-    height: 17px;
-    padding-left: 5px;
 }

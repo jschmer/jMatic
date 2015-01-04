@@ -47,9 +47,9 @@
             </div>
         </div>
         <div class="scrollable-content">
-            <p ng-show="registeredDevices.length==0">No registered devices!</p>
+            <p ng-show="devices.length==0">No registered devices!</p>
             <ul class="condensed">
-                <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
+                <li ng-repeat="device in devices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
                     {{device.name}} [{{device.type}}] <i ng-show="loading" class="fa fa-spinner fa-spin loading-spinner"></i>
                     <ul class="condensed">
                         <li class="channel"
@@ -76,24 +76,16 @@
             <span>Device Config</span>
         </div>
         <div class="scrollable-content">
-            <div class="configPane">
-                <div>Total number of registered devices: {{ registeredDevices.length }}</div>
-                <ul>
-                    <li ng-repeat="device in registeredDevices | orderBy:'name'">
-                        <span class="pointable" ng-click="unregisterDevice(device.id)">{{device.name}} ({{device.id}}) | {{device.type}}</span>
-                    </li>
-                </ul>
-
-                <div>
-                    Total number of available devices: {{ availableDevices.length }}
-                    <div><i ng-show="loading" class="fa fa-spinner fa-spin fa-3x"></i></div>
-                </div>
-
-                <ul ng-hide="loading">
-                    <li ng-repeat="device in availableDevices | orderBy:'name'">
-                        <span class="pointable" ng-click="registerDevice(device.id)">{{device.name}} ({{device.id}}) | {{device.type}}</span>
-                    </li>
-                </ul>
+            <div class="list-group" ng-hide="loading">
+                <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item pointable" ng-click="toggleSubscription(device.id)">
+                    <span class="config-list-item-state">
+                        <i ng-show="device.subscribed" class="fa fa-check green"></i>
+                    </span>
+                    <span>{{device.name}} ({{device.id}}) | {{device.type}}</span>
+                </span>
+            </div>
+            <div>
+                <i ng-show="loading" class="fa fa-spinner fa-spin fa-3x centered-loading-spinner"></i>
             </div>
         </div>
     </script>
@@ -109,8 +101,8 @@
             <ul ng-hide="loading" class="condensed">
                 <li ng-repeat="state in deviceStates | orderBy:'name'" class="device">
                     {{state.name}}
-                    <img ng-show="state.lowBat==true" class="batteryWarning" src="./img/error.png">
-                    <img ng-show="state.lowBat==false" class="batteryOK" src="./img/ok.png">
+                    <i ng-show="state.lowBat==false" class="fa fa-check green"></i>
+                    <i ng-show="state.lowBat==true" class="fa fa-remove red"></i>
                     <ul class="condensed">
                         <li class="channel"
                             ng-repeat="channel in state.channels"

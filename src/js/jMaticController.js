@@ -15,19 +15,18 @@ var jMaticControllers = angular.module('jMaticControllers', []);
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', function ($scope, $http) {
+jMaticControllers.controller('deviceStateController', function ($scope, $http, SharedState) {
 
     finishLoading($scope);
 
-    var hideChannelNames = localStorage.hideChannelNames;
-    if (hideChannelNames == null)
-        hideChannelNames = false;
-    else
-        hideChannelNames = hideChannelNames == "true";
-    $scope.hideChannelName = hideChannelNames;
+    var showChannelNames = localStorage.showChannelNames;
+    showChannelNames = showChannelNames == null ? false : showChannelNames == "true";
+    SharedState.initialize($scope, "showChannelNames");
+    SharedState.set("showChannelNames", showChannelNames);
+
     $scope.toggleChannelNames = function () {
-        $scope.hideChannelName = !$scope.hideChannelName;
-        localStorage.hideChannelNames = $scope.hideChannelName;
+        SharedState.toggle("showChannelNames");
+        localStorage.showChannelNames = SharedState.get("showChannelNames");;
     };
 
     $scope.registeredDevices = loadDeviceDataFromLocalStorage();

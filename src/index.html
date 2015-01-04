@@ -35,41 +35,43 @@
         <div ui-content-for="title">
             <span>Device State</span>
         </div>
-        <div class="scrollable-header" ui-state='channelNames'>
-            <div class="section section-break">
-                <a href="" class="btn btn-default" ng-click="loadStates()">Refresh</a>
-                <a href="" class="btn btn-default" ng-click="toggleChannelNames()" ui-toggle='channelNames'>
-                    <span ui-hide="channelNames">Show</span>
-                    <span ui-show="channelNames">Hide</span>
-                    Names
-                </a>
-                <span>{{lastRefreshTime}}</span>
+        <div>
+            <div class="scrollable-header">
+                <div class="section section-break">
+                    <a href="javascript:void(0)" class="btn btn-default no-outline no-focus" ng-click="loadStates()"><i class="fa fa-refresh"></i></a>
+                    <a href="javascript:void(0)" class="btn btn-default no-outline no-focus" ng-click="toggleChannelNames()">
+                        <span ui-hide="showChannelNames">Show</span>
+                        <span ui-show="showChannelNames">Hide</span>
+                        Names
+                    </a>
+                    <span>{{lastRefreshTime}}</span>
+                </div>
             </div>
-        </div>
-        <div class="scrollable-content">
-            <p ng-show="registeredDevices.length==0">No registered devices!</p>
-            <ul>
-                <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
-                    {{device.name}} [{{device.type}}] <div class="small progress" ng-show="loading"><div>Loading…</div></div>
+            <div class="scrollable-content">
+                <p ng-show="registeredDevices.length==0">No registered devices!</p>
+                <ul>
+                    <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
+                        {{device.name}} [{{device.type}}] <div class="small progress" ng-show="loading"><div>Loading…</div></div>
 
-                    <ul>
-                        <li class="channel"
-                            ng-hide="data.hide"
-                            ng-repeat="(propname, data) in device.state"
-                            ng-class="['jmatic_channel_'+propname,
+                        <ul>
+                            <li class="channel"
+                                ng-hide="data.hide"
+                                ng-repeat="(propname, data) in device.state"
+                                ng-class="['jmatic_channel_'+propname,
                     (propname=='STATE' && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
                     (propname=='STATE' && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
                     (data.thresholdExceeded==true ? 'threshold' : ''),
                     (data.changed==true ? 'changed' : ''),
                     ]">
-                            <span ng-hide="hideChannelName" class="channel_title">{{data.displayName}}: </span><span class="channel_value">{{data.value}}</span><span class="channel_unit">{{data.unit}}</span>
-                        </li>
-                        <li ng-show="device.state==null">
-                            <span>No data fetched yet!</span>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                                <span ui-show="showChannelNames" class="channel_title">{{data.displayName}}: </span><span class="channel_value">{{data.value}}</span><span class="channel_unit">{{data.unit}}</span>
+                            </li>
+                            <li ng-show="device.state==null">
+                                <span>No data fetched yet!</span>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </script>
     <script type="text/ng-template" id="c_deviceConfig.html">

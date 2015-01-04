@@ -16,13 +16,21 @@
 }
 
 .pointable {
-    cursor: pointer
+    cursor: pointer;
 }
 
 /* angular mobile overrides */
 .section-break.section {
     -webkit-box-shadow: 0 -1px rgba(0, 0, 0, .08), 0 1px rgba(0, 0, 0, .07), 0 10px 30px rgba(0, 0, 0, .05);
     box-shadow: 0px -1px rgba(0,0,0,0.08), 0px 1px rgba(0,0,0,0.07), 0px 10px 30px rgba(0,0,0,0.05);
+}
+
+.no-outline {
+    outline: 0 !important;
+}
+
+.no-focus:focus {
+    background-color: inherit;
 }
 
 /* view styles */

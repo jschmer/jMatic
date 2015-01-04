@@ -381,3 +381,22 @@ jMaticControllers.controller('sysVarsController', function ($scope, ngDialog, $h
 
     $scope.loadSysVars();
 });
+
+//
+// For this trivial demo we have just a unique MainController 
+// for everything
+//
+jMaticControllers.controller('MainController', function ($rootScope, $scope) {
+
+    // User agent displayed in home page
+    $scope.userAgent = navigator.userAgent;
+
+    // Needed for the loading screen
+    $rootScope.$on('$routeChangeStart', function () {
+        $rootScope.loading = true;
+    });
+
+    $rootScope.$on('$routeChangeSuccess', function () {
+        $rootScope.loading = false;
+    });
+});

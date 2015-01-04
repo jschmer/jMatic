@@ -32,40 +32,48 @@
 
     <!-- angular page templates -->
     <script type="text/ng-template" id="c_deviceState.html">
-        <div>
-            <ul class="menu small">
-                <li><a href="javascript: void(0)" ng-click="loadStates()">Refresh</a></li>
-                <li><a href="javascript: void(0)" ng-click="toggleChannelNames()">Hide/Show Channel Names</a></li>
-                <li><span class="lastLoadTime" style="margin-left:10px">{{lastRefreshTime}}</span></li>
-            </ul>
-            <div style="clear:both"></div>
-            <p ng-show="registeredDevices.length==0">No registered devices!</p>
-            <ul>
-                <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
-                    {{device.name}} [{{device.type}}] <div class="small progress" ng-show="loading"><div>Loading…</div></div>
+        <div ui-content-for="title">
+            <span>Device State</span>
+        </div>
+        <div class="scrollable">
+            <div class="scrollable-header">
+                <ul class="menu small">
+                    <li><a href="javascript: void(0)" ng-click="loadStates()">Refresh</a></li>
+                    <li><a href="javascript: void(0)" ng-click="toggleChannelNames()">Hide/Show Channel Names</a></li>
+                    <li><span class="lastLoadTime" style="margin-left:10px">{{lastRefreshTime}}</span></li>
+                </ul>
+            </div>
+            <div class="scrollable-content">
+                <p ng-show="registeredDevices.length==0">No registered devices!</p>
+                <ul>
+                    <li ng-repeat="device in registeredDevices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type">
+                        {{device.name}} [{{device.type}}] <div class="small progress" ng-show="loading"><div>Loading…</div></div>
 
-                    <ul>
-                        <li class="channel"
-                            ng-hide="data.hide"
-                            ng-repeat="(propname, data) in device.state"
-                            ng-class="['jmatic_channel_'+propname,
+                        <ul>
+                            <li class="channel"
+                                ng-hide="data.hide"
+                                ng-repeat="(propname, data) in device.state"
+                                ng-class="['jmatic_channel_'+propname,
                     (propname=='STATE' && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
                     (propname=='STATE' && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
                     (data.thresholdExceeded==true ? 'threshold' : ''),
                     (data.changed==true ? 'changed' : ''),
-                    ]"
-                            >
-                            <span ng-hide="hideChannelName" class="channel_title">{{data.displayName}}: </span><span class="channel_value">{{data.value}}</span><span class="channel_unit">{{data.unit}}</span>
-                        </li>
-                        <li ng-show="device.state==null">
-                            <span>No data fetched yet!</span>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                    ]">
+                                <span ng-hide="hideChannelName" class="channel_title">{{data.displayName}}: </span><span class="channel_value">{{data.value}}</span><span class="channel_unit">{{data.unit}}</span>
+                            </li>
+                            <li ng-show="device.state==null">
+                                <span>No data fetched yet!</span>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     </script>
     <script type="text/ng-template" id="c_deviceConfig.html">
+        <div ui-content-for="title">
+            <span>Device Config</span>
+        </div>
         <div>
             <div class="configPane">
                 <div>Total number of registered devices: {{ registeredDevices.length }}</div>
@@ -87,15 +95,16 @@
                 </ul>
             </div>
         </div>
-
     </script>
     <script type="text/ng-template" id="c_deviceBatteryCheck.html">
-        <h4>Battery Check</h4>
+        <div ui-content-for="title">
+            <span>Battery Check</span>
+        </div>
 
         <ul>
             <li class="progress" ng-show="loading"><div>Loading…</div></li>
             <li ng-repeat="state in deviceStates | orderBy:'name'" class="device" ng-hide="loading">
-                {{state.name}} <!-- ({{device.id}}) [{{device.type}}] -->
+                {{state.name}}
                 <img ng-show="state.lowBat==true"  class="batteryWarning" src="./img/error.png">
                 <img ng-show="state.lowBat==false" class="batteryOK"      src="./img/ok.png">
                 <ul>
@@ -110,8 +119,10 @@
         </ul>
     </script>
     <script type="text/ng-template" id="c_systemVariables.html">
-        <h4>System variables</h4>
-
+        <div ui-content-for="title">
+            <span>System variables</span>
+        </div>
+        
         <div class="progress" ng-show="loading"><div>Loading…</div></div>
         <table class="systemVariables">
             <tbody>
@@ -119,16 +130,6 @@
                     <td class="title">{{var.name}}</td>
                     <td>=</td>
                     <td class="value pointable" ng-click="ShowInputDialog(var)">{{var.displayValue}}</td>
-                    <!--
-                        id: ise_id,
-                        name: name,
-                        type: variableDataType,
-                        displayValue: parsedValue,
-                        value: value,
-                        min: min,
-                        max: max,
-                        valueMapping: {}
-                    -->
                 </tr>
             </tbody>
         </table>
@@ -157,51 +158,51 @@
         <button ng-click="closeThisDialog()">Cancel</button>
     </script>
 </head>
-<body>
+<body ng-app="jMaticApp" ng-controller="MainController">
     <!-- Sidebars -->
-    <div class="sidebar sidebar-left"><!-- ... --></div>
-    <div class="sidebar sidebar-right"><!-- ... --></div>
+    <div ui-track-as-search-param='true' class="sidebar sidebar-left">
+        <div class="scrollable">
+            <h1 class="scrollable-header app-name">jMatic</h1>
+            <div class="scrollable-content">
+                <div class="list-group" ui-turn-off='uiSidebarLeft'>
+                    <a class="list-group-item" href="#/deviceState">Device State <i class="fa fa-chevron-right pull-right"></i></a>
+                    <a class="list-group-item" href="#/deviceConfig">Abo Config <i class="fa fa-chevron-right pull-right"></i></a>
+                    <a class="list-group-item" href="#/batteryCheck">Battery Check <i class="fa fa-chevron-right pull-right"></i></a>
+                    <a class="list-group-item" href="#/sysVars">System variables <i class="fa fa-chevron-right pull-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="app">
+        <!-- ng-swipe-right='Ui.turnOn("uiSidebarLeft")' ng-swipe-left='Ui.turnOff("uiSidebarLeft")'> -->
+        <!-- Navbars -->
         <div class="navbar navbar-app navbar-absolute-top">
-            <!-- Top Navbar -->
-            <ul class="menu big">
-                <li><a href="#/deviceState">Device State</a></li>
-                <li><a href="#/deviceConfig">Abo-Config</a></li>
-                <li><a href="#/batteryCheck">Battery Check</a></li>
-                <li><a href="#/sysVars">System Variables</a></li>
-            </ul>
-        </div>
-        <div class="navbar navbar-app navbar-absolute-bottom">
-            <!-- Bottom Navbar -->
+            <div class="navbar-brand navbar-brand-center" ui-yield-to="title">
+                jMatic
+            </div>
+            <div class="btn-group pull-left">
+                <div ui-toggle="uiSidebarLeft" class="btn sidebar-toggle">
+                    <i class="fa fa-bars"></i> Menu
+                </div>
+            </div>
+            <div class="btn-group pull-right">
+                <div class="btn" style="text-transform: none !important;">
+                    jMatic
+                </div>
+            </div>
         </div>
 
-        <!-- App body -->
-        <div class='app-body'>
-            <div class='app-content' ng-view />
+        <!-- App Body -->
+        <div class="app-body" ng-class="{loading: loading}">
+            <div ng-show="loading" class="app-content-loading">
+                <i class="fa fa-spinner fa-spin loading-spinner"></i>
+            </div>
+            <div class="app-content">
+                <ng-view></ng-view>
+            </div>
         </div>
-    </div>
-
-    <!-- Modals and Overlays -->
+    </div><!-- ~ .app -->
     <div ui-yield-to="modals"></div>
-
-    <!--
-        <div class="background"></div>
-    <div id="errorMessageBox">
-        <span id="errorMessage"></span>
-    </div>
-    <hr />
-    <div id="menuWidget">
-        <ul class="menu big">
-            <li><a href="#/deviceState">Device State</a></li>
-            <li><a href="#/deviceConfig">Abo-Config</a></li>
-            <li><a href="#/batteryCheck">Battery Check</a></li>
-            <li><a href="#/sysVars">System Variables</a></li>
-        </ul>
-    </div>
-    <div style="clear:both;"></div>
-    <hr />
-    <div class="appViews" ng-view></div>
-        -->
 </body>
 </html>

@@ -5,19 +5,23 @@ var jMaticApp = angular
         $routeProvider.
             when('/deviceState', {
                 templateUrl: 'c_deviceState.html',
-                controller: 'deviceStateController'
+                controller: 'deviceStateController',
+                reloadOnSearch: false
             }).
             when('/deviceConfig', {
                 templateUrl: 'c_deviceConfig.html',
-                controller: 'deviceConfigController'
+                controller: 'deviceConfigController',
+                reloadOnSearch: false
             }).
             when('/batteryCheck', {
                 templateUrl: 'c_deviceBatteryCheck.html',
-                controller: 'batteryCheckController'
+                controller: 'batteryCheckController',
+                reloadOnSearch: false
             }).
             when('/sysVars', {
                 templateUrl: 'c_systemVariables.html',
-                controller: 'sysVarsController'
+                controller: 'sysVarsController',
+                reloadOnSearch: false
             }).
             otherwise({
                 redirectTo: '/deviceState'

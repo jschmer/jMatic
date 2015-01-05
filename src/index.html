@@ -53,7 +53,7 @@
             <p ng-show="devices.length==0">No registered devices!</p>
             <ul class="condensed">
                 <li ng-repeat="device in devices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
-                    {{device.name}} [{{device.type}}] <i ng-show="loading" class="fa fa-spinner fa-spin loading-spinner"></i>
+                    {{device.name}} [{{device.type}}] <span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span>
                     <ul class="condensed">
                         <li class="channel"
                             ng-hide="data.hide"
@@ -87,8 +87,8 @@
                     <span>{{device.name}} ({{device.id}}) | {{device.type}}</span>
                 </span>
             </div>
-            <div>
-                <i ng-show="loading" class="fa fa-spinner fa-spin fa-3x centered-loading-spinner"></i>
+            <div ng-show="loading">
+                <i class="fa fa-spinner fa-spin fa-3x centered-loading-spinner"></i>
             </div>
         </div>
     </script>

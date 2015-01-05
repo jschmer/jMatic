@@ -40,7 +40,7 @@
         </div>
         <div class="scrollable-header">
             <div class="section section-break">
-                <a href="javascript:void(0)" class="btn btn-default no-outline no-focus" ng-click="loadStates()"><i class="fa fa-refresh"></i></a>
+                <a href="javascript:void(0)" class="btn btn-default no-outline no-focus" ng-click="loadStates()"><i class="fa fa-refresh" ng-class="{'spin': loading}"></i></a>
                 <a href="javascript:void(0)" class="btn btn-default no-outline no-focus" ng-click="toggleChannelNames()">
                     <span ui-hide="showChannelNames">Show</span>
                     <span ui-show="showChannelNames">Hide</span>

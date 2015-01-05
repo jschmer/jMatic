@@ -1,6 +1,20 @@
 ﻿var x2js = new X2JS();
 var jMaticApp = angular
-    .module('jMaticApp', ['ngDialog', 'ngRoute', 'mobile-angular-ui', 'jMaticControllers'])
+    .module('jMaticApp', ['ngDialog', 'ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers'])
+
+    .service('Notification', function (toasty) {
+        this.error = function (message, timeout) {
+            console.error(message);
+            toasty.pop.error({
+                title: message,
+                sound: false,
+                showClose: true,
+                clickToClose: true,
+                timeout: isInt(timeout) ? timeout : 2000
+            });
+        };
+    })
+
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.
             when('/deviceState', {
@@ -40,18 +54,6 @@ jMaticApp.directive('autoFocus', function ($timeout) {
         }
     };
 });
-
-var timeoutFn = null;
-function setErrorMessage(text, duration) {
-    $('#errorMessage').text(text);
-    $('#errorMessageBox').show();
-
-    if (timeoutFn != null) clearTimeout(timeoutFn);
-    timeoutFn = setTimeout(function () {
-        $('#errorMessageBox').hide();
-        $('#errorMessage').text("");
-    }, duration);
-}
 
 function loadDeviceDataFromLocalStorage() {
     var registeredDevices = localStorage.registeredDevices;
@@ -100,4 +102,8 @@ function makeArrayIfOnlyOneObject(obj) {
     else {
         return obj;
     }
+}
+
+function isInt(obj) {
+    return (typeof obj==='number' && (obj%1)===0);
 }

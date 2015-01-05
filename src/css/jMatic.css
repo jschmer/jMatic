@@ -1,20 +1,4 @@
 ﻿/* general styles */
-#errorMessageBox {
-    display: none;
-    text-align: center;
-    z-index: 0;
-}
-
-#errorMessage {
-    display: inline-block;
-    color: darkred;
-    font-weight: bold;
-    text-align: center;
-    padding: 2px 10px 2px 10px;
-    border: 2px solid darkred;
-    border-radius: 5px 5px;
-}
-
 .pointable {
     cursor: pointer;
     user-select: none;

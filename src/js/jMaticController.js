@@ -15,7 +15,7 @@ var jMaticControllers = angular.module('jMaticControllers', []);
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', function ($scope, $http, SharedState) {
+jMaticControllers.controller('deviceStateController', function ($scope, $http, SharedState, Notification) {
 
     finishLoading($scope);
 
@@ -52,23 +52,23 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
 
                      var deviceStates = xmlResponse.state.device;
                      if (deviceStates == null) {
-                         setErrorMessage("ERROR no device states received!", 5000);
+                         Notification.error("ERROR no device states received!", 5000);
                          return;
                      }
 
                      // adjust statelists with only one device
                      deviceStates = makeArrayIfOnlyOneObject(deviceStates);
 
-                     parseStates($scope.registeredDevices, deviceStates);
+                     parseStates($scope.devices, deviceStates);
 
                      var d = new Date();
                      $scope.lastRefreshTime = d.toLocaleDateString() + " " + d.toLocaleTimeString();
                      localStorage.lastRefreshTime = $scope.lastRefreshTime;
 
-                     saveDeviceDataToLocalStorage($scope.registeredDevices);
+                     saveDeviceDataToLocalStorage($scope.devices);
                  }
                  catch (e) {
-                     setErrorMessage("ERROR parsing device states! " + e, 5000);
+                     Notification.error("ERROR parsing device states! " + e, 5000);
                      console.error(e);
                  }
                  finally {
@@ -77,7 +77,7 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
              })
              .error(function (data, status, headers, config) {
                  try {
-                     setErrorMessage("ERROR getting deviceStates for IDs " + deviceIds.join(), 5000);
+                     Notification.error("ERROR getting deviceStates for IDs " + deviceIds.join(), 5000);
                      console.log("ERROR getting deviceStates for IDs " + deviceIds.join(), data, status, headers, config);
                  }
                  catch (e) {
@@ -132,7 +132,7 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
              })
              .error(function (data, status, headers, config) {
                  try {
-                     setErrorMessage("ERROR getting devicelist!", 5000);
+                     Notification.error("ERROR getting devicelist!", 5000);
                      console.log("ERROR getting devicelist:", data, status, headers, config);
                  }
                  finally {
@@ -232,7 +232,7 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http) 
              })
              .error(function (data, status, headers, config) {
                  try {
-                     setErrorMessage("ERROR getting deviceStates", 5000);
+                     Notification.error("ERROR getting deviceStates!", 5000);
                      console.log("ERROR getting deviceStates", data, status, headers, config);
                  } finally {
                      finishLoading($scope);
@@ -296,7 +296,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, ngDialog, $h
              })
              .error(function (data, status, headers, config) {
                  try {
-                     setErrorMessage("ERROR getting systemVariables", 5000);
+                     Notification.error("ERROR getting systemVariables!", 5000);
                      console.log("ERROR getting systemVariables", data, status, headers, config);
                  } finally {
                      finishLoading($scope);
@@ -361,12 +361,12 @@ jMaticControllers.controller('sysVarsController', function ($scope, ngDialog, $h
                  }
                  else {
                      // change failed
-                     setErrorMessage("ERROR changing systemVariable " + id, 5000);
+                     Notification.error("ERROR changing systemVariable " + id, 5000);
                      console.log("ERROR changing systemVariable " + id, data, status, headers, config);
                  }
              })
              .error(function (data, status, headers, config) {
-                 setErrorMessage("ERROR changing systemVariable " + id, 5000);
+                 Notification.error("ERROR changing systemVariable " + id, 5000);
                  console.log("ERROR changing systemVariable " + id, data, status, headers, config);
              });
     }

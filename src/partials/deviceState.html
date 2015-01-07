@@ -1,0 +1,40 @@
+<div ui-content-for="title">
+    <span>Device State</span>
+</div>
+<div class="scrollable-header">
+    <div class="section section-break">
+        <button class="btn btn-default no-outline no-focus" ng-click="loadStates()">
+            <i class="fa fa-refresh" ng-class="{'fa-spin': loading}"></i>
+        </button>
+        <button class="btn btn-default no-outline no-focus" ng-click="toggleChannelNames()">
+            <span ui-hide="showChannelNames">Show</span>
+            <span ui-show="showChannelNames">Hide</span>
+            Names
+        </button>
+        <span>{{lastRefreshTime}}</span>
+    </div>
+</div>
+<div class="scrollable-content">
+    <p ng-show="devices.length==0">No registered devices!</p>
+    <ul class="condensed">
+        <li ng-repeat="device in devices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
+            {{device.name}} [{{device.type}}] <span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span>
+            <ul class="condensed">
+                <li class="channel"
+                    ng-hide="data.hide"
+                    ng-repeat="(propname, data) in device.state"
+                    ng-class="['jmatic_channel_'+propname,
+                (propname=='STATE' && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
+                (propname=='STATE' && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
+                (data.thresholdExceeded==true ? 'threshold' : ''),
+                (data.changed==true ? 'changed' : ''),
+                ]">
+                    <span ui-show="showChannelNames" class="channel_title">{{data.displayName}}: </span><span class="channel_value">{{data.value}}</span><span class="channel_unit">{{data.unit}}</span>
+                </li>
+                <li ng-show="device.state==null">
+                    <span>No data fetched yet!</span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

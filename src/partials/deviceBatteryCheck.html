@@ -1,0 +1,23 @@
+<div ui-content-for="title">
+    <span>Battery Check</span>
+</div>
+
+<div class="scrollable-content">
+    <div ng-show="loading" class="app-content-loading">
+        <i class="fa fa-spinner fa-spin centered-loading-spinner fa-3x"></i>
+    </div>
+    <ul ng-hide="loading" class="condensed">
+        <li ng-repeat="state in deviceStates | orderBy:'name'" class="device">
+            {{state.name}}
+            <i ng-show="state.lowBat==false" class="fa fa-check green"></i>
+            <i ng-show="state.lowBat==true" class="fa fa-remove red"></i>
+            <ul class="condensed">
+                <li class="channel"
+                    ng-repeat="channel in state.channels"
+                    ng-class="'jmatic_channel_'+channel.propname">
+                    <span class="channel_title">{{channel.displayName}}: </span><span class="channel_value">{{channel.value}}</span><span class="channel_unit">{{channel.unit}}</span>
+                </li>
+            </ul>
+        </li>
+    </ul>
+</div>

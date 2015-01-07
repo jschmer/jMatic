@@ -1,0 +1,18 @@
+<div ui-content-for="title">
+    <span>System variables</span>
+</div>
+
+<div class="scrollable-content">
+    <div ng-show="loading" class="app-content-loading">
+        <i class="fa fa-spinner fa-spin centered-loading-spinner fa-3x"></i>
+    </div>
+    <table class="systemVariables">
+        <tbody>
+            <tr ng-repeat="var in systemVars | orderBy:'name'" ng-hide="loading">
+                <td class="title">{{var.name}}</td>
+                <td>=</td>
+                <td class="value pointable" ng-click="ShowInputDialog(var)">{{var.displayValue}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

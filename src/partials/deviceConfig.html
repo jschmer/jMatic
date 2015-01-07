@@ -1,0 +1,16 @@
+<div ui-content-for="title">
+    <span>Device Config</span>
+</div>
+<div class="scrollable-content">
+    <div class="list-group" ng-hide="loading">
+        <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item pointable" ng-click="toggleSubscription(device.id)">
+            <span class="config-list-item-state">
+                <i ng-show="device.subscribed" class="fa fa-check green"></i>
+            </span>
+            <span>{{device.name}} ({{device.id}}) | {{device.type}}</span>
+        </span>
+    </div>
+    <div ng-show="loading">
+        <i class="fa fa-spinner fa-spin fa-3x centered-loading-spinner"></i>
+    </div>
+</div>

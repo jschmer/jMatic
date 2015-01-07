@@ -37,8 +37,20 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
         var deviceIds = []
         for (i = 0; i < $scope.devices.length; ++i)
         {
-            if ($scope.devices[i].subscribed)
-                deviceIds.push($scope.devices[i].id);
+            var device = $scope.devices[i];
+            if (device.subscribed) {
+                if (device.type === "UserdefinedVirtualGroup") {
+                    // add all devices that are referenced by this group
+                    for (var j = 0; j < device.config.length; ++j) {
+                        var cfg = device.config[j];
+                        if (deviceIds.indexOf(cfg.device_id) == -1)
+                            deviceIds.push(cfg.device_id);
+                    }
+                }
+                else {
+                    deviceIds.push(device.id);
+                }
+            }
         }
 
         startLoading($scope);
@@ -98,7 +110,10 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
 
     $scope.devices = loadDeviceDataFromLocalStorage();
 
+    // load user defined groups
     if (typeof (userdefined_groups) !== "undefined" && typeof (userdefined_groups.length) !== "undefined") {
+        var updateCache = false;
+
         // add virtual groups to config
         for (var i = 0; i < userdefined_groups.length; i += 1) {
             var grp = userdefined_groups[i];
@@ -106,6 +121,7 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
             var deviceIndex = findDevice($scope.devices, grp.id);
             if (deviceIndex != -1) {
                 var existingDevice = $scope.devices[deviceIndex];
+
                 // got an existing device, update it (and keep the state!)
                 $scope.devices[deviceIndex] = {
                     id: grp.id,
@@ -115,6 +131,8 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
                     subscribed: existingDevice.subscribed,
                     state: existingDevice.state,
                 };
+
+                updateCache = true;
             }
             else {
                 // got a new device/virtual group, add with defaults
@@ -128,6 +146,9 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
                 });
             }
         }
+
+        if (updateCache)
+            saveDeviceDataToLocalStorage($scope.devices);
     }
 
     $scope.loadDevices = function () {

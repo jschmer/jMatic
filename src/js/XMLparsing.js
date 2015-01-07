@@ -60,13 +60,100 @@ function parseState(device, stateObject) {
     }
 }
 
+function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
+    oldState = userdefinedGroup.state;
+    userdefinedGroup.state = {};
+
+    for (var j = 0; j < userdefinedGroup.config.length; ++j) {
+        var cfg = userdefinedGroup.config[j];
+
+        var deviceId = cfg.device_id;
+        var datapoints = cfg.datapoints;
+
+        // find device state in allDeviceStates
+        var deviceStateData = null;
+        for (var k = 0; k < allDeviceStates.length; ++k) {
+            if (allDeviceStates[k]._ise_id == deviceId) {
+                deviceStateData = allDeviceStates[k];
+                break;
+            }
+        }
+
+        if (!deviceStateData) {
+            console.warn("Couldn't find state data for device id " + deviceId + " in XML data!");
+            continue;
+        }
+
+        // parse datapoints
+        for (var i = 0; i < datapoints.length; ++i) {
+            var dataInstance = datapoints[i];
+
+            // get datapoint instance with functions
+            dataInstance = DeviceDataPoints.getByName(dataInstance.datapointName, dataInstance.channelIndex);
+
+            var dp = getPropValue(deviceStateData, dataInstance.channelIndex, dataInstance.datapointName);
+            if (dp == null) {
+                userdefinedGroup.state[dataInstance.datapointName] = {
+                    displayName: dataInstance.datapointName,
+                    hide: false,
+                    value: "Datapoint '" + dataInstance.datapointName + "' on channel " + dataInstance.channelIndex + " not found!",
+                    unconvertedValue: "",
+                    unit: "",
+                    thresholdExceeded: true,
+                }
+                console.error(userdefinedGroup.state[dataInstance.datapointName]);
+                continue;
+            }
+
+            var hideChannel = dataInstance.hideIf != null ? dataInstance.hideIf(dp.value) : false;
+            var displayValue = dataInstance.valueConversionFn != null ? dataInstance.valueConversionFn(dp.value) : dp.value;
+            var threshold = dataInstance.thresholdIf != null ? dataInstance.thresholdIf(dp.value) : false;
+
+            userdefinedGroup.state[dp.propName] = {
+                displayName: translate(dp.propName),
+                hide: hideChannel,
+                value: displayValue,
+                unconvertedValue: dp.value,
+                unit: dp.unit,
+                thresholdExceeded: threshold,
+            }
+        }
+    }
+
+    // flag changed values
+    if (oldState != null) {
+        for (var propName in oldState) {
+            if (!userdefinedGroup.state.hasOwnProperty(propName) || !oldState.hasOwnProperty(propName))
+                continue;
+
+            var oldPropObject = oldState[propName];
+            var newPropObject = userdefinedGroup.state[propName];
+
+            if (oldPropObject.unconvertedValue != newPropObject.unconvertedValue) {
+                newPropObject.changed = true;
+            }
+        }
+    }
+}
+
 function parseStates(devices, stateObject) {
 
-    // iterate through device states
+    // iterate through device states and parse states for native devices
     for (var i = 0; i < stateObject.length; ++i) {
         var deviceState = stateObject[i];
         var deviceIndex = findDevice(devices, deviceState._ise_id);
         parseState(devices[deviceIndex], deviceState);
+    }
+
+    // parse state for userdefined virtual groups
+    for (var i = 0; i < devices.length; ++i) {
+        var device = devices[i];
+
+        if (device.type === "UserdefinedVirtualGroup") {
+            console.log(device.config);
+            parseUserdefinedVirtualGroupState(devices[i], stateObject);
+        }
+
     }
 }
 

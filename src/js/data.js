@@ -147,7 +147,7 @@ var DeviceDataPoints = new function () {
         }
     };
 
-    var DataPoint = {
+    this.DataPoint = {
         LowBat: new DataPoint_t({
             datapointName: "LOWBAT",
             hideIf: HideFunctions.hideIfFalse,
@@ -188,42 +188,56 @@ var DeviceDataPoints = new function () {
             thresholdIf: ThresholdFunctions.always
         }),
         ValveState: new DataPoint_t({ datapointName: "VALVE_STATE" }),
+    };
+
+    this.getByName = function (name, index) {
+        index = (typeof index !== 'undefined' ? index : 0);
+
+        for (propname in this.DataPoint) {
+            if (this.DataPoint.hasOwnProperty(propname)) {
+                var datapoint = this.DataPoint[propname];
+                if (datapoint.datapointName === name)
+                    return datapoint.inChannel(index);
+            }
+        }
+
+        throw "Datapoint with name " + name + " does not exist!";
     }
 
     this.DefaultData = [
-        DataPoint.Default,
+        this.DataPoint.Default,
     ];
 
     this.VirtualGroupData = [
-        DataPoint.LowBat,
-        DataPoint.ControlMode.inChannel(1),
-        DataPoint.Humidity.inChannel(1),
-        DataPoint.SetTemperature.inChannel(1),
-        DataPoint.ActualTemperature.inChannel(1),
-        DataPoint.State.inChannel(2),
+        this.DataPoint.LowBat,
+        this.DataPoint.ControlMode.inChannel(1),
+        this.DataPoint.Humidity.inChannel(1),
+        this.DataPoint.SetTemperature.inChannel(1),
+        this.DataPoint.ActualTemperature.inChannel(1),
+        this.DataPoint.State.inChannel(2),
     ];
 
     this.WindowSensorData = [
-        DataPoint.LowBat,
-        DataPoint.State.inChannel(1),
-        DataPoint.Error.inChannel(1),
+        this.DataPoint.LowBat,
+        this.DataPoint.State.inChannel(1),
+        this.DataPoint.Error.inChannel(1),
     ];
 
     this.HeaterData = [
-        DataPoint.LowBat,
-        DataPoint.ControlMode.inChannel(4),
-        DataPoint.FaultReporting.inChannel(4),
-        DataPoint.ValveState.inChannel(4),
-        DataPoint.ActualTemperature.inChannel(4),
-        DataPoint.SetTemperature.inChannel(4),
+        this.DataPoint.LowBat,
+        this.DataPoint.ControlMode.inChannel(4),
+        this.DataPoint.FaultReporting.inChannel(4),
+        this.DataPoint.ValveState.inChannel(4),
+        this.DataPoint.ActualTemperature.inChannel(4),
+        this.DataPoint.SetTemperature.inChannel(4),
     ];
 
     this.ThermostatData = [
-        DataPoint.LowBat,
-        DataPoint.ControlMode.inChannel(2),
-        DataPoint.Humidity.inChannel(2),
-        DataPoint.ActualTemperature.inChannel(2),
-        DataPoint.SetTemperature.inChannel(2),
+        this.DataPoint.LowBat,
+        this.DataPoint.ControlMode.inChannel(2),
+        this.DataPoint.Humidity.inChannel(2),
+        this.DataPoint.ActualTemperature.inChannel(2),
+        this.DataPoint.SetTemperature.inChannel(2),
     ];
 }
 
@@ -262,6 +276,9 @@ function getDeviceDataPointsForType(type) {
     }
     else if (type == 'Thermostat') {
         return DeviceDataPoints.ThermostatData;
+    }
+    else {
+        return [];
     }
 }
 

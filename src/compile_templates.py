@@ -3,7 +3,7 @@ import os, sys, re
 def regex_walk(regex, top='.'):
   matches = []
   matcher = re.compile(regex);
-  print(matcher.pattern)
+  #print(matcher.pattern)
   for dirpath, dirnames, filenames in os.walk(top):
     full_relative_filepaths = [os.path.join(dirpath, name) for name in filenames]
     for filepath in full_relative_filepaths:
@@ -36,14 +36,10 @@ def compile_template(template_name, template_content, module_name='templates'):
 }})();
 """.format(module_name, template_name, javascript_template_content_string)
 
-if __name__=='__main__':
-  templates = r'partials\\.+\.html'
-  stripPrefix = r'partials\\'
-  outputpath = 'partials\compiled_templates.js'
+def compile(templates_regex, stripPrefix, outputpath, moduleName):
+  templateFiles = regex_walk(templates_regex, 'partials')
 
-  templateFiles = regex_walk(templates, 'partials')
-
-  print(templateFiles)
+  #print(templateFiles)
   print()
 
   with open(outputpath, "w") as templateFile:
@@ -53,6 +49,12 @@ if __name__=='__main__':
         templateName = re.sub(stripPrefix, "", template)
 
         # putting the templates into the templatecache of jMaticApp
-        compiledTemplate = compile_template(templateName, templateContent, 'jMaticApp')
-        print(compiledTemplate)
+        compiledTemplate = compile_template(templateName, templateContent, moduleName)
+        #print(compiledTemplate)
         templateFile.write(compiledTemplate);
+
+def compile_jMatic():
+  compile(r'partials\\.+\.html', r'partials\\', 'js\compiled_templates.js', 'jMaticApp')
+
+if __name__=='__main__':
+  compile_jMatic()

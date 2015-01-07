@@ -98,6 +98,38 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
 
     $scope.devices = loadDeviceDataFromLocalStorage();
 
+    if (typeof (userdefined_groups) !== "undefined" && typeof (userdefined_groups.length) !== "undefined") {
+        // add virtual groups to config
+        for (var i = 0; i < userdefined_groups.length; i += 1) {
+            var grp = userdefined_groups[i];
+
+            var deviceIndex = findDevice($scope.devices, grp.id);
+            if (deviceIndex != -1) {
+                var existingDevice = $scope.devices[deviceIndex];
+                // got an existing device, update it (and keep the state!)
+                $scope.devices[deviceIndex] = {
+                    id: grp.id,
+                    name: grp.name,
+                    type: 'UserdefinedVirtualGroup',
+                    config: grp.config,
+                    subscribed: existingDevice.subscribed,
+                    state: existingDevice.state,
+                };
+            }
+            else {
+                // got a new device/virtual group, add with defaults
+                $scope.devices.push({
+                    id: grp.id,
+                    name: grp.name,
+                    type: 'UserdefinedVirtualGroup',
+                    config: grp.config,
+                    subscribed: false,
+                    state: null,
+                });
+            }
+        }
+    }
+
     $scope.loadDevices = function () {
         startLoading($scope);
 

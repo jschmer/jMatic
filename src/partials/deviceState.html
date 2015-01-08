@@ -19,7 +19,7 @@
     <ul class="condensed">
         <li ng-repeat="device in devices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
             {{device.name}}
-            <span ui-show="showChannelNames">[{{device.type}}]</span>
+            <span ui-show="showChannelNames" class="device-type label" ng-class="device.type">{{device.type}}</span>
             <span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span>
 
             <ul class="condensed">

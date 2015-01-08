@@ -106,6 +106,8 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
 
 jMaticControllers.controller('deviceConfigController', function ($scope, $http) {
 
+    $scope.listOrder = 'name';
+
     finishLoading($scope);
 
     $scope.devices = loadDeviceDataFromLocalStorage();
@@ -206,6 +208,10 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
 
             $scope.persistDeviceConfig();
         }
+    }
+
+    $scope.setListOrder = function (orderBy) {
+        $scope.listOrder = orderBy;
     }
 
     $scope.loadDevices();

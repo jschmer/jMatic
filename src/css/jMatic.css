@@ -43,6 +43,31 @@ ul.condensed {
     display: inline-block;
 }
 
+.device-type {
+    color: inherit !important;
+    background-color: lightgray;
+}
+
+.device-type.VirtualGroup {
+    background-color: yellow;
+}
+
+.device-type.Heater {
+    background-color: lightcoral;
+}
+
+.device-type.WindowSensor {
+    background-color: lightgreen;
+}
+
+.device-type.Thermostat {
+    background-color: lightcyan;
+}
+
+.device-type.UserdefinedVirtualGroup {
+    background-color: lightsalmon;
+}
+
 .green {
     color: green;
 }

@@ -93,10 +93,10 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
 
             var dp = getPropValue(deviceStateData, dataInstance.channelIndex, dataInstance.datapointName);
             if (dp == null) {
-                userdefinedGroup.state[dataInstance.datapointName] = {
+                userdefinedGroup.state[dataInstance.datapointName + "_" + deviceId] = {
                     displayName: dataInstance.datapointName,
                     hide: false,
-                    value: "Datapoint '" + dataInstance.datapointName + "' on channel " + dataInstance.channelIndex + " not found!",
+                    value: "Datapoint '" + dataInstance.datapointName + "' on channel " + dataInstance.channelIndex + " for device (" + deviceId + ") not found!",
                     unconvertedValue: "",
                     unit: "",
                     thresholdExceeded: true,
@@ -109,7 +109,7 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
             var displayValue = dataInstance.valueConversionFn != null ? dataInstance.valueConversionFn(dp.value) : dp.value;
             var threshold = dataInstance.thresholdIf != null ? dataInstance.thresholdIf(dp.value) : false;
 
-            userdefinedGroup.state[dp.propName] = {
+            userdefinedGroup.state[dp.propName + "_" + deviceId] = {
                 displayName: translate(dp.propName),
                 hide: hideChannel,
                 value: displayValue,
@@ -150,7 +150,7 @@ function parseStates(devices, stateObject) {
         var device = devices[i];
 
         if (device.type === "UserdefinedVirtualGroup") {
-            console.log(device.config);
+            //console.log(device.config);
             parseUserdefinedVirtualGroupState(devices[i], stateObject);
         }
 

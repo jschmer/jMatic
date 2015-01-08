@@ -24,8 +24,8 @@
                     ng-hide="data.hide"
                     ng-repeat="(propname, data) in device.state"
                     ng-class="['jmatic_channel_'+propname,
-                (propname=='STATE' && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
-                (propname=='STATE' && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
+                (propname.startsWith('STATE') && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
+                (propname.startsWith('STATE') && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
                 (data.thresholdExceeded==true ? 'threshold' : ''),
                 (data.changed==true ? 'changed' : ''),
                 ]">

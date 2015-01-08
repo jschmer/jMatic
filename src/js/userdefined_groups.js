@@ -42,4 +42,32 @@ var userdefined_groups = [
             },
         ]
     },
+    {
+        id: 2,
+        name: "Wohnzimmer",
+        config: [
+            {
+                device_id: 2287, // virtualgroup
+                datapoints: [
+                    DeviceDataPoints.DataPoint.ControlMode.inChannel(1),
+                    DeviceDataPoints.DataPoint.Humidity.inChannel(1),
+                    DeviceDataPoints.DataPoint.ActualTemperature.inChannel(1),
+                    DeviceDataPoints.DataPoint.SetTemperature.inChannel(1),
+                    DeviceDataPoints.DataPoint.State.inChannel(2),
+                ]
+            },
+            {
+                device_id: 2744, // heater balkon
+                datapoints: [
+                    DeviceDataPoints.DataPoint.ValveState.inChannel(4),
+                ]
+            },
+            {
+                device_id: 2147, // heater window
+                datapoints: [
+                    DeviceDataPoints.DataPoint.ValveState.inChannel(4),
+                ]
+            },
+        ]
+    },
 ]

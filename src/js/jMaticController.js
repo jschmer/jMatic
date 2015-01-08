@@ -340,7 +340,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, ngDialog, $h
                          var sysVar = sysVars[i];
 
                          var parsedSysVar = parseSystemVariable(sysVar);
-                         console.log(parsedSysVar);
+                         //console.log(parsedSysVar);
                          $scope.systemVars.push(parsedSysVar);
                      }
                  } finally {

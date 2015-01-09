@@ -1,6 +1,6 @@
 ﻿var x2js = new X2JS();
 var jMaticApp = angular
-    .module('jMaticApp', ['ngDialog', 'ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers'])
+    .module('jMaticApp', ['ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers'])
 
     .service('Notification', function (toasty) {
         this.error = function (message, timeout) {

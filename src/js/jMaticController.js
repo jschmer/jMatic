@@ -302,7 +302,7 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http) 
     $scope.loadStates();
 });
 
-jMaticControllers.controller('sysVarsController', function ($scope, ngDialog, $http) {
+jMaticControllers.controller('sysVarsController', function ($scope, $http) {
 
     finishLoading($scope);
 

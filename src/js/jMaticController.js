@@ -377,54 +377,52 @@ jMaticControllers.controller('sysVarsController', function ($scope, ngDialog, $h
         var dialogSysVarData = {};
         jQuery.extend(dialogSysVarData, systemVariableData);
 
-        var dlg = ngDialog.open({
-            template: 'c_systemVariables_input_template',
-            scope: $scope,
-            className: 'ngdialog-theme-plain',
-            data: dialogSysVarData
-        });
-
-        dlg.closePromise.then(function (data) {
-            console.log(data.id + ' has been dismissed with ' + data.value);
-
-            if (data.value === 'OK') {
-                var valueToSend = dialogSysVarData.displayValue;
-
-                // map from display value to real value
-                if (dialogSysVarData.valueMapping != null) {
-                    for (var key in dialogSysVarData.valueMapping) {
-                        if (dialogSysVarData.valueMapping.hasOwnProperty(key)) {
-                            var mappingValue = dialogSysVarData.valueMapping[key];
-                            if (mappingValue == valueToSend) {
-                                valueToSend = key;
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                $scope.changeSysVar(dialogSysVarData.id, valueToSend);
-            }
-        });
+        $scope.editSysVar = dialogSysVarData;
     };
 
+    $scope.SaveChanges = function () {
+        var valueToSend = $scope.editSysVar.displayValue;
+
+        // map from display value to real value
+        if ($scope.editSysVar.valueMapping != null) {
+            for (var key in $scope.editSysVar.valueMapping) {
+                if ($scope.editSysVar.valueMapping.hasOwnProperty(key)) {
+                    var mappingValue = $scope.editSysVar.valueMapping[key];
+                    if (mappingValue == valueToSend) {
+                        valueToSend = key;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $scope.changeSysVar($scope.editSysVar.id, valueToSend);
+    }
+
     $scope.changeSysVar = function (id, value) {
+        startLoading($scope);
+
         delete $http.defaults.headers.common['X-Requested-With'];
         $http.get(XMLAPIUri.GetSysVarChange(id, value))
              .success(function (response) {
-                 console.log("OK changing systemVariable " + id);
-                 var result = x2js.xml_str2json(response).result;
-                 if (typeof (result.changed) !== "undefined") {
-                     // change succeeded
-                     $scope.loadSysVars();
-                 }
-                 else {
-                     // change failed
-                     Notification.error("ERROR changing systemVariable " + id, 5000);
-                     console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                 try {
+                     console.log("OK changing systemVariable " + id);
+                     var result = x2js.xml_str2json(response).result;
+                     if (typeof (result.changed) !== "undefined") {
+                         // change succeeded
+                         $scope.loadSysVars();
+                     }
+                     else {
+                         // change failed
+                         Notification.error("ERROR changing systemVariable " + id, 5000);
+                         console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                     }
+                 } finally{
+                     finishLoading($scope);
                  }
              })
              .error(function (data, status, headers, config) {
+                 finishLoading($scope);
                  Notification.error("ERROR changing systemVariable " + id, 5000);
                  console.log("ERROR changing systemVariable " + id, data, status, headers, config);
              });
@@ -433,10 +431,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, ngDialog, $h
     $scope.loadSysVars();
 });
 
-//
-// For this trivial demo we have just a unique MainController 
-// for everything
-//
+// Startup controller
 jMaticControllers.controller('MainController', function ($rootScope, $scope) {
 
     // User agent displayed in home page

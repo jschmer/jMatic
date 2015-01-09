@@ -35,31 +35,6 @@
 
     <script src="./js/compiled_templates.js"></script>
     <script src="./js/userdefined_groups.js"></script>
-
-    <!-- angular page templates -->
-    <script type="text/ng-template" id="c_systemVariables_input_template">
-        <style>
-            .error {
-                background-color: #FF3333;
-            }
-        </style>
-        <form name="inputForm" style="margin-bottom: 15px;">
-            <div>{{ngDialogData.name}}:</div>
-            <div ng-show="ngDialogData.sysVarType==SysVarDataType.logic||ngDialogData.sysVarType==SysVarDataType.option">
-                <select auto-focus ng-model="ngDialogData.displayValue" ng-options="data for (propname, data) in ngDialogData.valueMapping"></select>
-            </div>
-            <div ng-show="ngDialogData.sysVarType==SysVarDataType.number">
-                <input auto-focus ng-class="!inputForm.number.$valid ? 'error' : ''" type="number" name="number" ng-model="ngDialogData.displayValue" min="{{ngDialogData.min}}" max="{{ngDialogData.max}}" required />
-                <div ng-show="!inputForm.number.$valid">ERROR: {{inputForm.number.$error}}</div>
-            </div>
-            <div ng-show="ngDialogData.sysVarType==SysVarDataType.string">
-                <input auto-focus type="text" ng-model="ngDialogData.displayValue" />
-            </div>
-        </form>
-
-        <button ng-click="closeThisDialog('OK')" ng-disabled="inputForm.$invalid">Send</button>
-        <button ng-click="closeThisDialog()">Cancel</button>
-    </script>
 </head>
 <body ng-app="jMaticApp" ng-controller="MainController">
     <!-- Sidebars -->
@@ -105,10 +80,8 @@
                 </div>
             </div>
         </div>
-        <div ui-yield-to="modals"></div>
-        <!-- Toasty controller, add this to your index page / default template -->
-        <div>
-            <toasty-container toasty-defaults='{"timeout": 3000, "close-button":true}'></toasty-container>
-        </div>
+    </div>
+    <div ui-yield-to="modals"></div>
+    <div><toasty-container toasty-defaults='{"timeout": 3000, "close-button":true}'></toasty-container></div>
 </body>
 </html>

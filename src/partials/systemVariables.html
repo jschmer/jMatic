@@ -11,8 +11,47 @@
             <tr ng-repeat="var in systemVars | orderBy:'name'" ng-hide="loading">
                 <td class="title">{{var.name}}</td>
                 <td>=</td>
-                <td class="value pointable" ng-click="ShowInputDialog(var)">{{var.displayValue}}</td>
+                <td class="value pointable" ui-turn-on="sysVarDialog" ng-click="ShowInputDialog(var)">{{var.displayValue}}</td>
             </tr>
         </tbody>
     </table>
+</div>
+
+<div ui-content-for="modals">
+    <div class="modal modal-overlay" ui-if='sysVarDialog' ui-state='sysVarDialog'>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button class="close" ui-turn-off="sysVarDialog">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">Edit {{editSysVar.name}}</h4>
+                </div>
+                <div class="modal-body">
+                    <style>
+                        .error {
+                            background-color: #FF3333;
+                        }
+                    </style>
+                    <form name="inputForm" style="margin-bottom: 15px;">
+                        <div ng-if="editSysVar.sysVarType==SysVarDataType.logic||editSysVar.sysVarType==SysVarDataType.option">
+                            <select auto-focus ng-model="editSysVar.displayValue" ng-options="data for (propname, data) in editSysVar.valueMapping"></select>
+                        </div>
+                        <div ng-if="editSysVar.sysVarType==SysVarDataType.number">
+                            <p>[{{editSysVar.min}}, {{editSysVar.max}}]</p>
+                            <input auto-focus ng-model="editSysVar.displayValue" type="number" name="number" ng-class="!inputForm.number.$valid ? 'error' : ''" min="{{editSysVar.min}}" max="{{editSysVar.max}}" required />
+                            <div ng-show="!inputForm.number.$valid">ERROR: {{inputForm.number.$error}}</div>
+                        </div>
+                        <div ng-if="editSysVar.sysVarType==SysVarDataType.string">
+                            <input auto-focus ng-model="editSysVar.displayValue" type="text" style="width: 100%;" />
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button ui-turn-off="sysVarDialog" class="btn btn-default">Close</button>
+                    <button ui-turn-off="sysVarDialog" ng-click="SaveChanges()" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

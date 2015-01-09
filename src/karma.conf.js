@@ -21,7 +21,6 @@ module.exports = function(config) {
         'lib/angular/core/angular.js',
         'lib/angular/core/angular-mocks.js',
         'lib/angular/modules/route/angular-route.min.js',
-        'lib/angular/modules/ngDialog/js/ngDialog.min.js',
         'lib/angular/modules/animate/angular-animate.min.js',
         'lib/angular/modules/toasty/js/ng-toasty.min.js',
         'lib/angular/mobile-ui/js/mobile-angular-ui.min.js',

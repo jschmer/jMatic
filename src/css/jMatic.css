@@ -86,10 +86,6 @@ and (max-device-width:480px)
     color: red;
 }
 
-.ngdialog-content {
-    width: 200px !important; /* override ngDialog default */
-}
-
 table.systemVariables {
     padding-left: 20px;
 }

@@ -3,10 +3,13 @@
 </div>
 <div class="scrollable-header">
     <div class="section section-break">
-        <div class="btn-group">
+        <span class="btn-group">
             <a href class="btn btn-default" ng-class="[listOrder=='name' ? 'active' : '']"  ng-click="setListOrder('name')">Name</a>
             <a href class="btn btn-default" ng-class="[listOrder=='type' ? 'active' : '']" ng-click="setListOrder('type')">Type</a>
-        </div>
+        </span>
+        <span class="btn-group" ui-state="showIds" ui-default="false">
+            <a href class="btn btn-default" ui-class="{'active': showIds}" ui-toggle="showIds">IDs</a>
+        </span>
     </div>
 </div>
 <div class="scrollable-content">
@@ -16,7 +19,7 @@
                 <i ng-show="device.subscribed" class="fa fa-check green"></i>
             </span>
             <span>{{device.name}}</span>
-            <span> ({{device.id}})</span>
+            <span ui-show="showIds"> ({{device.id}})</span>
             <span class="device-type label" ng-class="device.type">{{device.type}}</span>
         </span>
     </div>

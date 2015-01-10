@@ -16,30 +16,31 @@
 </div>
 <div class="scrollable-content">
     <p ng-show="devices.length==0">No registered devices!</p>
-    <ul class="condensed">
-        <li ng-repeat="device in devices | orderBy:'name'" class="device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
-            {{device.name}}
-            <span ui-show="showChannelNames" class="device-type label" ng-class="device.type">{{device.type}}</span>
-            <span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span>
-
-            <ul class="condensed">
-                <li class="channel"
-                    ng-hide="data.hide"
-                    ng-repeat="(propname, data) in device.state"
-                    ng-class="['jmatic_channel_'+propname,
-                (propname.startsWith('STATE') && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
-                (propname.startsWith('STATE') && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
-                (data.thresholdExceeded==true ? 'threshold' : ''),
-                (data.changed==true ? 'changed' : ''),
-                ]">
+    <div class="list-group" ng-hide="loading">
+        <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
+            <div class="device-info">
+                <span class="device-name">{{device.name}}</span>
+                <span ui-show="showChannelNames" class="device-type label" ng-class="device.type">{{device.type}}</span>
+                <span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span>
+            </div>
+            <div class="device-state">
+                <span class="channel"
+                      ng-hide="data.hide"
+                      ng-repeat="(propname, data) in device.state"
+                      ng-class="[(data.thresholdExceeded==true ? 'threshold' : ''),
+                                 (data.changed==true ? 'changed' : '')]">
+                    <span class="channel-icon" ng-class="['jmatic_channel_'+data.propTypeName,
+                        (propname.startsWith('STATE') && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
+                        (propname.startsWith('STATE') && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
+                    ]"></span>
                     <span ui-show="showChannelNames" class="channel_title">{{data.displayName}}: </span>
                     <span class="channel_value">{{data.value}}</span>
                     <span class="channel_unit">{{data.unit}}</span>
-                </li>
-                <li ng-show="device.state==null">
+                </span>
+                <span ng-show="device.state==null">
                     <span>No data fetched yet!</span>
-                </li>
-            </ul>
-        </li>
-    </ul>
+                </span>
+            </div>
+        </span>
+    </div>
 </div>

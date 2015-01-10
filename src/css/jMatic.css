@@ -107,46 +107,53 @@ table.systemVariables .value {
 }
 
 .device .channel {
-    list-style-type: none;
-    padding: 2px 0px 2px 25px;
-    background-size: 20px 20px;
-    background-position: 0px center; 
-    background-repeat: no-repeat;
+    display: inline-block;
+    min-width: 100px;
+    padding-left: 20px;
 }
 
-li [class^="jmatic_channel_ACTUAL_HUMIDITY"], li [class*=" jmatic_channel_ACTUAL_HUMIDITY"] {
+.device .channel-icon {
+    display: inline-block;
+    background-size: 20px 20px;
+    background-position: center center;
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 20px;
+}
+
+*[class^="jmatic_channel_ACTUAL_HUMIDITY"], *[class*=" jmatic_channel_ACTUAL_HUMIDITY"] {
     background-image: url("../img/Luftfeuchte.png");
 }
 
-li [class^="jmatic_channel_ACTUAL_TEMPERATURE"], li [class*=" jmatic_channel_ACTUAL_TEMPERATURE"] {
+*[class^="jmatic_channel_ACTUAL_TEMPERATURE"], *[class*=" jmatic_channel_ACTUAL_TEMPERATURE"] {
     background-image: url("../img/IST-Temp.png");
 }
 
-li [class^="jmatic_channel_SET_TEMPERATURE"], li [class*=" jmatic_channel_SET_TEMPERATURE"] {
+*[class^="jmatic_channel_SET_TEMPERATURE"], *[class*=" jmatic_channel_SET_TEMPERATURE"] {
     background-image: url("../img/SOLL-Temp.png");
 }
 
-li [class1="jmatic_channel_BATTERY_STATE"], li [class*=" jmatic_channel_BATTERY_STATE"] {
+*[class1="jmatic_channel_BATTERY_STATE"], *[class*=" jmatic_channel_BATTERY_STATE"] {
     background-image: url("../img/Battery.png");
 }
 
-li [class1="jmatic_channel_LOWBAT"], li [class*=" jmatic_channel_LOWBAT"] {
+*[class1="jmatic_channel_LOWBAT"], *[class*=" jmatic_channel_LOWBAT"] {
     background-image: url("../img/Battery_Alert.png");
 }
 
-li [class1="jmatic_channel_OPEN"], li [class*=" jmatic_channel_OPEN"] {
+*[class1="jmatic_channel_OPEN"], *[class*=" jmatic_channel_OPEN"] {
     background-image: url("../img/WindowOpen.png");
 }
 
-li [class1="jmatic_channel_CLOSED"], li [class*=" jmatic_channel_CLOSED"] {
+*[class1="jmatic_channel_CLOSED"], *[class*=" jmatic_channel_CLOSED"] {
     background-image: url("../img/WindowClosed.png");
 }
 
-li [class1="jmatic_channel_CONTROL_MODE"], li [class*=" jmatic_channel_CONTROL_MODE"] {
+*[class1="jmatic_channel_CONTROL_MODE"], *[class*=" jmatic_channel_CONTROL_MODE"] {
     background-image: url("../img/ControlMode.png");
 }
 
-li [class1="jmatic_channel_VALVE_STATE"], li [class*=" jmatic_channel_VALVE_STATE"] {
+*[class1="jmatic_channel_VALVE_STATE"], *[class*=" jmatic_channel_VALVE_STATE"] {
     background-image: url("../img/Valve.png");
 }
 

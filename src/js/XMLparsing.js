@@ -19,6 +19,7 @@ function parseState(device, stateObject) {
         var dp = getPropValue(stateObject, dataInstance.channelIndex, dataInstance.datapointName);
         if (dp == null) {
             device.state[dataInstance.datapointName] = {
+                propTypeName: dataInstance.datapointName,
                 displayName: dataInstance.datapointName,
                 hide: false,
                 value: "Datapoint '" + dataInstance.datapointName + "' on channel " + dataInstance.channelIndex + " not found!",
@@ -35,6 +36,7 @@ function parseState(device, stateObject) {
         var threshold = dataInstance.thresholdIf != null ? dataInstance.thresholdIf(dp.value) : false;
 
         device.state[dp.propName] = {
+            propTypeName: dp.propName,
             displayName: translate(dp.propName),
             hide: hideChannel,
             value: displayValue,
@@ -94,6 +96,7 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
             var dp = getPropValue(deviceStateData, dataInstance.channelIndex, dataInstance.datapointName);
             if (dp == null) {
                 userdefinedGroup.state[dataInstance.datapointName + "_" + deviceId] = {
+                    propTypeName: dataInstance.datapointName,
                     displayName: dataInstance.datapointName,
                     hide: false,
                     value: "Datapoint '" + dataInstance.datapointName + "' on channel " + dataInstance.channelIndex + " for device (" + deviceId + ") not found!",
@@ -110,6 +113,7 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
             var threshold = dataInstance.thresholdIf != null ? dataInstance.thresholdIf(dp.value) : false;
 
             userdefinedGroup.state[dp.propName + "_" + deviceId] = {
+                propTypeName: dp.propName,
                 displayName: translate(dp.propName),
                 hide: hideChannel,
                 value: displayValue,

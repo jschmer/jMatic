@@ -19,15 +19,13 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
 
     finishLoading($scope);
 
-    var showChannelNames = localStorage.showChannelNames;
-    showChannelNames = showChannelNames == null ? false : showChannelNames == "true";
-    SharedState.initialize($scope, "showChannelNames");
-    SharedState.set("showChannelNames", showChannelNames);
+    initSharedStateFromLocalStorage("showChannelNames", SharedState, $scope);
+    initSharedStateFromLocalStorage("channelsStacked", SharedState, $scope);
 
-    $scope.toggleChannelNames = function () {
-        SharedState.toggle("showChannelNames");
-        localStorage.showChannelNames = SharedState.get("showChannelNames");;
-    };
+    $scope.toggleAndSaveSharedState = function (propertyName) {
+        SharedState.toggle(propertyName);
+        localStorage.channelsStacked = SharedState.get(propertyName);
+    }
 
     $scope.devices = loadDeviceDataFromLocalStorage();
     $scope.lastRefreshTime = localStorage.lastRefreshTime;

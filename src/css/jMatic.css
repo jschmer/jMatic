@@ -107,9 +107,16 @@ table.systemVariables .value {
 }
 
 .device .channel {
-    display: inline-block;
     min-width: 100px;
     padding-left: 20px;
+}
+
+.device .channel.stack {
+    display: block;
+}
+
+.device .channel.flow {
+    display: inline-block;
 }
 
 .device .channel-icon {

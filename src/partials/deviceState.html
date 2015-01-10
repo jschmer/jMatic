@@ -3,20 +3,29 @@
 </div>
 <div class="scrollable-header">
     <div class="section section-break">
-        <button class="btn btn-default no-outline no-focus" ng-click="loadStates()">
-            <i class="fa fa-refresh" ng-class="{'fa-spin': loading}"></i>
-        </button>
-        <button class="btn btn-default no-outline no-focus" ng-click="toggleChannelNames()">
-            <span ui-hide="showChannelNames">Show</span>
-            <span ui-show="showChannelNames">Hide</span>
-            Names
-        </button>
+        <span class="btn-group">
+            <a href class="btn btn-default no-outline no-focus" ng-click="loadStates()">
+                <i class="fa fa-refresh" ng-class="{'fa-spin': loading}"></i>
+            </a>
+        </span>
+        <span class="btn-group">
+            <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('showChannelNames')">
+                <span ui-hide="showChannelNames">Show</span>
+                <span ui-show="showChannelNames">Hide</span>
+                Names
+            </a>
+            <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('channelsStacked')">
+                <span ui-hide="channelsStacked">Stack</span>
+                <span ui-show="channelsStacked">Flow</span>
+                Layout
+            </a>
+        </span>
         <span>{{lastRefreshTime}}</span>
     </div>
 </div>
 <div class="scrollable-content">
     <p ng-show="devices.length==0">No registered devices!</p>
-    <div class="list-group" ng-hide="loading">
+    <div class="list-group">
         <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
             <div class="device-info">
                 <span class="device-name">{{device.name}}</span>
@@ -28,8 +37,13 @@
                       ng-hide="data.hide"
                       ng-repeat="(propname, data) in device.state"
                       ng-class="[(data.thresholdExceeded==true ? 'threshold' : ''),
-                                 (data.changed==true ? 'changed' : '')]">
-                    <span class="channel-icon" ng-class="['jmatic_channel_'+data.propTypeName,
+                                 (data.changed==true ? 'changed' : '')
+                      ]"
+                      ui-class="{
+                        'flow': channelsStacked==false,
+                        'stack': channelsStacked==true,
+                      }">
+                    <span class=" channel-icon" ng-class="['jmatic_channel_'+data.propTypeName,
                         (propname.startsWith('STATE') && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
                         (propname.startsWith('STATE') && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
                     ]"></span>

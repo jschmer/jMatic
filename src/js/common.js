@@ -107,3 +107,10 @@ function makeArrayIfOnlyOneObject(obj) {
 function isInt(obj) {
     return (typeof obj==='number' && (obj%1)===0);
 }
+
+function initSharedStateFromLocalStorage(booleanPropertyName, sharedState, scope) {
+    var boolValue = localStorage[booleanPropertyName];
+    boolValue = boolValue == null ? false : boolValue == "true";
+    sharedState.initialize(scope, booleanPropertyName);
+    sharedState.set(booleanPropertyName, boolValue);
+}

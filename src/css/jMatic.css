@@ -111,6 +111,11 @@ tr.systemVariable .title {
     text-align: right;
 }
 
+tr.systemVariable .equals {
+    text-align: center;
+    width: 20px;
+}
+
 tr.systemVariable .value {
     text-align: left;
 }

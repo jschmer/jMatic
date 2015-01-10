@@ -28,9 +28,9 @@
     <div class="list-group">
         <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
             <div class="device-info">
+                <span class="device-loader"><span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span></span>
                 <span class="device-name">{{device.name}}</span>
                 <span ui-show="showChannelNames" class="device-type label" ng-class="device.type">{{device.type}}</span>
-                <span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span>
             </div>
             <div class="device-state">
                 <span class="channel"

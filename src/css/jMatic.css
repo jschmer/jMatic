@@ -137,20 +137,33 @@ tr.systemVariable .value {
     list-style-type: circle;
 }
 
-.device .channel {
+.device-info {
+    padding: 4px 0px 4px 0px;
+}
+
+.device-info .device-name {
+    font-size: 1.1em;
+}
+
+.device-info .device-loader {
+    display: inline-block;
+    width: 15px;
+}
+
+.device-state .channel {
     min-width: 100px;
     padding-left: 20px;
 }
 
-.device .channel.stack {
+.device-state .channel.stack {
     display: block;
 }
 
-.device .channel.flow {
+.device-state .channel.flow {
     display: inline-block;
 }
 
-.device .channel-icon {
+.device-state .channel-icon {
     display: inline-block;
     background-size: 20px 20px;
     background-position: center center;

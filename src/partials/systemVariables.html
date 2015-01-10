@@ -8,10 +8,10 @@
     </div>
     <table class="systemVariables">
         <tbody>
-            <tr ng-repeat="var in systemVars | orderBy:'name'" ng-hide="loading">
+            <tr ng-repeat="var in systemVars | orderBy:'name'" ng-hide="loading" class="systemVariable pointable" ng-click="ShowInputDialog(var)" ui-turn-on="sysVarDialog">
                 <td class="title">{{var.name}}</td>
                 <td>=</td>
-                <td class="value pointable" ui-turn-on="sysVarDialog" ng-click="ShowInputDialog(var)">{{var.displayValue}}</td>
+                <td class="value">{{var.displayValue}}</td>
             </tr>
         </tbody>
     </table>

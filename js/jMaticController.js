@@ -1,34 +1,24 @@
-﻿var ccuIP = '192.168.178.10';
-
-var XMLAPIUri = {
-    AllDeviceStates: 'http://' + ccuIP + '/addons/xmlapi/statelist.cgi',
-    DeviceState: 'http://' + ccuIP + '/addons/xmlapi/state.cgi?device_id=',
-    DeviceList: 'http://' + ccuIP + '/addons/xmlapi/devicelist.cgi',
-    SysVarList: 'http://' + ccuIP + '/addons/xmlapi/sysvarlist.cgi',
-    GetSysVarChange: function (id, value) {
-        return 'http://' + ccuIP + '/addons/xmlapi/statechange.cgi?ise_id=' + id + '&new_value=' + value;
-    }
-}
+﻿
 
 var jMaticControllers = angular.module('jMaticControllers', []);
 
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', function ($scope, $http, SharedState, Notification) {
+jMaticControllers.controller('deviceStateController', function ($scope, $http, SharedState, Notification, LocalStorage, CCUXMLAPI) {
 
     finishLoading($scope);
 
-    initSharedStateFromLocalStorage("showChannelNames", SharedState, $scope);
-    initSharedStateFromLocalStorage("channelsStacked", SharedState, $scope);
+    LocalStorage.initSharedState("showChannelNames", SharedState, $scope);
+    LocalStorage.initSharedState("channelsStacked", SharedState, $scope);
 
     $scope.toggleAndSaveSharedState = function (propertyName) {
         SharedState.toggle(propertyName);
-        localStorage.channelsStacked = SharedState.get(propertyName);
+        LocalStorage.set(propertyName, SharedState.get(propertyName));
     }
 
-    $scope.devices = loadDeviceDataFromLocalStorage();
-    $scope.lastRefreshTime = localStorage.lastRefreshTime;
+    $scope.devices = LocalStorage.loadDevices();
+    $scope.lastRefreshTime = LocalStorage.get("lastRefreshTime");
 
     $scope.loadStates = function () {
 
@@ -62,7 +52,7 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
         startLoading($scope);
 
         delete $http.defaults.headers.common['X-Requested-With'];
-        $http.get(XMLAPIUri.DeviceState + deviceIds.join())
+        $http.get(CCUXMLAPI.DeviceState() + deviceIds.join())
              .success(function (response) {
                  try {
                      console.log("OK getting deviceStates for IDs " + deviceIds.join());
@@ -81,9 +71,9 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
 
                      var d = new Date();
                      $scope.lastRefreshTime = d.toLocaleDateString() + " " + d.toLocaleTimeString();
-                     localStorage.lastRefreshTime = $scope.lastRefreshTime;
+                     LocalStorage.set("lastRefreshTime", $scope.lastRefreshTime);
 
-                     saveDeviceDataToLocalStorage($scope.devices);
+                     LocalStorage.saveDevices($scope.devices);
                  }
                  catch (e) {
                      Notification.error("ERROR parsing device states! " + e, 5000);
@@ -95,8 +85,8 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
              })
              .error(function (data, status, headers, config) {
                  try {
-                     Notification.error("ERROR getting deviceStates for IDs " + deviceIds.join(), 5000);
-                     console.log("ERROR getting deviceStates for IDs " + deviceIds.join(), data, status, headers, config);
+                     Notification.error("ERROR getting deviceStates! Is your CCU reachable?", 5000);
+                     console.log("ERROR getting deviceStates! Is your CCU reachable?", data, status, headers, config);
                  }
                  catch (e) {
                      console.error(e);
@@ -110,13 +100,13 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
     $scope.loadStates();
 });
 
-jMaticControllers.controller('deviceConfigController', function ($scope, $http) {
+jMaticControllers.controller('deviceConfigController', function ($scope, $http, LocalStorage, CCUXMLAPI) {
 
     $scope.listOrder = 'name';
 
     finishLoading($scope);
 
-    $scope.devices = loadDeviceDataFromLocalStorage();
+    $scope.devices = LocalStorage.loadDevices();
 
     // load user defined groups
     if (typeof (userdefined_groups) !== "undefined" && typeof (userdefined_groups.length) !== "undefined") {
@@ -156,14 +146,14 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
         }
 
         if (updateCache)
-            saveDeviceDataToLocalStorage($scope.devices);
+            LocalStorage.saveDevices($scope.devices);
     }
 
     $scope.loadDevices = function () {
         startLoading($scope);
 
         delete $http.defaults.headers.common['X-Requested-With'];
-        $http.get(XMLAPIUri.DeviceList)
+        $http.get(CCUXMLAPI.DeviceList())
              .success(function (response) {
                  try {
                      console.log("OK getting devicelist!");
@@ -203,7 +193,7 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
     }
 
     $scope.persistDeviceConfig = function () {
-        saveDeviceDataToLocalStorage($scope.devices);
+        LocalStorage.saveDevices($scope.devices);
     }
 
     $scope.toggleSubscription = function (deviceId) {
@@ -223,7 +213,7 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http) 
     $scope.loadDevices();
 });
 
-jMaticControllers.controller('batteryCheckController', function ($scope, $http) {
+jMaticControllers.controller('batteryCheckController', function ($scope, $http, CCUXMLAPI) {
 
     finishLoading($scope);
 
@@ -243,7 +233,7 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http) 
         startLoading($scope);
 
         delete $http.defaults.headers.common['X-Requested-With'];
-        $http.get(XMLAPIUri.AllDeviceStates)
+        $http.get(CCUXMLAPI.AllDeviceStates())
              .success(function (response) {
                  try {
                      console.log("OK getting all deviceStates");
@@ -308,7 +298,7 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http) 
     $scope.loadStates();
 });
 
-jMaticControllers.controller('sysVarsController', function ($scope, $http) {
+jMaticControllers.controller('sysVarsController', function ($scope, $http, CCUXMLAPI) {
 
     finishLoading($scope);
 
@@ -340,7 +330,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http) {
         startLoading($scope);
 
         delete $http.defaults.headers.common['X-Requested-With'];
-        $http.get(XMLAPIUri.SysVarList)
+        $http.get(CCUXMLAPI.SysVarList())
              .success(function (response) {
                  try {
                      console.log("OK getting all systemVariables");
@@ -409,7 +399,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http) {
         startLoading($scope);
 
         delete $http.defaults.headers.common['X-Requested-With'];
-        $http.get(XMLAPIUri.GetSysVarChange(id, value))
+        $http.get(CCUXMLAPI.GetSysVarEdit(id, value))
              .success(function (response) {
                  try {
                      console.log("OK changing systemVariable " + id);
@@ -436,6 +426,20 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http) {
 
     $scope.loadSysVars();
 });
+
+jMaticControllers.controller('appConfigController', function ($scope, $http, LocalStorage) {
+
+    $scope.ccuIP = LocalStorage.get('CCU-IP');
+
+    $scope.$watch("ccuIP", function (newValue, oldValue) {
+        if ($scope.ccuIP.length > 0) {
+            LocalStorage.set('CCU-IP', $scope.ccuIP);
+        }
+    });
+
+    finishLoading($scope);
+});
+
 
 // Startup controller
 jMaticControllers.controller('MainController', function ($rootScope, $scope) {

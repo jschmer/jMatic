@@ -39,7 +39,6 @@ Features
 Roadmap
 -------
 - Write support for write-enabled channels in device state view
-- Config view for application configuration (CCU-IP, ...)
 - UI for dynamic definition of user defined widgets
 - Program view for running CCU programs
 

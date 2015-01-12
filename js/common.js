@@ -15,6 +15,57 @@ var jMaticApp = angular
         };
     })
 
+    .factory("LocalStorage", function () {
+        return {
+            loadDevices: function () {
+                var registeredDevices = localStorage.registeredDevices;
+                try {
+                    return JSON.parse(registeredDevices);
+                }
+                catch (e) { }
+                return [];
+            },
+            saveDevices: function (arrayOfDevices) {
+                try {
+                    var jsonEnocded = JSON.stringify(arrayOfDevices);
+                    localStorage.registeredDevices = jsonEnocded;
+                }
+                catch (e) { }
+            },
+            initSharedState: function (booleanPropertyName, sharedState, scope) {
+                var boolValue = localStorage[booleanPropertyName];
+                boolValue = boolValue == null ? false : boolValue == "true";
+                sharedState.initialize(scope, booleanPropertyName);
+                sharedState.set(booleanPropertyName, boolValue);
+            },
+            get: function (key) {
+                if (localStorage.hasOwnProperty(key))
+                    return localStorage[key];
+                else
+                    return undefined;
+            },
+            set: function (key, value) {
+                localStorage[key] = value;
+            }
+        };
+    })
+
+    .factory("CCUXMLAPI", function (LocalStorage) {
+        function getIP() {
+            return LocalStorage.get('CCU-IP');
+        }
+
+        return {
+            AllDeviceStates: function () { return 'http://' + getIP() + '/addons/xmlapi/statelist.cgi'; },
+            DeviceState: function () { return 'http://' + getIP() + '/addons/xmlapi/state.cgi?device_id='; },
+            DeviceList: function () { return 'http://' + getIP() + '/addons/xmlapi/devicelist.cgi'; },
+            SysVarList: function () { return 'http://' + getIP() + '/addons/xmlapi/sysvarlist.cgi'; },
+            GetSysVarEdit: function (id, value) {
+                return 'http://' + getIP() + '/addons/xmlapi/statechange.cgi?ise_id=' + id + '&new_value=' + value;
+            }
+        };
+    })
+
     .config(['$routeProvider', function ($routeProvider) {
         $routeProvider.
             when('/deviceState', {
@@ -37,6 +88,11 @@ var jMaticApp = angular
                 controller: 'sysVarsController',
                 reloadOnSearch: false
             }).
+            when('/appConfig', {
+                templateUrl: 'applicationConfig.html',
+                controller: 'appConfigController',
+                reloadOnSearch: false
+            }).
             otherwise({
                 redirectTo: '/deviceState'
             });
@@ -55,22 +111,6 @@ jMaticApp.directive('autoFocus', function ($timeout) {
     };
 });
 
-function loadDeviceDataFromLocalStorage() {
-    var registeredDevices = localStorage.registeredDevices;
-    try {
-        return JSON.parse(registeredDevices);
-    }
-    catch (e) { }
-    return [];
-}
-
-function saveDeviceDataToLocalStorage(arrayOfDevices) {
-    try {
-        var jsonEnocded = JSON.stringify(arrayOfDevices);
-        localStorage.registeredDevices = jsonEnocded;
-    }
-    catch (e) { }
-}
 
 function findDevice(deviceArray, deviceId) {
     for (i = 0; i < deviceArray.length; ++i) {
@@ -106,11 +146,4 @@ function makeArrayIfOnlyOneObject(obj) {
 
 function isInt(obj) {
     return (typeof obj==='number' && (obj%1)===0);
-}
-
-function initSharedStateFromLocalStorage(booleanPropertyName, sharedState, scope) {
-    var boolValue = localStorage[booleanPropertyName];
-    boolValue = boolValue == null ? false : boolValue == "true";
-    sharedState.initialize(scope, booleanPropertyName);
-    sharedState.set(booleanPropertyName, boolValue);
 }

@@ -7,6 +7,9 @@ js/compiled_templates.js
 # auto-generated python stuff
 __pycache__/
 
+# visual studio debug stuff
+Web.config
+
 # User-specific files
 *.suo
 *.user

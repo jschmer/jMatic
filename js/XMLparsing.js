@@ -4,6 +4,9 @@
     deviceObj.name = deviceNode._name;
     deviceObj.type = deviceTypes[deviceNode._device_type];
 
+    if (typeof (deviceObj.type) == "undefined")
+        deviceObj.type = deviceNode._device_type;
+
     return deviceObj;
 }
 
@@ -186,4 +189,72 @@ function getPropValue(stateObject, channelIndex, datapointName) {
             unit: datapoint._valueunit
         }
     }
+}
+
+function parseSystemVariable(syVarXMLnode) {
+    var name = syVarXMLnode._name;
+    var variable = syVarXMLnode._variable;
+    var value = syVarXMLnode._value;
+    var value_list = syVarXMLnode._value_list;
+    var ise_id = syVarXMLnode._ise_id;
+    var min = syVarXMLnode._min;
+    var max = syVarXMLnode._max;
+    var unit = syVarXMLnode._unit;
+    var sysVarType = parseInt(syVarXMLnode._type);
+    var subtype = parseInt(syVarXMLnode._subtype);
+    var logged = syVarXMLnode._logged;
+    var visible = syVarXMLnode._visible;
+    var timestamp = syVarXMLnode._timestamp;
+    var value_name_0 = syVarXMLnode._value_name_0;
+    var value_name_1 = syVarXMLnode._value_name_1;
+
+    var variableDataType = HMdataType[sysVarType];
+    var parsedValue = TypeValueConversionFn[variableDataType](value);
+
+    var sysVarObject = {
+        id: ise_id,
+        name: name,
+        type: variableDataType,
+        sysVarType: sysVarType,
+        displayValue: parsedValue,
+        value: value,
+        min: undefined,
+        max: undefined,
+        unit: undefined,
+        valueMapping: undefined
+    }
+
+    switch (sysVarType) {
+        case SysVarDataType.logic:
+            var valueMapping = {
+                false: value_name_0,
+                true: value_name_1
+            }
+
+            $.extend(sysVarObject, {
+                displayValue: valueMapping[parsedValue],
+                valueMapping: valueMapping
+            });
+            break;
+        case SysVarDataType.number:
+            $.extend(sysVarObject, {
+                min: min,
+                max: max,
+                unit: unit
+            });
+            break;
+        case SysVarDataType.option:
+            var displayValues = value_list.split(";")
+            var valueMapping = {}
+            for (var i = 0; i < displayValues.length; ++i)
+                valueMapping[i] = displayValues[i];
+
+            $.extend(sysVarObject, {
+                displayValue: valueMapping[parsedValue],
+                valueMapping: valueMapping
+            });
+            break;
+    }
+
+    return sysVarObject;
 }

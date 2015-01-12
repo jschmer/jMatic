@@ -208,37 +208,49 @@ var DeviceDataPoints = new function () {
         this.DataPoint.Default,
     ];
 
-    this.VirtualGroupData = [
-        this.DataPoint.LowBat,
-        this.DataPoint.ControlMode.inChannel(1),
-        this.DataPoint.Humidity.inChannel(1),
-        this.DataPoint.SetTemperature.inChannel(1),
-        this.DataPoint.ActualTemperature.inChannel(1),
-        this.DataPoint.State.inChannel(2),
-    ];
+    this.VirtualGroupData = {
+        forDevice: 'VirtualGroup',
+        datapoints: [
+            this.DataPoint.LowBat,
+            this.DataPoint.ControlMode.inChannel(1),
+            this.DataPoint.Humidity.inChannel(1),
+            this.DataPoint.SetTemperature.inChannel(1),
+            this.DataPoint.ActualTemperature.inChannel(1),
+            this.DataPoint.State.inChannel(2),
+        ]
+    };
 
-    this.WindowSensorData = [
-        this.DataPoint.LowBat,
-        this.DataPoint.State.inChannel(1),
-        this.DataPoint.Error.inChannel(1),
-    ];
+    this.WindowSensorData = {
+        forDevice: 'WindowSensor',
+        datapoints: [
+            this.DataPoint.LowBat,
+            this.DataPoint.State.inChannel(1),
+            this.DataPoint.Error.inChannel(1),
+        ]}
+    ;
 
-    this.HeaterData = [
-        this.DataPoint.LowBat,
-        this.DataPoint.ControlMode.inChannel(4),
-        this.DataPoint.FaultReporting.inChannel(4),
-        this.DataPoint.ValveState.inChannel(4),
-        this.DataPoint.ActualTemperature.inChannel(4),
-        this.DataPoint.SetTemperature.inChannel(4),
-    ];
+    this.HeaterData = {
+        forDevice: 'Heater',
+        datapoints: [
+            this.DataPoint.LowBat,
+            this.DataPoint.ControlMode.inChannel(4),
+            this.DataPoint.FaultReporting.inChannel(4),
+            this.DataPoint.ValveState.inChannel(4),
+            this.DataPoint.ActualTemperature.inChannel(4),
+            this.DataPoint.SetTemperature.inChannel(4),
+        ]
+    };
 
-    this.ThermostatData = [
-        this.DataPoint.LowBat,
-        this.DataPoint.ControlMode.inChannel(2),
-        this.DataPoint.Humidity.inChannel(2),
-        this.DataPoint.ActualTemperature.inChannel(2),
-        this.DataPoint.SetTemperature.inChannel(2),
-    ];
+    this.ThermostatData = {
+        forDevice: 'HM-TC-IT-WM-W-EU', //'Thermostat',
+        datapoints: [
+            this.DataPoint.LowBat,
+            this.DataPoint.ControlMode.inChannel(2),
+            this.DataPoint.Humidity.inChannel(2),
+            this.DataPoint.ActualTemperature.inChannel(2),
+            this.DataPoint.SetTemperature.inChannel(2),
+        ]
+    };
 }
 
 // Datapoint name translation
@@ -254,7 +266,6 @@ var Translation = {
     "CONTROL_MODE": "Modus",
     "FAULT_REPORTING": "Fehler",
 }
-
 function translate(string) {
     // if has translation: translate
     if (Translation.hasOwnProperty(string))
@@ -265,87 +276,12 @@ function translate(string) {
 }
 
 function getDeviceDataPointsForType(type) {
-    if (type == 'VirtualGroup') {
-        return DeviceDataPoints.VirtualGroupData;
-    }
-    else if (type == 'WindowSensor') {
-        return DeviceDataPoints.WindowSensorData;
-    }
-    else if (type == 'Heater') {
-        return DeviceDataPoints.HeaterData;
-    }
-    else if (type == 'Thermostat') {
-        return DeviceDataPoints.ThermostatData;
-    }
-    else {
-        return [];
-    }
-}
-
-function parseSystemVariable(syVarXMLnode) {
-    var name = syVarXMLnode._name;
-    var variable = syVarXMLnode._variable;
-    var value = syVarXMLnode._value;
-    var value_list = syVarXMLnode._value_list;
-    var ise_id = syVarXMLnode._ise_id;
-    var min = syVarXMLnode._min;
-    var max = syVarXMLnode._max;
-    var unit = syVarXMLnode._unit;
-    var sysVarType = parseInt(syVarXMLnode._type);
-    var subtype = parseInt(syVarXMLnode._subtype);
-    var logged = syVarXMLnode._logged;
-    var visible = syVarXMLnode._visible;
-    var timestamp = syVarXMLnode._timestamp;
-    var value_name_0 = syVarXMLnode._value_name_0;
-    var value_name_1 = syVarXMLnode._value_name_1;
-
-    var variableDataType = HMdataType[sysVarType];
-    var parsedValue = TypeValueConversionFn[variableDataType](value);
-
-    var sysVarObject = {
-        id: ise_id,
-        name: name,
-        type: variableDataType,
-        sysVarType: sysVarType,
-        displayValue: parsedValue,
-        value: value,
-        min: undefined,
-        max: undefined,
-        unit: undefined,
-        valueMapping: undefined
-    }
-
-    switch (sysVarType) {
-        case SysVarDataType.logic:
-            var valueMapping = {
-                false: value_name_0,
-                true: value_name_1
+    for (var key in DeviceDataPoints) {
+        if (DeviceDataPoints.hasOwnProperty(key)) {
+            if (typeof (DeviceDataPoints[key].forDevice) != "undefined" && DeviceDataPoints[key].forDevice == type) {
+                return DeviceDataPoints[key].datapoints;
             }
-
-            $.extend(sysVarObject, {
-                displayValue: valueMapping[parsedValue],
-                valueMapping: valueMapping
-            });
-            break;
-        case SysVarDataType.number:
-            $.extend(sysVarObject, {
-                min: min,
-                max: max,
-                unit: unit
-            });
-            break;
-        case SysVarDataType.option:
-            var displayValues = value_list.split(";")
-            var valueMapping = {}
-            for (var i = 0; i < displayValues.length; ++i)
-                valueMapping[i] = displayValues[i];
-
-            $.extend(sysVarObject, {
-                displayValue: valueMapping[parsedValue],
-                valueMapping: valueMapping
-            });
-            break;
+        }
     }
-
-    return sysVarObject;
+    return DeviceDataPoints.DefaultData;
 }

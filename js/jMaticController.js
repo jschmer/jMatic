@@ -100,7 +100,7 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
     $scope.loadStates();
 });
 
-jMaticControllers.controller('deviceConfigController', function ($scope, $http, LocalStorage, CCUXMLAPI) {
+jMaticControllers.controller('deviceConfigController', function ($scope, $http, Notification, LocalStorage, CCUXMLAPI) {
 
     $scope.listOrder = 'name';
 
@@ -202,6 +202,10 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
             var device = $scope.devices[deviceIndex];
             device.subscribed = !device.subscribed;
 
+            // clear device channel data if unsubscribed
+            if (device.subscribed == false)
+                device.state = null;
+
             $scope.persistDeviceConfig();
         }
     }
@@ -213,7 +217,7 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
     $scope.loadDevices();
 });
 
-jMaticControllers.controller('batteryCheckController', function ($scope, $http, CCUXMLAPI) {
+jMaticControllers.controller('batteryCheckController', function ($scope, $http, Notification, CCUXMLAPI) {
 
     finishLoading($scope);
 
@@ -298,7 +302,7 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http, 
     $scope.loadStates();
 });
 
-jMaticControllers.controller('sysVarsController', function ($scope, $http, CCUXMLAPI) {
+jMaticControllers.controller('sysVarsController', function ($scope, $http, Notification, CCUXMLAPI) {
 
     finishLoading($scope);
 
@@ -427,7 +431,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, CCUXM
     $scope.loadSysVars();
 });
 
-jMaticControllers.controller('appConfigController', function ($scope, $http, LocalStorage) {
+jMaticControllers.controller('appConfigController', function ($scope, $http, Notification, LocalStorage) {
 
     $scope.ccuIP = LocalStorage.get('CCU-IP');
 
@@ -439,7 +443,6 @@ jMaticControllers.controller('appConfigController', function ($scope, $http, Loc
 
     finishLoading($scope);
 });
-
 
 // Startup controller
 jMaticControllers.controller('MainController', function ($rootScope, $scope) {

@@ -15,9 +15,10 @@ Prerequisites
 - HomeMatic CCU/CCU2 with [XML-API] AddOn.
 - HTML5 compatible browser (for persistance in localStorage)
 - Tested with
-  - Firefox 31.3
-  - Google Chrome 39.0
-  - Google Chrome for Android 39.0
+  - Firefox 31
+  - Internet Explorer 11
+  - Google Chrome 39
+  - Google Chrome for Android 39
 
 Features
 --------

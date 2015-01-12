@@ -51,6 +51,14 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
             }
         }
 
+        if (deviceIds.length == 0) {
+            $scope.noSubscribedDevices = true;
+            return;
+        }
+        else {
+            $scope.noSubscribedDevices = false;
+        }
+
         startLoading($scope);
 
         delete $http.defaults.headers.common['X-Requested-With'];

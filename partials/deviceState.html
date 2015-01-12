@@ -24,7 +24,7 @@
     </div>
 </div>
 <div class="scrollable-content">
-    <p ng-show="devices.length==0">No registered devices!</p>
+    <p ng-show="noSubscribedDevices">No subscribed devices!</p>
     <div class="list-group">
         <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
             <div class="device-info">

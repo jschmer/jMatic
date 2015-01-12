@@ -14,6 +14,10 @@ Prerequisites
 -------------
 - HomeMatic CCU/CCU2 with [XML-API] AddOn.
 - HTML5 compatible browser (for persistance in localStorage)
+- Tested with
+  - Firefox 31.3
+  - Google Chrome 39.0
+  - Google Chrome for Android 39.0
 
 Features
 --------
@@ -30,6 +34,13 @@ Features
 - User defined widgets which are composed of arbitrary datapoints from different devices
 	- Currently only hardcoded in JSON-format
 	- UI for dynamic creation is planned
+
+Roadmap
+-------
+- Write support for write-enabled channels in device state view
+- Config view for application configuration (CCU-IP, ...)
+- UI for dynamic definition of user defined widgets
+- Program view for running CCU programs
 
 Usage
 -----

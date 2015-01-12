@@ -39,17 +39,26 @@ Or host it on a webserver.
 Views
 -----
 Device State  
-![Device States](../master/doc/screenshots/DeviceState_Flow.png?raw=true)
-![Device States with channel nammes](../master/doc/screenshots/DeviceState_Names.png?raw=true)
+![Device States](./doc/screenshots/DeviceState_Flow.png?raw=true)
+![Device States with channel nammes](./doc/screenshots/DeviceState_Names.png?raw=true)
 
 Device Subscription  
-![Device Subscription](../master/doc/screenshots/DeviceSubscription.png?raw=true)
+![Device Subscription](./doc/screenshots/DeviceSubscription.png?raw=true)
 
 Battery Check  
-![Battery Check](../master/doc/screenshots/BatteryCheck.png?raw=true)
+![Battery Check](./doc/screenshots/BatteryCheck.png?raw=true)
 
 System Variables  
-![System Variables](../master/doc/screenshots/SystemVariables.png?raw=true)
-![System Variables Edit](../master/doc/screenshots/SystemVariables_EditNumber.png?raw=true)
+![System Variables](./doc/screenshots/SystemVariables.png?raw=true)
+![System Variables Edit](./doc/screenshots/SystemVariables_EditNumber.png?raw=true)
+
+Dependencies
+------------
+Built with [jQuery], [X2JS], [angularJS] and [Mobile Angular UI].
+
 
 [XML-API]: http://www.homematic-inside.de/software/xml-api
+[jQuery]: http://jquery.com/
+[X2JS]: https://code.google.com/p/x2js/
+[angularJS]: https://angularjs.org/
+[Mobile Angular UI]: http://mobileangularui.com/

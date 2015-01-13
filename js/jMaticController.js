@@ -17,6 +17,10 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
         LocalStorage.set(propertyName, SharedState.get(propertyName));
     }
 
+    $scope.editChannel = function (device, channelName) {
+        alert("Edit me: " + device.name + " -- " + channelName);
+    }
+
     $scope.devices = LocalStorage.loadDevices();
     $scope.lastRefreshTime = LocalStorage.get("lastRefreshTime");
 

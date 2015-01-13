@@ -38,6 +38,7 @@
                                  (data.changed==true ? 'changed' : ''),
                                  (data.writeable==true ? 'writeable' : '')
                       ]"
+                      ng-click="!data.writeable || editChannel(device, propname)"
                       ui-class="{
                         'flow': channelsStacked==false,
                         'stack': channelsStacked==true,

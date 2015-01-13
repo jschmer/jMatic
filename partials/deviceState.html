@@ -1,5 +1,5 @@
 <div ui-content-for="title">
-    <span>Device State</span>
+    <span translate>TITLE_DEVICE_STATE</span>
 </div>
 <div class="scrollable-header">
     <div class="section section-break">
@@ -10,14 +10,12 @@
         </span>
         <span class="btn-group">
             <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('showChannelNames')">
-                <span ui-hide="showChannelNames">Show</span>
-                <span ui-show="showChannelNames">Hide</span>
-                Names
+                <span ui-hide="showChannelNames" translate="SHOW_NAMES"></span>
+                <span ui-show="showChannelNames" translate="HIDE_NAMES"></span>
             </a>
             <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('channelsStacked')">
-                <span ui-hide="channelsStacked">Stack</span>
-                <span ui-show="channelsStacked">Flow</span>
-                Layout
+                <span ui-hide="channelsStacked" translate="STACK_LAYOUT"></span>
+                <span ui-show="channelsStacked" translate="FLOW_LAYOUT"></span>
             </a>
         </span>
         <span class="last-refresh">{{lastRefreshTime}}</span>

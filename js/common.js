@@ -1,6 +1,6 @@
 ﻿var x2js = new X2JS();
 var jMaticApp = angular
-    .module('jMaticApp', ['ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers'])
+    .module('jMaticApp', ['ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers', 'pascalprecht.translate'])
 
     .service('Notification', function (toasty) {
         this.error = function (message, timeout) {
@@ -15,42 +15,46 @@ var jMaticApp = angular
         };
     })
 
-    .factory("LocalStorage", function () {
-        return {
-            loadDevices: function () {
-                var registeredDevices = localStorage.registeredDevices;
-                try {
-                    return JSON.parse(registeredDevices);
-                }
-                catch (e) { }
-                return [];
-            },
-            saveDevices: function (arrayOfDevices) {
-                try {
-                    var jsonEnocded = JSON.stringify(arrayOfDevices);
-                    localStorage.registeredDevices = jsonEnocded;
-                }
-                catch (e) { }
-            },
-            initSharedState: function (booleanPropertyName, sharedState, scope) {
-                var boolValue = localStorage[booleanPropertyName];
-                boolValue = boolValue == null ? false : boolValue == "true";
-                sharedState.initialize(scope, booleanPropertyName);
-                sharedState.set(booleanPropertyName, boolValue);
-            },
-            get: function (key) {
-                if (localStorage.hasOwnProperty(key))
-                    return localStorage[key];
-                else
-                    return undefined;
-            },
-            set: function (key, value) {
-                localStorage[key] = value;
+    .service("LocalStorage", function () {
+        this.loadDevices = function () {
+            var registeredDevices = localStorage.registeredDevices;
+            try {
+                return JSON.parse(registeredDevices);
             }
+            catch (e) { }
+            return [];
+        };
+
+        this.saveDevices = function (arrayOfDevices) {
+            try {
+                var jsonEnocded = JSON.stringify(arrayOfDevices);
+                localStorage.registeredDevices = jsonEnocded;
+            }
+            catch (e) { }
+        };
+
+        this.initSharedState = function (booleanPropertyName, sharedState, scope) {
+            var boolValue = localStorage[booleanPropertyName];
+            boolValue = boolValue == null ? false : boolValue == "true";
+            sharedState.initialize(scope, booleanPropertyName);
+            sharedState.set(booleanPropertyName, boolValue);
+        };
+
+        this.get = function (key) {
+            if (localStorage.hasOwnProperty(key))
+                return localStorage[key];
+            else
+                return undefined;
+        };
+
+        this.set = function (key, value) {
+            localStorage[key] = value;
         };
     })
 
     .factory("CCUXMLAPI", function (LocalStorage) {
+        // TODO: put http request stuff in here
+
         function getIP() {
             return LocalStorage.get('CCU-IP');
         }
@@ -66,7 +70,7 @@ var jMaticApp = angular
         };
     })
 
-    .config(['$routeProvider', function ($routeProvider) {
+    .config(['$routeProvider', '$translateProvider', function ($routeProvider, $translateProvider) {
         $routeProvider.
             when('/deviceState', {
                 templateUrl: 'deviceState.html',
@@ -96,7 +100,26 @@ var jMaticApp = angular
             otherwise({
                 redirectTo: '/deviceState'
             });
-    }]);
+
+        // load defined languages
+        if (typeof (lang) !== "undefined") {
+            for (keycode in lang) {
+                if (lang.hasOwnProperty(keycode)) {
+                    $translateProvider.translations(keycode, lang[keycode]);
+                }
+            }
+        }
+
+        $translateProvider
+            .preferredLanguage('en')
+            .fallbackLanguage('en');
+    }])
+    .run(function (LocalStorage, $translate) {
+        var currentLang = LocalStorage.get('lang');
+        if (typeof (currentLang) !== "undefined")
+            $translate.use(currentLang);
+    })
+;
 
 
 // enable auto-focus attribute
@@ -145,5 +168,5 @@ function makeArrayIfOnlyOneObject(obj) {
 }
 
 function isInt(obj) {
-    return (typeof obj==='number' && (obj%1)===0);
+    return (typeof obj === 'number' && (obj % 1) === 0);
 }

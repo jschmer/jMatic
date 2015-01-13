@@ -1,11 +1,11 @@
 <div ui-content-for="title">
-    <span>Device Config</span>
+    <span translate>TITLE_DEVICE_CONFIG</span>
 </div>
 <div class="scrollable-header">
     <div class="section section-break">
         <span class="btn-group">
-            <a href class="btn btn-default" ng-class="[listOrder=='name' ? 'active' : '']"  ng-click="setListOrder('name')">Name</a>
-            <a href class="btn btn-default" ng-class="[listOrder=='type' ? 'active' : '']" ng-click="setListOrder('type')">Type</a>
+            <a href class="btn btn-default" ng-class="[listOrder=='name' ? 'active' : '']"  ng-click="setListOrder('name')"><span translate="NAME"></span></a>
+            <a href class="btn btn-default" ng-class="[listOrder=='type' ? 'active' : '']" ng-click="setListOrder('type')"><span translate="TYPE"></span></a>
         </span>
         <span class="btn-group" ui-state="showIds" ui-default="false">
             <a href class="btn btn-default" ui-class="{'active': showIds}" ui-toggle="showIds">IDs</a>

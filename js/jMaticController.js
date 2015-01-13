@@ -431,15 +431,24 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
     $scope.loadSysVars();
 });
 
-jMaticControllers.controller('appConfigController', function ($scope, $http, Notification, LocalStorage) {
+jMaticControllers.controller('appConfigController', function ($scope, $http, Notification, LocalStorage, $translate) {
 
     $scope.ccuIP = LocalStorage.get('CCU-IP');
+    $scope.currentLang = LocalStorage.get('lang');
+    if (typeof ($scope.currentLang) === "undefined")
+        $scope.currentLang = $translate.use();
 
     $scope.$watch("ccuIP", function (newValue, oldValue) {
         if ($scope.ccuIP.length > 0) {
             LocalStorage.set('CCU-IP', $scope.ccuIP);
         }
     });
+
+    $scope.changeLanguage = function (langKey) {
+        $translate.use(langKey);
+        $scope.currentLang = langKey;
+        LocalStorage.set("lang", langKey);
+    };
 
     finishLoading($scope);
 });

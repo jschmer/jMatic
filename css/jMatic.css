@@ -237,6 +237,10 @@ tr.systemVariable .value {
     font-weight: bold;
 }
 
+.writeable {
+    cursor: pointer;
+}
+
 .threshold {
     color: red;
 }

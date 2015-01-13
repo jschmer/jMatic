@@ -29,6 +29,7 @@ function parseState(device, stateObject) {
                 unconvertedValue: "",
                 unit: "",
                 thresholdExceeded: true,
+                writeable: dataInstance.writeable != null ? dataInstance.writeable : false
             }
             console.error(device.state[dataInstance.datapointName]);
             continue;
@@ -46,6 +47,7 @@ function parseState(device, stateObject) {
             unconvertedValue: dp.value,
             unit: dp.unit,
             thresholdExceeded: threshold,
+            writeable: dataInstance.writeable != null ? dataInstance.writeable : false
         }
     }
 
@@ -106,6 +108,7 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
                     unconvertedValue: "",
                     unit: "",
                     thresholdExceeded: true,
+                    writeable: dataInstance.writeable != null ? dataInstance.writeable : false
                 }
                 console.error(userdefinedGroup.state[dataInstance.datapointName]);
                 continue;
@@ -123,6 +126,7 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
                 unconvertedValue: dp.value,
                 unit: dp.unit,
                 thresholdExceeded: threshold,
+                writeable: dataInstance.writeable != null ? dataInstance.writeable : false
             }
         }
     }

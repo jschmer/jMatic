@@ -115,7 +115,7 @@ var ThresholdFunctions = {
 }
 
 var DeviceDataPoints = new function () {
-    function DataPoint_t(channelIndex, datapointName, valueConversionFn, hideIf, thresholdIf) {
+    function DataPoint_t(channelIndex, datapointName, valueConversionFn, hideIf, thresholdIf, writeable) {
         if (typeof (channelIndex) == "object") {
             var params = channelIndex;
 
@@ -124,6 +124,7 @@ var DeviceDataPoints = new function () {
             this.valueConversionFn = params.valueConversionFn;
             this.hideIf            = params.hideIf;
             this.thresholdIf       = params.thresholdIf;
+            this.writeable         = params.writeable;
         }
         else {
             this.channelIndex      = channelIndex;
@@ -131,6 +132,7 @@ var DeviceDataPoints = new function () {
             this.valueConversionFn = valueConversionFn;
             this.hideIf            = hideIf;
             this.thresholdIf       = thresholdIf;
+            this.writeable         = writeable;
         }
 
         if (this.channelIndex == null)
@@ -144,6 +146,7 @@ var DeviceDataPoints = new function () {
             valueConversionFn : this.valueConversionFn,
             hideIf            : this.hideIf,
             thresholdIf       : this.thresholdIf,
+            writeable         : this.writeable,
         }
     };
 
@@ -164,7 +167,8 @@ var DeviceDataPoints = new function () {
         }),
         SetTemperature: new DataPoint_t({
             datapointName: "SET_TEMPERATURE",
-            thresholdIf: ThresholdFunctions.temperatureThreshold
+            thresholdIf: ThresholdFunctions.temperatureThreshold,
+            writeable: true
         }),
         ActualTemperature: new DataPoint_t({
             datapointName: "ACTUAL_TEMPERATURE",

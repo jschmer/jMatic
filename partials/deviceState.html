@@ -35,7 +35,8 @@
                       ng-hide="data.hide"
                       ng-repeat="(propname, data) in device.state"
                       ng-class="[(data.thresholdExceeded==true ? 'threshold' : ''),
-                                 (data.changed==true ? 'changed' : '')
+                                 (data.changed==true ? 'changed' : ''),
+                                 (data.writeable==true ? 'writeable' : '')
                       ]"
                       ui-class="{
                         'flow': channelsStacked==false,

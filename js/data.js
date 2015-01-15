@@ -26,7 +26,8 @@ TypeValueConversionFn[Type.int] = function (stringVal) { return parseInt(stringV
 TypeValueConversionFn[Type.float] = function (stringVal) { return parseFloat(stringVal); }
 TypeValueConversionFn[Type.string] = function (stringVal) { return stringVal; }
 
-var SysVarDataType = {
+var HomematicType = {
+    none: 0,
     logic: 2,
     number: 4,
     option: 16,

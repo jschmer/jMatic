@@ -17,11 +17,60 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
         LocalStorage.set(propertyName, SharedState.get(propertyName));
     }
 
+    $scope.HomematicType = HomematicType;
     $scope.tryEditChannel = function (channelState) {
         if (channelState.writeable) {
             $scope.editChannel = copy(channelState);
             SharedState.turnOn('editChannelDialog');
         }
+    }
+
+    $scope.SaveChanges = function () {
+        var valueToSend = $scope.editChannel.displayValue;
+
+        // map from display value to real value
+        if ($scope.editChannel.valueMapping != null) {
+            for (var key in $scope.editChannel.valueMapping) {
+                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
+                    var mappingValue = $scope.editChannel.valueMapping[key];
+                    if (mappingValue == valueToSend) {
+                        valueToSend = key;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $scope.changeChannelValue($scope.editChannel.id, valueToSend);
+    }
+
+    $scope.changeChannelValue = function (id, value) {
+        startLoading($scope);
+
+        delete $http.defaults.headers.common['X-Requested-With'];
+        $http.get(CCUXMLAPI.ChannelEdit(id, value))
+             .success(function (response) {
+                 try {
+                     console.log("OK changing systemVariable " + id);
+                     var result = x2js.xml_str2json(response).result;
+                     if (typeof (result.changed) !== "undefined") {
+                         // change succeeded
+                         $scope.loadStates();
+                     }
+                     else {
+                         // change failed
+                         Notification.error("ERROR changing systemVariable " + id, 5000);
+                         console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                     }
+                 } finally {
+                     finishLoading($scope);
+                 }
+             })
+             .error(function (data, status, headers, config) {
+                 finishLoading($scope);
+                 Notification.error("ERROR changing systemVariable " + id, 5000);
+                 console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+             });
     }
 
     $scope.loadStates = function () {

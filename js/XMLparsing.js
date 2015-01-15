@@ -88,11 +88,16 @@ function getPropValue(stateObject, channelIndex, datapointName) {
     if (datapoint == null)
         return null;
     else {
-        var dataType = HMdataType[parseInt(datapoint._valuetype)];
+        var homematicType = parseInt(datapoint._valuetype);
+        var dataType = HMdataType[homematicType];
+
+        // TODO: parse additional data (value type, ...) see channel data structure for data needed
 
         return {
             chanID: datapoint._ise_id,
             propName: datapoint._type,
+            homematicType: homematicType,
+            valueType: dataType,
             value: TypeValueConversionFn[dataType](datapoint._value),
             unit: datapoint._valueunit
         }
@@ -112,8 +117,8 @@ function getChannelState(datapoint, stateObject) {
         id: dp.chanID,
         name: dp.propName,
         displayName: translate(dp.propName),
-        valueType: undefined,
-        homematicType: HomematicType.none,
+        valueType: dp.valueType,
+        homematicType: dp.homematicType,
         displayValue: displayValue,
         value: dp.value,
         min: undefined,

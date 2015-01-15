@@ -82,6 +82,7 @@ Used in views **Device State** and **Device Subscription**
 		subscribed: boolean,
 		state:  {
 					CHANNELNAME_DEVICEID: {
+						chanID: int,
 						propTypeName: "CHANNELNAME",
 						displayName: "translated channel name",
 						hide: boolean,

@@ -10,138 +10,88 @@
     return deviceObj;
 }
 
+function getPropValue(stateObject, channelIndex, datapointName) {
+    // adjust channels with a single datapoint
+    stateObject.channel[channelIndex].datapoint = makeArrayIfOnlyOneObject(stateObject.channel[channelIndex].datapoint);
 
-function parseState(device, stateObject) {
-    oldState = device.state;
-    device.state = {};
-
-    var data = getDeviceDataPointsForType(device.type);
-
-    for (var i = 0; i < data.length; ++i) {
-        var dataInstance = data[i];
-        var dp = getPropValue(stateObject, dataInstance.channelIndex, dataInstance.datapointName);
-        if (dp == null) {
-            device.state[dataInstance.datapointName] = {
-                propTypeName: dataInstance.datapointName,
-                displayName: dataInstance.datapointName,
-                hide: false,
-                value: "Datapoint '" + dataInstance.datapointName + "' on channel " + dataInstance.channelIndex + " not found!",
-                unconvertedValue: "",
-                unit: "",
-                thresholdExceeded: true,
-                writeable: dataInstance.writeable != null ? dataInstance.writeable : false
-            }
-            console.error(device.state[dataInstance.datapointName]);
-            continue;
-        }
-
-        var hideChannel = dataInstance.hideIf != null ? dataInstance.hideIf(dp.value) : false;
-        var displayValue = dataInstance.valueConversionFn != null ? dataInstance.valueConversionFn(dp.value) : dp.value;
-        var threshold = dataInstance.thresholdIf != null ? dataInstance.thresholdIf(dp.value) : false;
-
-        device.state[dp.propName] = {
-            propTypeName: dp.propName,
-            displayName: translate(dp.propName),
-            hide: hideChannel,
-            value: displayValue,
-            unconvertedValue: dp.value,
-            unit: dp.unit,
-            thresholdExceeded: threshold,
-            writeable: dataInstance.writeable != null ? dataInstance.writeable : false
+    // find datapoint
+    var datapoint = null;
+    for (var i = 0; i < stateObject.channel[channelIndex].datapoint.length; ++i) {
+        var dp = stateObject.channel[channelIndex].datapoint[i];
+        if (dp._name.indexOf(datapointName) != -1) {
+            datapoint = dp;
+            break;
         }
     }
 
-    // flag changed values
-    if (oldState != null) {
-        for (var propName in oldState) {
-            if (!device.state.hasOwnProperty(propName) || !oldState.hasOwnProperty(propName))
-                continue;
+    if (datapoint == null)
+        return null;
+    else {
+        var dataType = HMdataType[parseInt(datapoint._valuetype)];
 
-            var oldPropObject = oldState[propName];
-            var newPropObject = device.state[propName];
-
-            if (oldPropObject.unconvertedValue != newPropObject.unconvertedValue) {
-                newPropObject.changed = true;
-            }
+        return {
+            chanID: datapoint._ise_id,
+            propName: datapoint._type,
+            value: TypeValueConversionFn[dataType](datapoint._value),
+            unit: datapoint._valueunit
         }
     }
 }
 
-function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
-    oldState = userdefinedGroup.state;
-    userdefinedGroup.state = {};
+function getChannelState(datapoint, stateObject) {
+    var dp = getPropValue(stateObject, datapoint.channelIndex, datapoint.datapointName);
+    if (dp == null) return null;
 
-    for (var j = 0; j < userdefinedGroup.config.length; ++j) {
-        var cfg = userdefinedGroup.config[j];
+    var hideChannel  = datapoint.hideIf            != null ? datapoint.hideIf(dp.value) : false;
+    var displayValue = datapoint.valueConversionFn != null ? datapoint.valueConversionFn(dp.value) : dp.value;
+    var threshold    = datapoint.thresholdIf       != null ? datapoint.thresholdIf(dp.value) : false;
+    var writeable    = datapoint.writeable         != null ? datapoint.writeable : false;
 
-        var deviceId = cfg.device_id;
-        var datapoints = cfg.datapoints;
-
-        // find device state in allDeviceStates
-        var deviceStateData = null;
-        for (var k = 0; k < allDeviceStates.length; ++k) {
-            if (allDeviceStates[k]._ise_id == deviceId) {
-                deviceStateData = allDeviceStates[k];
-                break;
-            }
-        }
-
-        if (!deviceStateData) {
-            console.warn("Couldn't find state data for device id " + deviceId + " in XML data!");
-            continue;
-        }
-
-        // parse datapoints
-        for (var i = 0; i < datapoints.length; ++i) {
-            var dataInstance = datapoints[i];
-
-            // get datapoint instance with functions
-            dataInstance = DeviceDataPoints.getByName(dataInstance.datapointName, dataInstance.channelIndex);
-
-            var dp = getPropValue(deviceStateData, dataInstance.channelIndex, dataInstance.datapointName);
-            if (dp == null) {
-                userdefinedGroup.state[dataInstance.datapointName + "_" + deviceId] = {
-                    propTypeName: dataInstance.datapointName,
-                    displayName: dataInstance.datapointName,
-                    hide: false,
-                    value: "Datapoint '" + dataInstance.datapointName + "' on channel " + dataInstance.channelIndex + " for device (" + deviceId + ") not found!",
-                    unconvertedValue: "",
-                    unit: "",
-                    thresholdExceeded: true,
-                    writeable: dataInstance.writeable != null ? dataInstance.writeable : false
-                }
-                console.error(userdefinedGroup.state[dataInstance.datapointName]);
-                continue;
-            }
-
-            var hideChannel = dataInstance.hideIf != null ? dataInstance.hideIf(dp.value) : false;
-            var displayValue = dataInstance.valueConversionFn != null ? dataInstance.valueConversionFn(dp.value) : dp.value;
-            var threshold = dataInstance.thresholdIf != null ? dataInstance.thresholdIf(dp.value) : false;
-
-            userdefinedGroup.state[dp.propName + "_" + deviceId] = {
-                propTypeName: dp.propName,
-                displayName: translate(dp.propName),
-                hide: hideChannel,
-                value: displayValue,
-                unconvertedValue: dp.value,
-                unit: dp.unit,
-                thresholdExceeded: threshold,
-                writeable: dataInstance.writeable != null ? dataInstance.writeable : false
-            }
-        }
+    return {
+        chanID: dp.chanID,
+        propTypeName: dp.propName,
+        displayName: translate(dp.propName),
+        hide: hideChannel,
+        value: displayValue,
+        unconvertedValue: dp.value,
+        unit: dp.unit,
+        thresholdExceeded: threshold,
+        writeable: writeable,
     }
+}
 
+function getMissingDatapointState(datapoint) {
+    return {
+        chanID: undefined,
+        propTypeName: datapoint.datapointName,
+        displayName: datapoint.datapointName,
+        hide: false,
+        value: "Datapoint '" + datapoint.datapointName + "' on channel " + datapoint.channelIndex + " not found!",
+        unconvertedValue: "",
+        unit: "",
+        thresholdExceeded: true,
+        writeable: datapoint.writeable != null ? datapoint.writeable : false
+    }
+}
+
+function flagChangedValues(oldState, newState) {
     // flag changed values
-    if (oldState != null) {
-        for (var propName in oldState) {
-            if (!userdefinedGroup.state.hasOwnProperty(propName) || !oldState.hasOwnProperty(propName))
+    if (newState != null) {
+        for (var propName in newState) {
+            if (!newState.hasOwnProperty(propName))
                 continue;
 
-            var oldPropObject = oldState[propName];
-            var newPropObject = userdefinedGroup.state[propName];
+            if (!oldState.hasOwnProperty(propName)) {
+                // prop is new -> always flagged changed
+                newState[propName].changed = true;
+            }
+            else {
+                var oldPropObject = oldState[propName];
+                var newPropObject = newState[propName];
 
-            if (oldPropObject.unconvertedValue != newPropObject.unconvertedValue) {
-                newPropObject.changed = true;
+                if (oldPropObject.unconvertedValue != newPropObject.unconvertedValue) {
+                    newPropObject.changed = true;
+                }
             }
         }
     }
@@ -168,31 +118,79 @@ function parseStates(devices, stateObject) {
     }
 }
 
-function getPropValue(stateObject, channelIndex, datapointName) {
-    // adjust channels with a single datapoint
-    stateObject.channel[channelIndex].datapoint = makeArrayIfOnlyOneObject(stateObject.channel[channelIndex].datapoint);
+function parseState(device, stateObject) {
+    oldState = device.state;
+    device.state = {};
 
-    // find datapoint
-    var datapoint = null;
-    for (var i = 0; i < stateObject.channel[channelIndex].datapoint.length; ++i) {
-        var dp = stateObject.channel[channelIndex].datapoint[i];
-        if (dp._name.indexOf(datapointName) != -1) {
-            datapoint = dp;
-            break;
+    var data = getDeviceDataPointsForType(device.type);
+
+    for (var i = 0; i < data.length; ++i) {
+        var dataInstance = data[i];
+
+        var channelState = getChannelState(dataInstance, stateObject);
+
+        if (channelState == null) {
+            device.state[dataInstance.datapointName] = getMissingDatapointState(dataInstance);
+            console.error(device.state[dataInstance.datapointName]);
+            continue;
+        }
+        else {
+            device.state[channelState.propTypeName] = channelState;
+        }
+
+    }
+
+    flagChangedValues(oldState, device.state);
+}
+
+function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
+    oldState = userdefinedGroup.state;
+    userdefinedGroup.state = {};
+
+    // parse all data defined in userdefinedGroup.config and
+    // move them into userdefinedGroup.state
+    for (var j = 0; j < userdefinedGroup.config.length; ++j) {
+        var cfg = userdefinedGroup.config[j];
+
+        var deviceId = cfg.device_id;
+        var datapoints = cfg.datapoints;
+
+        // find device state in allDeviceStates
+        var deviceStateData = null;
+        for (var k = 0; k < allDeviceStates.length; ++k) {
+            if (allDeviceStates[k]._ise_id == deviceId) {
+                deviceStateData = allDeviceStates[k];
+                break;
+            }
+        }
+
+        if (!deviceStateData) {
+            console.warn("Couldn't find state data for device id " + deviceId + " in XML data!");
+            continue;
+        }
+
+        // parse datapoints
+        for (var i = 0; i < datapoints.length; ++i) {
+            var dataInstance = datapoints[i];
+            // get datapoint instance with functions, userdefinedGroup config data is deserialized, e.g. no functions attached to this object!
+            dataInstance = DeviceDataPoints.getByName(dataInstance.datapointName, dataInstance.channelIndex);
+
+            var channelState = getChannelState(dataInstance, deviceStateData);
+
+            if (channelState == null) {
+                var propName = dataInstance.datapointName + "_" + deviceId;
+                userdefinedGroup.state[propName] = getMissingDatapointState(dataInstance);
+                console.error(userdefinedGroup.state[propName]);
+                continue;
+            }
+            else {
+                var propName = channelState.propTypeName + "_" + deviceId;
+                userdefinedGroup.state[propName] = channelState;
+            }
         }
     }
 
-    if (datapoint == null)
-        return null;
-    else {
-        var dataType = HMdataType[parseInt(datapoint._valuetype)];
-
-        return {
-            propName: datapoint._type,
-            value: TypeValueConversionFn[dataType](datapoint._value),
-            unit: datapoint._valueunit
-        }
-    }
+    flagChangedValues(oldState, userdefinedGroup.state);
 }
 
 function parseSystemVariable(syVarXMLnode) {

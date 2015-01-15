@@ -64,9 +64,9 @@ var jMaticApp = angular
             DeviceState: function () { return 'http://' + getIP() + '/addons/xmlapi/state.cgi?device_id='; },
             DeviceList: function () { return 'http://' + getIP() + '/addons/xmlapi/devicelist.cgi'; },
             SysVarList: function () { return 'http://' + getIP() + '/addons/xmlapi/sysvarlist.cgi'; },
-            GetSysVarEdit: function (id, value) {
+            ChannelEdit: function (id, value) {
                 return 'http://' + getIP() + '/addons/xmlapi/statechange.cgi?ise_id=' + id + '&new_value=' + value;
-            }
+            },
         };
     })
 
@@ -169,4 +169,8 @@ function makeArrayIfOnlyOneObject(obj) {
 
 function isInt(obj) {
     return (typeof obj === 'number' && (obj % 1) === 0);
+}
+
+function copy(obj) {
+    return $.extend({}, obj);
 }

@@ -38,17 +38,17 @@
                                  (data.changed==true ? 'changed' : ''),
                                  (data.writeable==true ? 'writeable' : '')
                       ]"
-                      ng-click="!data.writeable || editChannel(device, data)"
+                      ng-click="tryEditChannel(data)"
                       ui-class="{
                         'flow': channelsStacked==false,
                         'stack': channelsStacked==true,
                       }">
-                    <span class=" channel-icon" ng-class="['jmatic_channel_'+data.propTypeName,
-                        (propname.startsWith('STATE') && data.unconvertedValue==true ? 'jmatic_channel_OPEN' : ''),
-                        (propname.startsWith('STATE') && data.unconvertedValue==false ? 'jmatic_channel_CLOSED' : ''),
+                    <span class=" channel-icon" ng-class="['jmatic_channel_'+data.name,
+                        (data.name=='STATE' && data.value==true ? 'jmatic_channel_OPEN' : ''),
+                        (data.name=='STATE' && data.value==false ? 'jmatic_channel_CLOSED' : ''),
                     ]"></span>
                     <span ui-show="showChannelNames" class="channel_title">{{data.displayName}}: </span>
-                    <span class="channel_value">{{data.value}}</span>
+                    <span class="channel_value">{{data.displayValue}}</span>
                     <span class="channel_unit">{{data.unit}}</span>
                 </span>
                 <span ng-show="device.state==null">
@@ -57,4 +57,8 @@
             </div>
         </span>
     </div>
+</div>
+
+<div ui-content-for="modals">
+    <div ng-include src="'channelEdit.html'"></div>
 </div>

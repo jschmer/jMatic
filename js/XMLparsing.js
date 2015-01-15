@@ -10,6 +10,67 @@
     return deviceObj;
 }
 
+//createChannelModel({
+//    id: undefined,
+//    name: datapoint.datapointNam,
+//    displayName: datapoint.datapointNam,
+//    valueType: undefined,
+//    homematicType: undefined,
+//    displayValue: "Datapoint '" + datapoint.datapointName + "' on channel " + datapoint.channelIndex + " not found!",
+//    value: undefined,
+//    min: undefined,
+//    max: undefined,
+//    unit: undefined,
+//    valueMapping: undefined,
+//    hide: false,
+//    thresholdExceeded: false,
+//    writeable: true,
+//});
+function createChannelModel(id, name, displayName, valueType, homematicType, displayValue, value, min, max, unit, valueMapping, hide, thresholdExceeded, writeable) {
+    var channel = {}
+
+    if (typeof (id) == "object") {
+        var params = id;
+
+        channel.id            = params.id;
+        channel.name          = params.name;
+        channel.displayName   = params.displayName;
+        channel.valueType     = params.valueType;
+        channel.homematicType = params.homematicType;
+        channel.displayValue  = params.displayValue;
+        channel.value         = params.value;
+        // homematicType specifics
+        channel.min           = params.min;
+        channel.max           = params.max;
+        channel.unit          = params.unit;
+        channel.valueMapping  = params.valueMapping;
+        // flags for the UI
+        channel.hide              = params.hide;
+        channel.thresholdExceeded = params.thresholdExceeded;
+        channel.writeable         = params.writeable;
+    }
+    else {
+        channel.id                = id;
+        channel.name              = name;
+        channel.displayName       = displayName;
+        channel.valueType         = valueType;
+        channel.homematicType     = homematicType;
+        channel.displayValue      = displayValue;
+        channel.value             = value;
+        // homematicType specifics
+        channel.min = min;
+        channel.max               = max;
+        channel.unit              = unit;
+        channel.valueMapping      = valueMapping;
+        // flags for the UI
+        channel.hide              = hide;
+        channel.thresholdExceeded = thresholdExceeded;
+        channel.writeable         = writeable;
+    }
+
+    return channel;
+}
+
 function getPropValue(stateObject, channelIndex, datapointName) {
     // adjust channels with a single datapoint
     stateObject.channel[channelIndex].datapoint = makeArrayIfOnlyOneObject(stateObject.channel[channelIndex].datapoint);
@@ -47,31 +108,41 @@ function getChannelState(datapoint, stateObject) {
     var threshold    = datapoint.thresholdIf       != null ? datapoint.thresholdIf(dp.value) : false;
     var writeable    = datapoint.writeable         != null ? datapoint.writeable : false;
 
-    return {
-        chanID: dp.chanID,
-        propTypeName: dp.propName,
+    return createChannelModel({
+        id: dp.chanID,
+        name: dp.propName,
         displayName: translate(dp.propName),
-        hide: hideChannel,
-        value: displayValue,
-        unconvertedValue: dp.value,
+        valueType: undefined,
+        homematicType: HomematicType.none,
+        displayValue: displayValue,
+        value: dp.value,
+        min: undefined,
+        max: undefined,
         unit: dp.unit,
+        valueMapping: undefined,
+        hide: hideChannel,
         thresholdExceeded: threshold,
         writeable: writeable,
-    }
+    });
 }
 
 function getMissingDatapointState(datapoint) {
-    return {
-        chanID: undefined,
-        propTypeName: datapoint.datapointName,
+    return createChannelModel({
+        id: undefined,
+        name: datapoint.datapointName,
         displayName: datapoint.datapointName,
+        valueType: undefined,
+        homematicType: undefined,
+        displayValue: "Datapoint '" + datapoint.datapointName + "' on channel " + datapoint.channelIndex + " not found!",
+        value: undefined,
+        min: undefined,
+        max: undefined,
+        unit: undefined,
+        valueMapping: undefined,
         hide: false,
-        value: "Datapoint '" + datapoint.datapointName + "' on channel " + datapoint.channelIndex + " not found!",
-        unconvertedValue: "",
-        unit: "",
-        thresholdExceeded: true,
-        writeable: datapoint.writeable != null ? datapoint.writeable : false
-    }
+        thresholdExceeded: false,
+        writeable: false,
+    });
 }
 
 function flagChangedValues(oldState, newState) {
@@ -81,7 +152,7 @@ function flagChangedValues(oldState, newState) {
             if (!newState.hasOwnProperty(propName))
                 continue;
 
-            if (!oldState.hasOwnProperty(propName)) {
+            if (oldState == null || !oldState.hasOwnProperty(propName)) {
                 // prop is new -> always flagged changed
                 newState[propName].changed = true;
             }
@@ -89,7 +160,7 @@ function flagChangedValues(oldState, newState) {
                 var oldPropObject = oldState[propName];
                 var newPropObject = newState[propName];
 
-                if (oldPropObject.unconvertedValue != newPropObject.unconvertedValue) {
+                if (oldPropObject.value != newPropObject.value) {
                     newPropObject.changed = true;
                 }
             }
@@ -135,7 +206,7 @@ function parseState(device, stateObject) {
             continue;
         }
         else {
-            device.state[channelState.propTypeName] = channelState;
+            device.state[channelState.name] = channelState;
         }
 
     }
@@ -184,7 +255,7 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
                 continue;
             }
             else {
-                var propName = channelState.propTypeName + "_" + deviceId;
+                var propName = channelState.name + "_" + deviceId;
                 userdefinedGroup.state[propName] = channelState;
             }
         }
@@ -213,50 +284,47 @@ function parseSystemVariable(syVarXMLnode) {
     var variableDataType = HMdataType[sysVarType];
     var parsedValue = TypeValueConversionFn[variableDataType](value);
 
-    var sysVarObject = {
+    var channelData = createChannelModel({
         id: ise_id,
         name: name,
-        type: variableDataType,
-        sysVarType: sysVarType,
+        displayName: name,
+        valueType: variableDataType,
+        homematicType: sysVarType,
         displayValue: parsedValue,
-        value: value,
-        min: undefined,
-        max: undefined,
-        unit: undefined,
-        valueMapping: undefined
-    }
+        value: value
+    });
 
     switch (sysVarType) {
-        case SysVarDataType.logic:
+        case HomematicType.logic:
             var valueMapping = {
                 false: value_name_0,
                 true: value_name_1
             }
 
-            $.extend(sysVarObject, {
+            $.extend(channelData, {
                 displayValue: valueMapping[parsedValue],
                 valueMapping: valueMapping
             });
             break;
-        case SysVarDataType.number:
-            $.extend(sysVarObject, {
+        case HomematicType.number:
+            $.extend(channelData, {
                 min: min,
                 max: max,
                 unit: unit
             });
             break;
-        case SysVarDataType.option:
+        case HomematicType.option:
             var displayValues = value_list.split(";")
             var valueMapping = {}
             for (var i = 0; i < displayValues.length; ++i)
                 valueMapping[i] = displayValues[i];
 
-            $.extend(sysVarObject, {
+            $.extend(channelData, {
                 displayValue: valueMapping[parsedValue],
                 valueMapping: valueMapping
             });
             break;
     }
 
-    return sysVarObject;
+    return channelData;
 }

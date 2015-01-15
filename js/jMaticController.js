@@ -17,8 +17,11 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
         LocalStorage.set(propertyName, SharedState.get(propertyName));
     }
 
-    $scope.editChannel = function (device, channelState) {
-        alert("Edit me: " + device.name + " -- " + channelState.name + " (" + channelState.chanID + ")");
+    $scope.tryEditChannel = function (channelState) {
+        if (channelState.writeable) {
+            $scope.editChannel = copy(channelState);
+            SharedState.turnOn('editChannelDialog');
+        }
     }
 
     $scope.loadStates = function () {
@@ -309,7 +312,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
 
     finishLoading($scope);
 
-    $scope.SysVarDataType = SysVarDataType;
+    $scope.HomematicType = HomematicType;
 
     $scope.systemVars = []
     /*
@@ -380,17 +383,17 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
         var dialogSysVarData = {};
         jQuery.extend(dialogSysVarData, systemVariableData);
 
-        $scope.editSysVar = dialogSysVarData;
+        $scope.editChannel = dialogSysVarData;
     };
 
     $scope.SaveChanges = function () {
-        var valueToSend = $scope.editSysVar.displayValue;
+        var valueToSend = $scope.editChannel.displayValue;
 
         // map from display value to real value
-        if ($scope.editSysVar.valueMapping != null) {
-            for (var key in $scope.editSysVar.valueMapping) {
-                if ($scope.editSysVar.valueMapping.hasOwnProperty(key)) {
-                    var mappingValue = $scope.editSysVar.valueMapping[key];
+        if ($scope.editChannel.valueMapping != null) {
+            for (var key in $scope.editChannel.valueMapping) {
+                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
+                    var mappingValue = $scope.editChannel.valueMapping[key];
                     if (mappingValue == valueToSend) {
                         valueToSend = key;
                         break;
@@ -399,14 +402,14 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
             }
         }
 
-        $scope.changeSysVar($scope.editSysVar.id, valueToSend);
+        $scope.changeSysVar($scope.editChannel.id, valueToSend);
     }
 
     $scope.changeSysVar = function (id, value) {
         startLoading($scope);
 
         delete $http.defaults.headers.common['X-Requested-With'];
-        $http.get(CCUXMLAPI.GetSysVarEdit(id, value))
+        $http.get(CCUXMLAPI.ChannelEdit(id, value))
              .success(function (response) {
                  try {
                      console.log("OK changing systemVariable " + id);

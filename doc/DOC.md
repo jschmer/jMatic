@@ -78,24 +78,46 @@ Used in views **Device State** and **Device Subscription**
 	{
 		id: int,
 		name: "string",
-		type: "HomeMatic Device Type",
+		type: "HomeMatic Device Type" (an entry from deviceTypes map or raw device type code),
 		subscribed: boolean,
 		state:  {
-					CHANNELNAME_DEVICEID: {
-						chanID: int,
-						propTypeName: "CHANNELNAME",
-						displayName: "translated channel name",
-						hide: boolean,
-						value: Converted boolean/int/float/string,
-						unconvertedValue: Unconverted real value from XML API,
-						unit: string,
-						thresholdExceeded: boolean
-					},
-					...
+					CHANNELNAME_DEVICEID: channel_data_structure
+					or
+					CHANNELNAME: channel_data_structure
+					, ...
 				}
 	},
 	...
 ]
+```
+
+### Channel data structure
+---
+Used in views **Device State**, **Device Subscription** and **System variables**
+```javascript
+channel: {
+    id: int,
+    name: string,
+    displayName: string,
+    valueType: enum(bool, int, float, string),
+    homematicType: enum(logic, number, option, string),
+    displayValue: Converted boolean/int/float/string, // == value
+    value: Unconverted value from XML API as a string, // == unconvertedValue
+    
+    // specifics for different homematicTypes
+    min: number, // used for number 
+    max: number, // used for number
+    unit: string, // used for number
+    valueMapping: { // used for logic, option
+      value0: mappedValue0,
+      value1: mappedValue1
+    },
+    
+    // data to drive the ui
+    hide: boolean,
+    thresholdExceeded: boolean,
+    writeable: boolean
+}
 ```
 
 ### UI config

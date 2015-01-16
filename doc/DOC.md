@@ -110,7 +110,8 @@ channel: {
     unit: string, // used for number
     valueMapping: { // used for logic, option
       value0: mappedValue0,
-      value1: mappedValue1
+      value1: mappedValue1,
+      ...
     },
     
     // data to drive the ui

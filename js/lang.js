@@ -2,6 +2,7 @@
     "en": {
         'JMATIC': 'jMatic',
         'TITLE_DEVICE_STATE': 'Device State',
+        'TITLE_DEVICE_STATE_EDIT': 'Edit Device State',
         'TITLE_DEVICE_CONFIG': 'Subscription Config',
         'TITLE_BATTERY_CHECK': 'Battery Check',
         'TITLE_SYSVARS': 'System Variables',
@@ -19,6 +20,7 @@
     },
     "de": {
         'TITLE_DEVICE_STATE': 'Gerätestatus',
+        'TITLE_DEVICE_STATE_EDIT': 'Gerätestatus ändern',
         'TITLE_DEVICE_CONFIG': 'Abo-Konfiguration',
         'TITLE_BATTERY_CHECK': 'Batteriecheck',
         'TITLE_SYSVARS': 'Systemvariablen',

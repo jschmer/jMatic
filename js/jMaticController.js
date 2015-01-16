@@ -5,9 +5,7 @@ var jMaticControllers = angular.module('jMaticControllers', []);
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', function ($scope, $http, SharedState, Notification, LocalStorage, CCUXMLAPI) {
-
-    finishLoading($scope);
+jMaticControllers.controller('deviceStateController', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI) {
 
     LocalStorage.initSharedState("showChannelNames", SharedState, $scope);
     LocalStorage.initSharedState("channelsStacked", SharedState, $scope);
@@ -17,60 +15,8 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
         LocalStorage.set(propertyName, SharedState.get(propertyName));
     }
 
-    $scope.HomematicType = HomematicType;
-    $scope.tryEditChannel = function (channelState) {
-        if (channelState.writeable) {
-            $scope.editChannel = copy(channelState);
-            SharedState.turnOn('editChannelDialog');
-        }
-    }
-
-    $scope.SaveChanges = function () {
-        var valueToSend = $scope.editChannel.displayValue;
-
-        // map from display value to real value
-        if ($scope.editChannel.valueMapping != null) {
-            for (var key in $scope.editChannel.valueMapping) {
-                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
-                    var mappingValue = $scope.editChannel.valueMapping[key];
-                    if (mappingValue == valueToSend) {
-                        valueToSend = key;
-                        break;
-                    }
-                }
-            }
-        }
-
-        $scope.changeChannelValue($scope.editChannel.id, valueToSend);
-    }
-
-    $scope.changeChannelValue = function (id, value) {
-        startLoading($scope);
-
-        delete $http.defaults.headers.common['X-Requested-With'];
-        $http.get(CCUXMLAPI.ChannelEdit(id, value))
-             .success(function (response) {
-                 try {
-                     console.log("OK changing systemVariable " + id);
-                     var result = x2js.xml_str2json(response).result;
-                     if (typeof (result.changed) !== "undefined") {
-                         // change succeeded
-                         $scope.loadStates();
-                     }
-                     else {
-                         // change failed
-                         Notification.error("ERROR changing systemVariable " + id, 5000);
-                         console.log("ERROR changing systemVariable " + id, data, status, headers, config);
-                     }
-                 } finally {
-                     finishLoading($scope);
-                 }
-             })
-             .error(function (data, status, headers, config) {
-                 finishLoading($scope);
-                 Notification.error("ERROR changing systemVariable " + id, 5000);
-                 console.log("ERROR changing systemVariable " + id, data, status, headers, config);
-             });
+    $scope.editDevice = function (deviceId) {
+        $location.path('/editDeviceState/' + deviceId);
     }
 
     $scope.loadStates = function () {
@@ -153,6 +99,168 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, S
     $scope.devices = LocalStorage.loadDevices();
     $scope.lastRefreshTime = LocalStorage.get("lastRefreshTime");
     $scope.loadStates();
+
+    finishLoading($scope);
+});
+
+jMaticControllers.controller('editDeviceStateController', function ($scope, $http, SharedState, Notification, LocalStorage, CCUXMLAPI, $routeParams) {
+
+    LocalStorage.initSharedState("showChannelNames", SharedState, $scope);
+    $scope.toggleAndSaveSharedState = function (propertyName) {
+        SharedState.toggle(propertyName);
+        LocalStorage.set(propertyName, SharedState.get(propertyName));
+    }
+
+    SharedState.turnOff('editChannelDialog');
+    $scope.HomematicType = HomematicType;
+    $scope.tryEditChannel = function (channelState) {
+        if (channelState.writeable) {
+            $scope.editChannel = copy(channelState);
+            SharedState.turnOn('editChannelDialog');
+        }
+    }
+
+    $scope.SaveChanges = function () {
+        var valueToSend = $scope.editChannel.displayValue;
+
+        // map from display value to real value
+        if ($scope.editChannel.valueMapping != null) {
+            for (var key in $scope.editChannel.valueMapping) {
+                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
+                    var mappingValue = $scope.editChannel.valueMapping[key];
+                    if (mappingValue == valueToSend) {
+                        valueToSend = key;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $scope.changeChannelValue($scope.editChannel.id, valueToSend);
+    }
+
+    $scope.changeChannelValue = function (id, value) {
+        startLoading($scope);
+
+        delete $http.defaults.headers.common['X-Requested-With'];
+        $http.get(CCUXMLAPI.ChannelEdit(id, value))
+             .success(function (response) {
+                 try {
+                     console.log("OK changing systemVariable " + id);
+                     var result = x2js.xml_str2json(response).result;
+                     if (typeof (result.changed) !== "undefined") {
+                         // change succeeded
+                         $scope.loadStates();
+                     }
+                     else {
+                         // change failed
+                         Notification.error("ERROR changing systemVariable " + id, 5000);
+                         console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                     }
+                 } finally {
+                     finishLoading($scope);
+                 }
+             })
+             .error(function (data, status, headers, config) {
+                 finishLoading($scope);
+                 Notification.error("ERROR changing systemVariable " + id, 5000);
+                 console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+             });
+    }
+
+    $scope.loadStates = function () {
+
+        var deviceIds = []
+        for (i = 0; i < $scope.devices.length; ++i) {
+            var device = $scope.devices[i];
+            if (device.subscribed) {
+                if (device.type === "UserdefinedVirtualGroup") {
+                    // add all devices that are referenced by this group
+                    for (var j = 0; j < device.config.length; ++j) {
+                        var cfg = device.config[j];
+                        if (deviceIds.indexOf(cfg.device_id) == -1)
+                            deviceIds.push(cfg.device_id);
+                    }
+                }
+                else {
+                    deviceIds.push(device.id);
+                }
+            }
+        }
+
+        if (deviceIds.length == 0) {
+            $scope.noSubscribedDevices = true;
+            return;
+        }
+        else {
+            $scope.noSubscribedDevices = false;
+        }
+
+        startLoading($scope);
+
+        delete $http.defaults.headers.common['X-Requested-With'];
+        $http.get(CCUXMLAPI.DeviceState() + deviceIds.join())
+             .success(function (response) {
+                 try {
+                     console.log("OK getting deviceStates for IDs " + deviceIds.join());
+                     var xmlResponse = x2js.xml_str2json(response);
+
+                     var deviceStates = xmlResponse.state.device;
+                     if (deviceStates == null) {
+                         Notification.error("ERROR no device states received!", 5000);
+                         return;
+                     }
+
+                     // adjust statelists with only one device
+                     deviceStates = makeArrayIfOnlyOneObject(deviceStates);
+
+                     parseStates($scope.devices, deviceStates);
+
+                     var d = new Date();
+                     $scope.lastRefreshTime = d.toLocaleDateString() + " " + d.toLocaleTimeString();
+                     LocalStorage.set("lastRefreshTime", $scope.lastRefreshTime);
+
+                     LocalStorage.saveDevices($scope.devices);
+                 }
+                 catch (e) {
+                     Notification.error("ERROR parsing device states! " + e, 5000);
+                     console.error(e);
+                 }
+                 finally {
+                     finishLoading($scope);
+                 }
+             })
+             .error(function (data, status, headers, config) {
+                 try {
+                     Notification.error("ERROR getting deviceStates! Is your CCU reachable?", 5000);
+                     console.log("ERROR getting deviceStates! Is your CCU reachable?", data, status, headers, config);
+                 }
+                 catch (e) {
+                     console.error(e);
+                 }
+                 finally {
+                     finishLoading($scope);
+                 }
+             });
+    }
+
+    $scope.devices = LocalStorage.loadDevices();
+    $scope.lastRefreshTime = LocalStorage.get("lastRefreshTime");
+
+    var editedDeviceId = $routeParams.deviceId;
+    $scope.editedDevice = null;
+    for (var i = 0; i < $scope.devices.length; ++i) {
+        if ($scope.devices[i].id == editedDeviceId) {
+            $scope.editedDevice = $scope.devices[i];
+            break;
+        }
+    }
+
+    if ($scope.editedDevice == null) {
+        Notification.error("Device with id '" + editedDeviceId + "' not found!");
+    }
+
+    finishLoading($scope);
 });
 
 jMaticControllers.controller('deviceConfigController', function ($scope, $http, Notification, LocalStorage, CCUXMLAPI) {
@@ -357,7 +465,7 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http, 
     $scope.loadStates();
 });
 
-jMaticControllers.controller('sysVarsController', function ($scope, $http, Notification, CCUXMLAPI) {
+jMaticControllers.controller('sysVarsController', function ($scope, $http, Notification, SharedState, CCUXMLAPI) {
 
     finishLoading($scope);
 
@@ -428,6 +536,7 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
         }
     }
 
+    SharedState.turnOff('editChannelDialog');
     $scope.ShowInputDialog = function (systemVariableData) {
         var dialogSysVarData = {};
         jQuery.extend(dialogSysVarData, systemVariableData);

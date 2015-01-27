@@ -1,10 +1,20 @@
-﻿var deviceTypes = {
+﻿// map device type code to display name
+var deviceTypeNames = {
     'HM-CC-VG-1': 'VirtualGroup',
     'HM-Sec-SCo': 'WindowSensor',
     'HM-CC-RT-DN': 'Heater',
     'HM-TC-IT-WM-W-EU': 'Thermostat',
 }
 
+// map device type display name to device code
+var deviceTypeCode = {}
+for (var key in deviceTypeNames) {
+    if (deviceTypeNames.hasOwnProperty(key)) {
+        deviceTypeCode[deviceTypeNames[key]] = key;
+    }
+}
+
+// device constructor
 function Device() {
     this.id = -1;
     this.name = "Unknown";
@@ -20,12 +30,14 @@ var Type = {
     string: 3
 }
 
+// value conversion functions from string to native javascript type
 var TypeValueConversionFn = {}
 TypeValueConversionFn[Type.bool] = function (stringVal) { return stringVal == "true"; }
 TypeValueConversionFn[Type.int] = function (stringVal) { return parseInt(stringVal); }
 TypeValueConversionFn[Type.float] = function (stringVal) { return parseFloat(stringVal); }
 TypeValueConversionFn[Type.string] = function (stringVal) { return stringVal; }
 
+// homematic variable data types
 var HomematicType = {
     none: 0,
     logic: 2,
@@ -34,6 +46,7 @@ var HomematicType = {
     string: 20
 }
 
+// homematic logical datapoint type
 var HMdataType = {
     1: Type.bool, // action
     2: Type.bool,
@@ -43,6 +56,29 @@ var HMdataType = {
     20: Type.string
 }
 
+// datapoint name translations
+var Translation = {
+    "LOWBAT": "Low Battery",
+    "BATTERY_STATE": "Battery",
+    "ACTUAL_HUMIDITY": "Luftfeuchte",
+    "ACTUAL_TEMPERATURE": "Temperatur",
+    "SET_TEMPERATURE": "Zieltemperatur",
+    "VALVE_STATE": "Ventilstatus",
+    "ERROR": "Sabotage",
+    "STATE": "Status",
+    "CONTROL_MODE": "Modus",
+    "FAULT_REPORTING": "Fehler",
+}
+function translate(string) {
+    // if has translation: translate
+    if (Translation.hasOwnProperty(string))
+        return Translation[string];
+        // else: return input string
+    else
+        return string;
+}
+
+// datapoint value translations
 var ControlModeState = {
     Auto: 0,
     Manual: 1,
@@ -92,6 +128,7 @@ function getWindowOpenClosedString(state) {
         return "Auf";
 }
 
+// datapoint state functions (hide if, threshold if)
 var HideFunctions = {
     hideIfFalse: function(value) {
         return value == false;
@@ -115,8 +152,10 @@ var ThresholdFunctions = {
     trueState: function (value) { return value == true; }
 }
 
+// datapoint definition
 var DeviceDataPoints = new function () {
-    function DataPoint_t(channelIndex, datapointName, valueConversionFn, hideIf, thresholdIf, writeable) {
+    // datapoint constructor
+    function DataPoint_t(channelIndex, datapointName, valueConversionFn, hideIf, thresholdIf, writeable, constraints) {
         if (typeof (channelIndex) == "object") {
             var params = channelIndex;
 
@@ -126,6 +165,7 @@ var DeviceDataPoints = new function () {
             this.hideIf            = params.hideIf;
             this.thresholdIf       = params.thresholdIf;
             this.writeable         = params.writeable;
+            this.constraints       = params.constraints;
         }
         else {
             this.channelIndex      = channelIndex;
@@ -134,6 +174,7 @@ var DeviceDataPoints = new function () {
             this.hideIf            = hideIf;
             this.thresholdIf       = thresholdIf;
             this.writeable         = writeable;
+            this.constraints       = constraints;
         }
 
         if (this.channelIndex == null)
@@ -141,14 +182,13 @@ var DeviceDataPoints = new function () {
     }
     DataPoint_t.prototype.inChannel = function (index) {
         // copy object! (would change the channel of the one object in place all the time otherwise...)
-        return {
-            channelIndex      : index,
-            datapointName     : this.datapointName,
-            valueConversionFn : this.valueConversionFn,
-            hideIf            : this.hideIf,
-            thresholdIf       : this.thresholdIf,
-            writeable         : this.writeable,
-        }
+        return $.extend({}, this, { channelIndex: index });
+    };
+    DataPoint_t.prototype.constraints = function (constraints) {
+        return $.extend({}, this, { constraints: constraints });
+    };
+    DataPoint_t.prototype.writeable = function (state) {
+        return $.extend({}, this, { writeable: typeof (state) === "undefined" || state == true });
     };
 
     this.DataPoint = {
@@ -169,7 +209,11 @@ var DeviceDataPoints = new function () {
         SetTemperature: new DataPoint_t({
             datapointName: "SET_TEMPERATURE",
             thresholdIf: ThresholdFunctions.temperatureThreshold,
-            writeable: true
+            writeable: true,
+            constraints: {
+                min: 4.5,
+                max: 30.5
+            }
         }),
         ActualTemperature: new DataPoint_t({
             datapointName: "ACTUAL_TEMPERATURE",
@@ -258,32 +302,14 @@ var DeviceDataPoints = new function () {
     };
 }
 
-// Datapoint name translation
-var Translation = {
-    "LOWBAT": "Low Battery",
-    "BATTERY_STATE": "Battery",
-    "ACTUAL_HUMIDITY": "Luftfeuchte",
-    "ACTUAL_TEMPERATURE": "Temperatur",
-    "SET_TEMPERATURE": "Zieltemperatur",
-    "VALVE_STATE": "Ventilstatus",
-    "ERROR": "Sabotage",
-    "STATE": "Status",
-    "CONTROL_MODE": "Modus",
-    "FAULT_REPORTING": "Fehler",
-}
-function translate(string) {
-    // if has translation: translate
-    if (Translation.hasOwnProperty(string))
-        return Translation[string];
-        // else: return input string
-    else
-        return string;
-}
+function getDeviceDataPointsForType(typeName) {
+    var code = deviceTypeCode[typeName];
 
-function getDeviceDataPointsForType(type) {
     for (var key in DeviceDataPoints) {
         if (DeviceDataPoints.hasOwnProperty(key)) {
-            if (typeof (DeviceDataPoints[key].forDevice) != "undefined" && DeviceDataPoints[key].forDevice == type) {
+            if (typeof (DeviceDataPoints[key].forDevice) != "undefined"
+                && (DeviceDataPoints[key].forDevice == typeName || DeviceDataPoints[key].forDevice == code))
+            {
                 return DeviceDataPoints[key].datapoints;
             }
         }

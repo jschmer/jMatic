@@ -39,13 +39,18 @@ Error: new DataPoint_t({
            valueConversionFn: getErrorString,     // translate the error number/string
            hideIf: HideFunctions.hideIfNoError,   // show only if there is an error
            thresholdIf: ThresholdFunctions.always // always highlight
+           writeable: true,                       // datapoint can be edited
+           constraints: {                         // optional numerical constraints on the datapoint value
+               min: 0,
+               max: 40
+           }
        }),
 ```
 Then extend the DeviceDataPoints object with a new property for your new device.
 Example for a heater device:
 ```javascript
 this.HeaterData = {
-    forDevice: 'Heater', // or the device code 'HM-CC-RT-DN' if the optional step later is skipped
+    forDevice: 'Heater', // or the device code 'HM-CC-RT-DN'
     datapoints: [
         this.DataPoint.LowBat,                          // implicitly channel 0
         this.DataPoint.ControlMode.inChannel(4),        // explicitly channel 4
@@ -57,11 +62,11 @@ this.HeaterData = {
 };
 ```
 
-Optionally extend the deviceTypes map with your new device to provide a menaingful name
+Optionally extend the deviceTypeNames map with your new device to provide a menaingful name
 instead of a cryptic device code. If you provide a new name here you have to update the 
 forDevice property of your DeviceDataPoints!
 ```javascript
-var deviceTypes = {
+var deviceTypeNames = {
     'HM-CC-VG-1': 'VirtualGroup',
     'HM-Sec-SCo': 'WindowSensor',
     'HM-CC-RT-DN': 'Heater',
@@ -78,7 +83,7 @@ Used in views **Device State** and **Device Subscription**
 	{
 		id: int,
 		name: "string",
-		type: "HomeMatic Device Type" (an entry from deviceTypes map or raw device type code),
+		type: "HomeMatic Device Type" (an entry from deviceTypeNames map or raw device type code),
 		subscribed: boolean,
 		state:  {
 					CHANNELNAME_DEVICEID: channel_data_structure
@@ -103,10 +108,13 @@ channel: {
     homematicType: enum(logic, number, option, string),
     displayValue: Converted boolean/int/float/string, // == value
     value: Unconverted value from XML API as a string, // == unconvertedValue
+    writeable: boolean,
     
     // specifics for different homematicTypes
-    min: number, // used for number 
-    max: number, // used for number
+    constraints: {
+        min: number, // used for number 
+        max: number, // used for number
+    }
     unit: string, // used for number
     valueMapping: { // used for logic, option
       value0: mappedValue0,
@@ -115,9 +123,11 @@ channel: {
     },
     
     // data to drive the ui
-    hide: boolean,
-    thresholdExceeded: boolean,
-    writeable: boolean
+    ui: {
+        hide: boolean,
+        thresholdExceeded: boolean,
+        changed: boolean // value changed
+    }
 }
 ```
 

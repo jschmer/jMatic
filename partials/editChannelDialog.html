@@ -1,36 +1,40 @@
 ﻿<div class="modal modal-overlay" ui-if='editChannelDialog' ui-state='editChannelDialog'>
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <button class="close" ui-turn-off="editChannelDialog">
-                    &times;
-                </button>
-                <h4 class="modal-title">Edit {{editChannel.name}} ({{editChannel.id}})</h4>
-            </div>
-            <div class="modal-body">
-                <style>
-                    .error {
-                        background-color: #FF3333;
-                    }
-                </style>
-                <form name="inputForm" style="margin-bottom: 15px;">
+            <form name="inputForm" style="margin-bottom: 15px;">
+                <div class="modal-header">
+                    <button class="close" ui-turn-off="editChannelDialog">
+                        &times;
+                    </button>
+                    <h4 class="modal-title">Edit {{editChannel.name}} ({{editChannel.id}})</h4>
+                </div>
+                <div class="modal-body">
+                    <style>
+                        .error {
+                            background-color: #FF3333;
+                        }
+                    </style>
                     <div ng-if="editChannel.homematicType==HomematicType.logic||editChannel.homematicType==HomematicType.option">
                         <select auto-focus ng-model="editChannel.displayValue" ng-options="data for (propname, data) in editChannel.valueMapping"></select>
                     </div>
                     <div ng-if="editChannel.homematicType==HomematicType.number">
-                        <p ng-show="editChannel.min&&editchannel.max">[{{editChannel.min}}, {{editChannel.max}}]</p>
-                        <input auto-focus ng-model="editChannel.displayValue" type="number" name="number" ng-class="!inputForm.number.$valid ? 'error' : ''" min="{{editChannel.min}}" max="{{editChannel.max}}" required />
-                        <div ng-show="!inputForm.number.$valid">ERROR: {{inputForm.number.$error}}</div>
+                        <p ng-show="editChannel.constraints.min">[{{editChannel.constraints.min}}, {{editChannel.constraints.max}}]</p>
+                        <input auto-focus ng-model="editChannel.displayValue" type="number" name="number" ng-class="!inputForm.number.$valid ? 'error' : ''" min="{{editChannel.constraints.min}}" max="{{editChannel.constraints.max}}" required />
+                        <span ng-show="!inputForm.number.$valid">
+                            <span ng-show="inputForm.number.$error.min">Out of range: Minimum</span>
+                            <span ng-show="inputForm.number.$error.max">Out of range: Maximum</span>
+                            <span ng-show="inputForm.number.$error.required">Required!</span>
+                        </span>
                     </div>
                     <div ng-if="editChannel.homematicType==HomematicType.string">
                         <input auto-focus ng-model="editChannel.displayValue" type="text" style="width: 100%;" />
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button ui-turn-off="editChannelDialog" class="btn btn-default">Close</button>
-                <button ui-turn-off="editChannelDialog" ng-click="SaveChanges()" class="btn btn-primary">Save changes</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button ui-turn-off="editChannelDialog" class="btn btn-default">Close</button>
+                    <button ui-turn-off="editChannelDialog" ng-disabled="!inputForm.number.$valid" ng-click="SaveChanges()" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

@@ -38,9 +38,9 @@
             <div class="device-state">
                 <span class="channel stack"
                       ng-repeat="(propname, data) in editedDevice.state"
-                      ng-hide="data.hide"
-                      ng-class="[(data.thresholdExceeded==true ? 'threshold' : ''),
-                                 (data.changed==true ? 'changed' : ''),
+                      ng-hide="data.ui.hide"
+                      ng-class="[(data.ui.thresholdExceeded==true ? 'threshold' : ''),
+                                 (data.ui.changed==true ? 'changed' : ''),
                                  (data.writeable==true ? 'writeable' : '')
                       ]"
                       ng-click="tryEditChannel(data)"

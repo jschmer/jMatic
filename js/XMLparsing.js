@@ -2,7 +2,7 @@
     deviceObj = new Device();
     deviceObj.id = parseInt(deviceNode._ise_id);
     deviceObj.name = deviceNode._name;
-    deviceObj.type = deviceTypes[deviceNode._device_type];
+    deviceObj.type = deviceTypeNames[deviceNode._device_type];
 
     if (typeof (deviceObj.type) == "undefined")
         deviceObj.type = deviceNode._device_type;
@@ -10,22 +10,6 @@
     return deviceObj;
 }
 
-//createChannelModel({
-//    id: undefined,
-//    name: datapoint.datapointNam,
-//    displayName: datapoint.datapointNam,
-//    valueType: undefined,
-//    homematicType: undefined,
-//    displayValue: "Datapoint '" + datapoint.datapointName + "' on channel " + datapoint.channelIndex + " not found!",
-//    value: undefined,
-//    min: undefined,
-//    max: undefined,
-//    unit: undefined,
-//    valueMapping: undefined,
-//    hide: false,
-//    thresholdExceeded: false,
-//    writeable: true,
-//});
 function createChannelModel(id, name, displayName, valueType, homematicType, displayValue, value, min, max, unit, valueMapping, hide, thresholdExceeded, writeable) {
     var channel = {}
 
@@ -39,15 +23,19 @@ function createChannelModel(id, name, displayName, valueType, homematicType, dis
         channel.homematicType = params.homematicType;
         channel.displayValue  = params.displayValue;
         channel.value         = params.value;
+        channel.writeable                 = params.writeable;
         // homematicType specifics
-        channel.min           = params.min;
-        channel.max           = params.max;
-        channel.unit          = params.unit;
-        channel.valueMapping  = params.valueMapping;
+        channel.constraints = {
+            min: params.min,
+            max: params.max,
+        };
+        channel.unit                      = params.unit;
+        channel.valueMapping              = params.valueMapping;
         // flags for the UI
-        channel.hide              = params.hide;
-        channel.thresholdExceeded = params.thresholdExceeded;
-        channel.writeable         = params.writeable;
+        channel.ui = {
+            hide: params.hide,
+            thresholdExceeded: params.thresholdExceeded,
+        };
     }
     else {
         channel.id                = id;
@@ -57,15 +45,19 @@ function createChannelModel(id, name, displayName, valueType, homematicType, dis
         channel.homematicType     = homematicType;
         channel.displayValue      = displayValue;
         channel.value             = value;
+        channel.writeable         = writeable;
         // homematicType specifics
-        channel.min = min;
-        channel.max               = max;
+        channel.constraints = {
+            min: min,
+            max: max,
+        };
         channel.unit              = unit;
         channel.valueMapping      = valueMapping;
         // flags for the UI
-        channel.hide              = hide;
-        channel.thresholdExceeded = thresholdExceeded;
-        channel.writeable         = writeable;
+        channel.ui = {
+            hide: hide,
+            thresholdExceeded: thresholdExceeded,
+        };
     }
 
     return channel;
@@ -113,6 +105,15 @@ function getChannelState(datapoint, stateObject) {
     var threshold    = datapoint.thresholdIf       != null ? datapoint.thresholdIf(dp.value) : false;
     var writeable    = datapoint.writeable         != null ? datapoint.writeable : false;
 
+    var constraints = {
+        min: undefined,
+        max: undefined
+    };
+    if (datapoint.constraints) {
+        constraints.min = datapoint.constraints.min;
+        constraints.max = datapoint.constraints.max;
+    }
+
     return createChannelModel({
         id: dp.chanID,
         name: dp.propName,
@@ -121,13 +122,13 @@ function getChannelState(datapoint, stateObject) {
         homematicType: dp.homematicType,
         displayValue: displayValue,
         value: dp.value,
-        min: undefined,
-        max: undefined,
+        writeable: writeable,
+        min: constraints.min,
+        max: constraints.max,
         unit: dp.unit,
         valueMapping: undefined,
         hide: hideChannel,
         thresholdExceeded: threshold,
-        writeable: writeable,
     });
 }
 
@@ -140,13 +141,17 @@ function getMissingDatapointState(datapoint) {
         homematicType: undefined,
         displayValue: "Datapoint '" + datapoint.datapointName + "' on channel " + datapoint.channelIndex + " not found!",
         value: undefined,
-        min: undefined,
-        max: undefined,
+        writeable: false,
+        constraints: {
+            min: undefined,
+            max: undefined,
+        },
         unit: undefined,
         valueMapping: undefined,
-        hide: false,
-        thresholdExceeded: false,
-        writeable: false,
+        ui: {
+            hide: false,
+            thresholdExceeded: true,
+        },
     });
 }
 
@@ -159,14 +164,14 @@ function flagChangedValues(oldState, newState) {
 
             if (oldState == null || !oldState.hasOwnProperty(propName)) {
                 // prop is new -> always flagged changed
-                newState[propName].changed = true;
+                newState[propName].ui.changed = true;
             }
             else {
                 var oldPropObject = oldState[propName];
                 var newPropObject = newState[propName];
 
                 if (oldPropObject.value != newPropObject.value) {
-                    newPropObject.changed = true;
+                    newPropObject.ui.changed = true;
                 }
             }
         }
@@ -313,8 +318,10 @@ function parseSystemVariable(syVarXMLnode) {
             break;
         case HomematicType.number:
             $.extend(channelData, {
-                min: min,
-                max: max,
+                constraints: {
+                    min: min,
+                    max: max,
+                },
                 unit: unit
             });
             break;

@@ -475,13 +475,15 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
     /*
      [
         {
-           id: zahl,
+           id: number,
            name: "",
            type: "",
            displayValue: "", // already mapped
            value: "",
-           min: zahl | null,
-           max: zahl | null,
+           constraints: {
+               min: number | null,
+               max: number | null,
+           },
            valueMapping: // for displaying a dropdown box of valid values for input? (enum, bool, alarm)
            {
                mapping: value,

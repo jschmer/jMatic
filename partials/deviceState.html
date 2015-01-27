@@ -24,19 +24,18 @@
 <div class="scrollable-content">
     <p ng-show="noSubscribedDevices">No subscribed devices!</p>
     <div class="list-group">
-        <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed" ng-click="editDevice(device.id)">
+        <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
             <div class="device-info">
                 <span class="device-loader"><span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span></span>
-                <span class="device-name">{{device.name}}</span>
+                <span class="device-name pointable" ng-click="editDevice(device.id)">{{device.name}}</span>
                 <span ui-show="showChannelNames" class="device-type label" ng-class="device.type">{{device.type}}</span>
             </div>
             <div class="device-state">
                 <span class="channel"
-                      ng-hide="data.hide"
+                      ng-hide="data.ui.hide"
                       ng-repeat="(propname, data) in device.state"
-                      ng-class="[(data.thresholdExceeded==true ? 'threshold' : ''),
-                                 (data.changed==true ? 'changed' : ''),
-                                 (data.writeable==true ? 'writeable' : '')
+                      ng-class="[(data.ui.thresholdExceeded==true ? 'threshold' : ''),
+                                 (data.ui.changed==true ? 'changed' : ''),
                       ]"
                       ui-class="{
                         'flow': channelsStacked==false,

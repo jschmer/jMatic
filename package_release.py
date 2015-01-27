@@ -7,7 +7,22 @@ package_entities = [
   'css',
   'img',
   'js',
-  'lib',
+  'lib/xml2json/xml2json.min.js',
+  'lib/jQuery/jquery-2.1.3.min.js',
+  'lib/angular/core/angular.min.js',
+  #'lib/angular/core/angular.min.js.map',
+  'lib/angular/modules/route/angular-route.min.js',
+  #'lib/angular/modules/route/angular-route.min.js.map',
+  'lib/angular/modules/animate/angular-animate.min.js',
+  #'lib/angular/modules/animate/angular-animate.min.js.map',
+  'lib/angular/modules/toasty/css/ng-toasty.css',
+  'lib/angular/modules/toasty/js/ng-toasty.min.js',
+  'lib/angular/modules/translate/angular-translate.min.js',
+  'lib/angular/mobile-ui/css/mobile-angular-ui-hover.min.css',
+  'lib/angular/mobile-ui/css/mobile-angular-ui-base.min.css',
+  'lib/angular/mobile-ui/css/mobile-angular-ui-desktop.min.css',
+  'lib/angular/mobile-ui/js/mobile-angular-ui.min.js',
+  'lib/angular/mobile-ui/fonts',
   'index.html'
 ]
 

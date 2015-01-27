@@ -13,10 +13,10 @@ Especially the language is a mix of en/de.
 Prerequisites
 -------------
 - HomeMatic CCU/CCU2 with [XML-API] AddOn.
-- HTML5 compatible browser (for persistance in localStorage)
+- HTML5 compatible browser (for persistence in localStorage)
 - Tested with
   - Firefox 31
-  - Internet Explorer 11
+  - Internet Explorer 11 (not working when launching the file::// directly!)
   - Google Chrome 39
   - Google Chrome for Android 39
 
@@ -24,7 +24,7 @@ Features
 --------
 - Device widgets that display only important datapoints of HomeMatic components
 	- Read-only
-	- Write-support for write-enabled datapoints is planned
+	- Write-support for write-enabled datapoints
 	- Highlight datapoints (red font color) if the value exceeds some hardcoded threshold
 	- Highlight changed values (bold font weight)
 - Subscribing to devices
@@ -38,14 +38,13 @@ Features
 
 Roadmap
 -------
-- Write support for write-enabled channels in device state view
 - UI for dynamic definition of user defined widgets
 - Program view for running CCU programs
 
 Usage
 -----
 Either copy jMatic to your device and launch index.html locally with a browser and bookmark it.
-Or host it on a webserver.
+Or host it on a webserver. IE11 only works with a hosted version.
 
 Views
 -----

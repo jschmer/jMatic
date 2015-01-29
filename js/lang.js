@@ -17,6 +17,10 @@
         'STACK_LAYOUT': 'Stack Layout',
         'FLOW_LAYOUT': 'Flow Layout',
         'MENU': 'Menu',
+        'LEGEND': 'Legend',
+        'DEVICE_DELETE': 'Delete device in jMatic',
+        'DEVICE_CONFIG_MISSING_ON_CCU': 'Device configuration is missing on your CCU (device was probably deleted there!)',
+        'DEVICE_REGISTERED': 'Device is registered in jMatic',
     },
     "de": {
         'TITLE_DEVICE_STATE': 'Gerätestatus',
@@ -33,5 +37,9 @@
         'STACK_LAYOUT': 'Tabellarisch',
         'FLOW_LAYOUT': 'Fließend',
         'MENU': 'Menü',
+        'LEGEND': 'Legende',
+        'DEVICE_DELETE': 'Konfiguration in jMatic löschen',
+        'DEVICE_CONFIG_MISSING_ON_CCU': 'Geräte-Konfiguration fehlt auf deiner CCU-Zentrale (Gerät wurde wahrscheinlich dort gelöscht!)',
+        'DEVICE_REGISTERED': 'Gerät ist in jMatic registriert',
     }
 };

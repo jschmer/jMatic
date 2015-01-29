@@ -6,11 +6,24 @@ var jMaticApp = angular
         this.error = function (message, timeout) {
             console.error(message);
             toasty.pop.error({
-                title: message,
+                title: "Error",
+                msg: message,
                 sound: false,
                 showClose: true,
                 clickToClose: true,
-                timeout: isInt(timeout) ? timeout : 2000
+                timeout: isInt(timeout) ? timeout : 0
+            });
+        };
+
+        this.success = function (message, timeout) {
+            console.info(message);
+            toasty.pop.success({
+                title: "Success",
+                msg: message,
+                sound: false,
+                showClose: true,
+                clickToClose: true,
+                timeout: isInt(timeout) ? timeout : 0
             });
         };
     })

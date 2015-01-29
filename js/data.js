@@ -5,6 +5,7 @@ var deviceTypeNames = {
     'HM-CC-RT-DN': 'Heater',
     'HM-TC-IT-WM-W-EU': 'Thermostat',
 }
+var userdefinedGroupType = 'UserdefinedVirtualGroup';
 
 // map device type display name to device code
 var deviceTypeCode = {}

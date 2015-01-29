@@ -46,11 +46,6 @@ and (max-device-width:480px)
 }
 
 /* view styles */
-.config-list-item-state {
-    width: 15px;
-    display: inline-block;
-}
-
 .device-type {
     color: inherit !important;
     background-color: lightgray;

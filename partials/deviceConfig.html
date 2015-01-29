@@ -10,17 +10,35 @@
         <span class="btn-group" ui-state="showIds" ui-default="false">
             <a href class="btn btn-default" ui-class="{'active': showIds}" ui-toggle="showIds">IDs</a>
         </span>
+        <span class="btn-group" ui-state="showLegend" ui-default="false">
+            <a href class="btn btn-default" ui-class="{'active': showLegend}" ui-toggle="showLegend"><span translate="LEGEND"></span></a>
+        </span>
+        <div ui-show="showLegend">
+            <div><i class="fa fa-check green fa-fw"></i> = <span translate="DEVICE_REGISTERED"></span></div>
+            <div><i class="fa fa-question red fa-fw"></i> = <span translate="DEVICE_CONFIG_MISSING_ON_CCU"></span></div>
+            <div><i class="fa fa-close red fa-fw"></i> = <span translate="DEVICE_DELETE"></span></div>
+        </div>
     </div>
 </div>
 <div class="scrollable-content">
     <div class="list-group" ng-hide="loading">
-        <span ng-repeat="device in devices | orderBy: listOrder" class="list-group-item pointable" ng-click="toggleSubscription(device.id)">
-            <span class="config-list-item-state">
-                <i ng-show="device.subscribed" class="fa fa-check green"></i>
+        <span ng-repeat="device in devices | orderBy: listOrder" class="list-group-item">
+            <span ng-click="toggleSubscription(device.id)" class="pointable">
+                <span class="config-list-config-state">
+                    <i class="fa fa-fw" ng-class="[
+                        !device.available ? 'fa-question red' : ''
+                       ]"></i>
+                </span>
+                <span class="config-list-subscription-state">
+                    <i class="fa fa-fw" ng-class="[
+                        device.subscribed ? 'fa-check green' : ''
+                       ]"></i>
+                </span>
+                <span>{{device.name}}</span>
+                <span ui-show="showIds"> ({{device.id}})</span>
+                <span class="device-type label" ng-class="device.type">{{device.type}}</span>
             </span>
-            <span>{{device.name}}</span>
-            <span ui-show="showIds"> ({{device.id}})</span>
-            <span class="device-type label" ng-class="device.type">{{device.type}}</span>
+            <i ng-show="!device.available" class="fa fa-close red fa-fw pointable" ng-click="deleteDevice(device.id)"></i>
         </span>
     </div>
     <div ng-show="loading">

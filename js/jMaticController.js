@@ -20,7 +20,6 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, $
     }
 
     $scope.loadStates = function () {
-
         var deviceIds = []
         for (i = 0; i < $scope.devices.length; ++i)
         {
@@ -59,7 +58,7 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, $
 
                      var deviceStates = xmlResponse.state.device;
                      if (deviceStates == null) {
-                         Notification.error("ERROR no device states received!", 5000);
+                         Notification.error("No device states received!");
                          return;
                      }
 
@@ -75,7 +74,7 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, $
                      LocalStorage.saveDevices($scope.devices);
                  }
                  catch (e) {
-                     Notification.error("ERROR parsing device states! " + e, 5000);
+                     Notification.error("Failed parsing device states! " + e);
                      console.error(e);
                  }
                  finally {
@@ -84,8 +83,9 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, $
              })
              .error(function (data, status, headers, config) {
                  try {
-                     Notification.error("ERROR getting deviceStates! Is your CCU reachable?", 5000);
-                     console.log("ERROR getting deviceStates! Is your CCU reachable?", data, status, headers, config);
+                     var message = "Failed getting deviceStates! Is your CCU reachable?";
+                     Notification.error(message);
+                     console.log(message, data, status, headers, config);
                  }
                  catch (e) {
                      console.error(e);
@@ -154,8 +154,9 @@ jMaticControllers.controller('editDeviceStateController', function ($scope, $htt
                      }
                      else {
                          // change failed
-                         Notification.error("ERROR changing systemVariable " + id, 5000);
-                         console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                         var message = "Failed changing systemVariable " + id;
+                         Notification.error(message);
+                         console.log(message, data, status, headers, config);
                      }
                  } finally {
                      finishLoading($scope);
@@ -163,8 +164,9 @@ jMaticControllers.controller('editDeviceStateController', function ($scope, $htt
              })
              .error(function (data, status, headers, config) {
                  finishLoading($scope);
-                 Notification.error("ERROR changing systemVariable " + id, 5000);
-                 console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                 var message = "Network error while changing systemVariable " + id;
+                 Notification.error(message);
+                 console.log(message, data, status, headers, config);
              });
     }
 
@@ -207,7 +209,7 @@ jMaticControllers.controller('editDeviceStateController', function ($scope, $htt
 
                      var deviceStates = xmlResponse.state.device;
                      if (deviceStates == null) {
-                         Notification.error("ERROR no device states received!", 5000);
+                         Notification.error("No device states received!");
                          return;
                      }
 
@@ -223,7 +225,7 @@ jMaticControllers.controller('editDeviceStateController', function ($scope, $htt
                      LocalStorage.saveDevices($scope.devices);
                  }
                  catch (e) {
-                     Notification.error("ERROR parsing device states! " + e, 5000);
+                     Notification.error("Failed parsing device states! " + e);
                      console.error(e);
                  }
                  finally {
@@ -232,8 +234,9 @@ jMaticControllers.controller('editDeviceStateController', function ($scope, $htt
              })
              .error(function (data, status, headers, config) {
                  try {
-                     Notification.error("ERROR getting deviceStates! Is your CCU reachable?", 5000);
-                     console.log("ERROR getting deviceStates! Is your CCU reachable?", data, status, headers, config);
+                     var message = "Failed getting device states! Is your CCU reachable?";
+                     Notification.error(message);
+                     console.log(message, data, status, headers, config);
                  }
                  catch (e) {
                      console.error(e);
@@ -270,6 +273,9 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
     finishLoading($scope);
 
     $scope.devices = LocalStorage.loadDevices();
+    // invalidate the availability of all devices before loading from the CCU to flag missing device configurations
+    for (var i = 0; i < $scope.devices.length; ++i)
+        $scope.devices[i].available = false;
 
     // load user defined groups
     if (typeof (userdefined_groups) !== "undefined" && typeof (userdefined_groups.length) !== "undefined") {
@@ -287,9 +293,10 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
                 $scope.devices[deviceIndex] = {
                     id: grp.id,
                     name: grp.name,
-                    type: 'UserdefinedVirtualGroup',
+                    type: userdefinedGroupType,
                     config: grp.config,
                     subscribed: existingDevice.subscribed,
+                    available: true,
                     state: existingDevice.state,
                 };
 
@@ -300,9 +307,10 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
                 $scope.devices.push({
                     id: grp.id,
                     name: grp.name,
-                    type: 'UserdefinedVirtualGroup',
+                    type: userdefinedGroupType,
                     config: grp.config,
                     subscribed: false,
+                    available: true,
                     state: null,
                 });
             }
@@ -310,6 +318,10 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
 
         if (updateCache)
             LocalStorage.saveDevices($scope.devices);
+    }
+
+    $scope.isUserdefinedConfig = function (type) {
+        return type === userdefinedGroupType;
     }
 
     $scope.loadDevices = function () {
@@ -327,6 +339,7 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
                      for (var i = 0; i < deviceArray.length; i += 1) {
                          device = deviceArray[i];
                          device = createDeviceModel(device);
+                         device.available = true;
 
                          var deviceIndex = findDevice($scope.devices, device.id);
                          if (deviceIndex != -1) {
@@ -336,9 +349,12 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
                              $scope.devices[deviceIndex] = device;
                          }
                          else {
+                             // got a new device
                              $scope.devices.push(device);
                          }
                      }
+
+                     $scope.persistDeviceConfig($scope.devices);
                  }
                  finally {
                      finishLoading($scope);
@@ -346,8 +362,9 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
              })
              .error(function (data, status, headers, config) {
                  try {
-                     Notification.error("ERROR getting devicelist!", 5000);
-                     console.log("ERROR getting devicelist:", data, status, headers, config);
+                     var message = "Failed getting devicelist!";
+                     Notification.error(message);
+                     console.log(message, data, status, headers, config);
                  }
                  finally {
                      finishLoading($scope);
@@ -355,8 +372,8 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
              });
     }
 
-    $scope.persistDeviceConfig = function () {
-        LocalStorage.saveDevices($scope.devices);
+    $scope.persistDeviceConfig = function (devices) {
+        LocalStorage.saveDevices(typeof(devices) === 'undefined' ? $scope.devices : devices);
     }
 
     $scope.toggleSubscription = function (deviceId) {
@@ -375,6 +392,19 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
 
     $scope.setListOrder = function (orderBy) {
         $scope.listOrder = orderBy;
+    }
+
+    $scope.deleteDevice = function (deviceId) {
+        var deviceIndex = findDevice($scope.devices, deviceId);
+        if (deviceIndex != -1) {
+            var device = $scope.devices[deviceIndex];
+            $scope.devices.splice(deviceIndex, 1);
+            Notification.success("Device '" + device.name + "' deleted!", 2000);
+            $scope.persistDeviceConfig($scope.devices);
+        }
+        else {
+            Notification.error("Device with id " + deviceId + " not found!");
+        }
     }
 
     $scope.loadDevices();
@@ -454,8 +484,9 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http, 
              })
              .error(function (data, status, headers, config) {
                  try {
-                     Notification.error("ERROR getting deviceStates!", 5000);
-                     console.log("ERROR getting deviceStates", data, status, headers, config);
+                     var message = "Failed getting device states!";
+                     Notification.error(message);
+                     console.log(message, data, status, headers, config);
                  } finally {
                      finishLoading($scope);
                  }
@@ -520,8 +551,9 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
              })
              .error(function (data, status, headers, config) {
                  try {
-                     Notification.error("ERROR getting systemVariables!", 5000);
-                     console.log("ERROR getting systemVariables", data, status, headers, config);
+                     var message = "Failed getting systemVariables!";
+                     Notification.error(message);
+                     console.log(message, data, status, headers, config);
                  } finally {
                      finishLoading($scope);
                  }
@@ -580,8 +612,9 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
                      }
                      else {
                          // change failed
-                         Notification.error("ERROR changing systemVariable " + id, 5000);
-                         console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                         var message = "Changing systemVariable with id " + id + " failed!";
+                         Notification.error(message);
+                         console.log(message, data, status, headers, config);
                      }
                  } finally{
                      finishLoading($scope);
@@ -589,8 +622,9 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
              })
              .error(function (data, status, headers, config) {
                  finishLoading($scope);
-                 Notification.error("ERROR changing systemVariable " + id, 5000);
-                 console.log("ERROR changing systemVariable " + id, data, status, headers, config);
+                 var message = "Network error while changing systemVariable " + id;
+                 Notification.error(message);
+                 console.log(message, data, status, headers, config);
              });
     }
 

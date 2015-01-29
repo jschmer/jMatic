@@ -57,7 +57,7 @@ var userdefined_groups = [
                 ]
             },
             {
-                device_id: 2744, // heater balkon
+                device_id: 3413, // heater balkon
                 datapoints: [
                     DeviceDataPoints.DataPoint.ValveState.inChannel(4),
                 ]

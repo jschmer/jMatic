@@ -568,6 +568,74 @@ jMaticControllers.controller('appConfigController', function ($scope, $http, Not
     finishLoading($scope);
 });
 
+jMaticControllers.controller('programController', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout) {
+
+    finishLoading($scope);
+
+    $scope.programs = []
+
+    $scope.runProgram = function (prog) {
+        startLoading($scope);
+
+        CCUXMLAPI.RunProgram(prog.id, {
+            success: function (result) {
+                try {
+                    if (result._program_id != prog.id) {
+                        var message = "Running program with id " + prog.id + " failed!";
+                        Notification.error(message);
+                        console.error(message, data, status, headers, config);
+                    }
+                    else {
+                        Notification.success("Running program '" + prog.name + "' successful!", 2000);
+                    }
+                }
+                finally {
+                    finishLoading($scope);
+                }
+            },
+            error: function () {
+                finishLoading($scope);
+            }
+        });
+    }
+
+    $scope.loadPrograms = function () {
+
+        startLoading($scope);
+
+        CCUXMLAPI.ProgramList({
+            success: function (progList) {
+                console.log("Got " + progList.length + " programs");
+
+                try {
+                    $scope.programs = []
+                    for (var i = 0; i < progList.length; ++i) {
+                        var prog = progList[i];
+
+                        $scope.programs.push({
+                            id: prog._id,
+                            name: prog._name,
+                            desc: prog._description,
+                            active: prog._active
+                        });
+                    }
+                } catch (e) {
+                    var message = "Failed parsing system variables list!" + e;
+                    Notification.error(message);
+                    console.error(message, data, status, headers, config);
+                } finally {
+                    finishLoading($scope);
+                }
+            },
+            error: function () {
+                finishLoading($scope);
+            }
+        });
+    }
+    
+    $scope.loadPrograms();
+});
+
 // Startup controller
 jMaticControllers.controller('MainController', function ($rootScope, $scope) {
 

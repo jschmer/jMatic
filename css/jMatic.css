@@ -79,26 +79,37 @@ and (max-device-width:480px)
     color: red;
 }
 
-table.systemVariables {
+table.systemVariables,
+table.programs {
     padding-left: 20px;
     width: 100%;
 }
 
-table.systemVariables td {
+table.programs th {
+    text-align: center;
+    font-weight: bold;
+}
+
+table.systemVariables td,
+table.programs td {
     padding: 0px 3px 0px 3px;
 }
 
-tr.systemVariable {
+tr.systemVariable,
+tr.program,
+table.programs tr:first-child {
     margin-bottom: 0px;
     border: 0 none;
     border-bottom: 1px solid #ddd;
 }
 
-tr.systemVariable td:first-child {
+tr.systemVariable td:first-child,
+tr.program td:first-child {
     padding: 10px 2px 10px 10px;
 }
 
-tr.systemVariable td:last-child {
+tr.systemVariable td:last-child,
+tr.program td:last-child {
     padding: 10px 10px 10px 2px;
 }
 
@@ -113,6 +124,10 @@ tr.systemVariable .equals {
 
 tr.systemVariable .value {
     text-align: left;
+}
+
+tr.program .id {
+    text-align: center;
 }
 
 .last-refresh {

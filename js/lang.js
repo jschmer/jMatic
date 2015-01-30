@@ -6,6 +6,7 @@
         'TITLE_DEVICE_CONFIG': 'Subscription Config',
         'TITLE_BATTERY_CHECK': 'Battery Check',
         'TITLE_SYSVARS': 'System Variables',
+        'TITLE_PROGRAMS': 'Programs',
         'TITLE_APP_CONFIG': 'Settings',
         'BUTTON_LANG_DE': 'de',
         'BUTTON_LANG_EN': 'en',
@@ -21,6 +22,9 @@
         'DEVICE_DELETE': 'Delete device in jMatic',
         'DEVICE_CONFIG_MISSING_ON_CCU': 'Device configuration is missing on your CCU (device was probably deleted there!)',
         'DEVICE_REGISTERED': 'Device is registered in jMatic',
+        'DETAILS': 'Details',
+        'ID': 'Id',
+        'DESCRIPTION': 'Description',
     },
     "de": {
         'TITLE_DEVICE_STATE': 'Gerätestatus',
@@ -28,6 +32,7 @@
         'TITLE_DEVICE_CONFIG': 'Abo-Konfiguration',
         'TITLE_BATTERY_CHECK': 'Batteriecheck',
         'TITLE_SYSVARS': 'Systemvariablen',
+        'TITLE_PROGRAMS': 'Programme',
         'TITLE_APP_CONFIG': 'Einstellungen',
         'APP_CONFIG_LANGUAGE': 'Sprache ',
         'NAME': 'Name',
@@ -41,5 +46,6 @@
         'DEVICE_DELETE': 'Konfiguration in jMatic löschen',
         'DEVICE_CONFIG_MISSING_ON_CCU': 'Geräte-Konfiguration fehlt auf deiner CCU-Zentrale (Gerät wurde wahrscheinlich dort gelöscht!)',
         'DEVICE_REGISTERED': 'Gerät ist in jMatic registriert',
+        'DESCRIPTION': 'Beschreibung',
     }
 };

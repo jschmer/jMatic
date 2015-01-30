@@ -78,6 +78,8 @@ var jMaticApp = angular
             ChannelEdit: function (id, value) {
                 return 'http://' + getIP() + '/addons/xmlapi/statechange.cgi?ise_id=' + id + '&new_value=' + value;
             },
+            ProgramList: function () { return 'http://' + getIP() + '/addons/xmlapi/programlist.cgi'; },
+            RunProgram: function (id) { return 'http://' + getIP() + '/addons/xmlapi/runprogram.cgi?program_id=' + id; },
         }
 
         function executeHttpGet(params) {
@@ -266,6 +268,67 @@ var jMaticApp = angular
                     }
                 });
             },
+            ProgramList: function (callbacks) {
+                if (!callbacks) callbacks = {}
+
+                executeHttpGet({
+                    uri: URI.ProgramList(),
+                    success: function (response, status, headers, config) {
+                        console.log("OK getting program list!");
+
+                        try {
+                            var programList = x2js.xml_str2json(response).programList.program;
+                            if (programList == null) {
+                                Notification.error("No programs received!");
+                                return;
+                            }
+                            console.log("OK converting program list to json!");
+
+                            // adjust program list with only one program
+                            programList = makeArrayIfOnlyOneObject(programList);
+                        }
+                        catch (e) {
+                            Notification.error("Failed parsing program list! " + e);
+                            console.error(e);
+                            return;
+                        }
+
+                        if (callbacks.success) callbacks.success(programList);
+                    },
+                    error: function (response, status, headers, config) {
+                        genericErrorFn("Failed getting program list! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                    }
+                });
+            },
+            RunProgram: function (id, callbacks) {
+                if (!callbacks) callbacks = {}
+
+                executeHttpGet({
+                    uri: URI.RunProgram(id),
+                    success: function (response, status, headers, config) {
+                        console.log("OK running program " + id);
+
+                        try {
+                            var result = x2js.xml_str2json(response).result.started;
+                            if (result == null) {
+                                Notification.error("Running program with id " + id + " failed!");
+                                return;
+                            }
+                            console.log("OK converting result of running program to json!");
+                        }
+                        catch (e) {
+                            Notification.error("Failed running program! " + e);
+                            console.error(e);
+                            return;
+                        }
+
+                        if (callbacks.success) callbacks.success(result);
+                    },
+                    error: function (response, status, headers, config) {
+                        genericErrorFn("Failed running program " + id + "! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                    }
+                });
+            },
         };
     })
 
@@ -299,6 +362,11 @@ var jMaticApp = angular
             when('/appConfig', {
                 templateUrl: 'applicationConfig.html',
                 controller: 'appConfigController',
+                reloadOnSearch: false
+            }).
+            when('/programs', {
+                templateUrl: 'programs.html',
+                controller: 'programController',
                 reloadOnSearch: false
             }).
             otherwise({

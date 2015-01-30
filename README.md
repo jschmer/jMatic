@@ -32,6 +32,7 @@ Features
 - Refreshing data manually and on page load
 - Checking battery for every device
 - Display and modify system variables
+- Running programs
 - User defined widgets which are composed of arbitrary datapoints from different devices
 	- Currently only hardcoded in JSON-format
 	- UI for dynamic creation is planned
@@ -39,7 +40,6 @@ Features
 Roadmap
 -------
 - UI for dynamic definition of user defined widgets
-- Program view for running CCU programs
 
 Usage
 -----

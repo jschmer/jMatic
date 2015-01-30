@@ -62,7 +62,7 @@ System Variables
 ![System Variables](./doc/screenshots/SystemVariables.png?raw=true)
 ![System Variables Edit](./doc/screenshots/SystemVariables_EditNumber.png?raw=true)
 
-Settings 
+Settings  
 ![Settings](./doc/screenshots/Settings.png?raw=true)
 
 Dependencies

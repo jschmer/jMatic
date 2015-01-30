@@ -1,4 +1,4 @@
-﻿<div class="modal modal-overlay" ui-if='editChannelDialog' ui-state='editChannelDialog'>
+﻿<div class="modal modal-overlay" ui-state='editChannelDialog' ui-if='editChannelDialog' >
     <div class="modal-dialog">
         <div class="modal-content">
             <form name="inputForm" style="margin-bottom: 15px;">
@@ -32,7 +32,7 @@
                 </div>
                 <div class="modal-footer">
                     <button ui-turn-off="editChannelDialog" class="btn btn-default">Close</button>
-                    <button ui-turn-off="editChannelDialog" ng-disabled="!inputForm.number.$valid" ng-click="SaveChanges()" class="btn btn-primary">Save changes</button>
+                    <button ui-turn-off="editChannelDialog" ng-disabled="!inputForm.number.$valid&&editChannel.homematicType==HomematicType.number" ng-click="SaveChanges()" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>

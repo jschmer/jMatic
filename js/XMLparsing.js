@@ -184,7 +184,8 @@ function parseStates(devices, stateObject) {
     for (var i = 0; i < stateObject.length; ++i) {
         var deviceState = stateObject[i];
         var deviceIndex = findDevice(devices, deviceState._ise_id);
-        parseState(devices[deviceIndex], deviceState);
+        if (deviceIndex != -1)
+            parseState(devices[deviceIndex], deviceState);
     }
 
     // parse state for userdefined virtual groups
@@ -199,7 +200,7 @@ function parseStates(devices, stateObject) {
     }
 }
 
-function parseState(device, stateObject) {
+function parseState(device, stateObjectForDevice) {
     oldState = device.state;
     device.state = {};
 
@@ -208,7 +209,7 @@ function parseState(device, stateObject) {
     for (var i = 0; i < data.length; ++i) {
         var dataInstance = data[i];
 
-        var channelState = getChannelState(dataInstance, stateObject);
+        var channelState = getChannelState(dataInstance, stateObjectForDevice);
 
         if (channelState == null) {
             device.state[dataInstance.datapointName] = getMissingDatapointState(dataInstance);

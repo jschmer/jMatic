@@ -28,7 +28,7 @@ var jMaticApp = angular
         };
     })
 
-    .service("LocalStorage", function () {
+    .service("LocalStorage", function (SharedState) {
         this.loadDevices = function () {
             var registeredDevices = localStorage.registeredDevices;
             try {
@@ -46,11 +46,11 @@ var jMaticApp = angular
             catch (e) { }
         };
 
-        this.initSharedState = function (booleanPropertyName, sharedState, scope) {
+        this.initSharedState = function (booleanPropertyName, scope) {
             var boolValue = localStorage[booleanPropertyName];
             boolValue = boolValue == null ? false : boolValue == "true";
-            sharedState.initialize(scope, booleanPropertyName);
-            sharedState.set(booleanPropertyName, boolValue);
+            SharedState.initialize(scope, booleanPropertyName);
+            SharedState.set(booleanPropertyName, boolValue);
         };
 
         this.get = function (key) {
@@ -65,20 +65,206 @@ var jMaticApp = angular
         };
     })
 
-    .factory("CCUXMLAPI", function (LocalStorage) {
-        // TODO: put http request stuff in here
-
+    .factory("CCUXMLAPI", function (LocalStorage, $http, Notification) {
         function getIP() {
             return LocalStorage.get('CCU-IP');
         }
 
-        return {
+        var URI = {
             AllDeviceStates: function () { return 'http://' + getIP() + '/addons/xmlapi/statelist.cgi'; },
-            DeviceState: function () { return 'http://' + getIP() + '/addons/xmlapi/state.cgi?device_id='; },
+            DeviceState: function (ids) { return 'http://' + getIP() + '/addons/xmlapi/state.cgi?device_id=' + ids.join(); },
             DeviceList: function () { return 'http://' + getIP() + '/addons/xmlapi/devicelist.cgi'; },
             SysVarList: function () { return 'http://' + getIP() + '/addons/xmlapi/sysvarlist.cgi'; },
             ChannelEdit: function (id, value) {
                 return 'http://' + getIP() + '/addons/xmlapi/statechange.cgi?ise_id=' + id + '&new_value=' + value;
+            },
+        }
+
+        function executeHttpGet(params) {
+            delete $http.defaults.headers.common['X-Requested-With'];
+            $http.get(params.uri)
+                 .success(params.success)
+                 .error(params.error);
+        }
+
+        function genericErrorFn(message, response, status, headers, config, errorCallback) {
+            Notification.error(message);
+            console.error(message, response, status, headers, config);
+
+            if (errorCallback) errorCallback();
+        }
+
+        // Executes HTTP GET requests on the CCU and converts the response to JSON
+        // Every method takes a callbacks object with success and error functions that get executed in
+        // their corresponding handler depending on the outcome of the http request
+        return {
+            AllDeviceStates: function (callbacks) {
+                if (!callbacks) callbacks = {}
+
+                executeHttpGet({
+                    uri: URI.AllDeviceStates(),
+                    success: function (response, status, headers, config) {
+                        console.log("OK getting all deviceStates");
+
+                        try {
+                            var deviceStates = x2js.xml_str2json(response).stateList.device;
+                            if (deviceStates == null) {
+                                Notification.error("No device states received!");
+                                return;
+                            }
+                            console.log("OK converting device states to json!");
+
+                            // adjust statelists with only one device
+                            deviceStates = makeArrayIfOnlyOneObject(deviceStates);
+                        }
+                        catch (e) {
+                            Notification.error("Failed parsing device states! " + e);
+                            console.error(e);
+                            return;
+                        }
+
+                        if (callbacks.success) callbacks.success(deviceStates);
+                    },
+                    error: function (response, status, headers, config) {
+                        genericErrorFn("Failed getting device states! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                    }
+                });
+
+                return 'http://' + getIP() + '/addons/xmlapi/statelist.cgi';
+            },
+            DeviceState: function (ids, callbacks) {
+                if (!isArray(ids)) {
+                    var msg = ids + " is not an array!";
+                    console.error(msg);
+                    throw msg;
+                }
+                if (!callbacks) callbacks = {}
+
+                executeHttpGet({
+                    uri: URI.DeviceState(ids),
+                    success: function (response, status, headers, config) {
+                        console.log("OK getting deviceStates for IDs " + ids.join());
+
+                        try {
+                            var deviceStates = x2js.xml_str2json(response).state.device;
+                            if (deviceStates == null) {
+                                Notification.error("No device states received!");
+                                return;
+                            }
+                            console.log("OK converting device states to json!");
+
+                            // adjust statelists with only one device
+                            deviceStates = makeArrayIfOnlyOneObject(deviceStates);
+                        }
+                        catch (e) {
+                            Notification.error("Failed parsing device states! " + e);
+                            console.error(e);
+                            return;
+                        }
+
+                        if (callbacks.success) callbacks.success(deviceStates);
+                    },
+                    error: function (response, status, headers, config) {
+                        genericErrorFn("Failed getting device states! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                    }
+                });
+            },
+            DeviceList: function (callbacks) {
+                if (!callbacks) callbacks = {}
+
+                executeHttpGet({
+                    uri: URI.DeviceList(),
+                    success: function (response, status, headers, config) {
+                        console.log("OK getting devicelist!");
+
+                        try {
+                            var deviceArray = x2js.xml_str2json(response).deviceList.device;
+                            if (deviceArray == null) {
+                                Notification.error("No device states received!");
+                                return;
+                            }
+                            console.log("OK converting device list to json!");
+
+                            // adjust device arrays with only one device
+                            deviceArray = makeArrayIfOnlyOneObject(deviceArray);
+                        }
+                        catch (e) {
+                            Notification.error("Failed parsing devices! " + e);
+                            console.error(e);
+                            return;
+                        }
+
+                        if (callbacks.success) callbacks.success(deviceArray);
+                    },
+                    error: function (response, status, headers, config) {
+                        genericErrorFn("Failed getting devices! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                    }
+                });
+            },
+            SysVarList: function (callbacks) {
+                if (!callbacks) callbacks = {}
+
+                executeHttpGet({
+                    uri: URI.SysVarList(),
+                    success: function (response, status, headers, config) {
+                        console.log("OK getting system variable list!");
+
+                        try {
+                            var sysVars = x2js.xml_str2json(response).systemVariables.systemVariable;
+                            if (sysVars == null) {
+                                Notification.error("No system variables received!");
+                                return;
+                            }
+                            console.log("OK converting system variable list to json!");
+
+                            // adjust sysvar list with only one system variable
+                            sysVars = makeArrayIfOnlyOneObject(sysVars);
+                        }
+                        catch (e) {
+                            Notification.error("Failed parsing system variables! " + e);
+                            console.error(e);
+                            return;
+                        }
+
+                        if (callbacks.success) callbacks.success(sysVars);
+                    },
+                    error: function (response, status, headers, config) {
+                        genericErrorFn("Failed getting system variable list! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                    }
+                });
+            },
+            ChannelEdit: function (id, value, callbacks) {
+                console.info("Writing value " + value + " to channel " + id);
+                if (!callbacks) callbacks = {}
+
+                executeHttpGet({
+                    uri: URI.ChannelEdit(id, value),
+                    success: function (response, status, headers, config) {
+                        console.log("OK changing channel " + id);
+
+                        try {
+                            var result = x2js.xml_str2json(response).result;
+                            if (result == null) {
+                                // write failed
+                                var message = "Writing " + value + " to system variable with id " + id + " failed!";
+                                Notification.error(message);
+                                console.error(message, response, status, headers, config);
+                                return;
+                            }
+                            console.log("OK converting write result to json!");
+                        }
+                        catch (e) {
+                            Notification.error("Failed parsing device states! " + e);
+                            console.error(e);
+                            return;
+                        }
+
+                        if (callbacks.success) callbacks.success(result);
+                    },
+                    error: function (response, status, headers, config) {
+                        genericErrorFn("Failed writing channel state! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                    }
+                });
             },
         };
     })
@@ -187,6 +373,10 @@ function makeArrayIfOnlyOneObject(obj) {
 
 function isInt(obj) {
     return (typeof obj === 'number' && (obj % 1) === 0);
+}
+
+function isArray(obj) {
+    return Object.prototype.toString.call(obj) === "[object Array]";
 }
 
 function copy(obj) {

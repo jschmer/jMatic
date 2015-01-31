@@ -332,7 +332,7 @@ var jMaticApp = angular
         };
     })
 
-    .config(['$routeProvider', '$translateProvider', function ($routeProvider, $translateProvider) {
+    .config(['$routeProvider', '$translateProvider', '$animateProvider', function ($routeProvider, $translateProvider, $animateProvider) {
         $routeProvider.
             when('/deviceState', {
                 templateUrl: 'deviceState.html',
@@ -385,7 +385,11 @@ var jMaticApp = angular
         $translateProvider
             .preferredLanguage('en')
             .fallbackLanguage('en');
+
+        // disable animations for ng-show/hide for elements with fa-spinner class
+        $animateProvider.classNameFilter(/^((?!(fa-spinner)).)*$/);
     }])
+
     .run(function (LocalStorage, $translate) {
         var currentLang = LocalStorage.get('lang');
         if (typeof (currentLang) !== "undefined")

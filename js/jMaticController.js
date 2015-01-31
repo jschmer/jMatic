@@ -574,8 +574,16 @@ jMaticControllers.controller('programController', function ($scope, $http, Notif
 
     $scope.programs = []
 
-    $scope.runProgram = function (prog) {
-        startLoading($scope);
+    $scope.runProgram = function (prog, element) {
+        prog.running = true;
+
+        // delay stopping the program run by half a second
+        // to be able to notice totally fast programs in the ui
+        function programRunFinished(prog) {
+            $timeout(function () {
+                prog.running = false;
+            }, 500);
+        }
 
         CCUXMLAPI.RunProgram(prog.id, {
             success: function (result) {
@@ -590,11 +598,11 @@ jMaticControllers.controller('programController', function ($scope, $http, Notif
                     }
                 }
                 finally {
-                    finishLoading($scope);
+                    programRunFinished(prog);
                 }
             },
             error: function () {
-                finishLoading($scope);
+                programRunFinished(prog);
             }
         });
     }

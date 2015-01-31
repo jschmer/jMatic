@@ -21,11 +21,14 @@
                 <th ui-show ="programDetails"><span translate="DESCRIPTION"></span></th>
                 <th></th>
             </tr>
-            <tr ng-repeat="prog in programs | orderBy:'name'" ng-hide="loading" class="program" ng-click="runProgram(prog)">
+            <tr ng-repeat="prog in programs | orderBy:'name'" ng-hide="loading" class="program" ng-click="runProgram(prog, this)">
                 <td class="name">{{prog.name}}</td>
                 <td class="id" ui-show="programDetails">{{prog.id}}</td>
                 <td class="description" ui-show="programDetails">{{prog.desc}}</td>
-                <td><i class="fa fa-play fa-2x pointable green"></i></td>
+                <td>
+                    <i ng-show="!prog.running" class="fa fa-play fa-2x pointable green"></i>
+                    <i ng-show="prog.running" class="fa fa-2x fa-spinner fa-spin"></i>
+                </td>
             </tr>
         </tbody>
     </table>

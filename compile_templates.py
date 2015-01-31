@@ -29,10 +29,10 @@ def compile_template(template_name, template_content, module_name='templates'):
   }} catch (e) {{
     module = angular.module('{0}', []);
   }}
-  module.run(function($templateCache) {{
+  module.run(['$templateCache', function($templateCache) {{
     $templateCache.put('{1}',
       {2});
-  }});
+  }}]);
 }})();
 """.format(module_name, template_name, javascript_template_content_string)
 

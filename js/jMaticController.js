@@ -5,7 +5,7 @@ var jMaticControllers = angular.module('jMaticControllers', []);
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI) {
+jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$location', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI) {
 
     LocalStorage.initSharedState("showChannelNames", $scope);
     LocalStorage.initSharedState("channelsStacked", $scope);
@@ -86,9 +86,9 @@ jMaticControllers.controller('deviceStateController', function ($scope, $http, $
     $scope.loadStates();
 
     finishLoading($scope);
-});
+}]);
 
-jMaticControllers.controller('editDeviceStateController', function ($scope, $http, SharedState, Notification, LocalStorage, CCUXMLAPI, $routeParams, $timeout) {
+jMaticControllers.controller('editDeviceStateController', ['$scope', '$http', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$routeParams', '$timeout', function ($scope, $http, SharedState, Notification, LocalStorage, CCUXMLAPI, $routeParams, $timeout) {
 
     LocalStorage.initSharedState("showChannelNames", $scope);
     $scope.toggleAndSaveSharedState = function (propertyName) {
@@ -219,9 +219,9 @@ jMaticControllers.controller('editDeviceStateController', function ($scope, $htt
     }
 
     finishLoading($scope);
-});
+}]);
 
-jMaticControllers.controller('deviceConfigController', function ($scope, $http, Notification, LocalStorage, CCUXMLAPI) {
+jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Notification', 'LocalStorage', 'CCUXMLAPI', function ($scope, $http, Notification, LocalStorage, CCUXMLAPI) {
 
     $scope.listOrder = 'name';
 
@@ -357,9 +357,9 @@ jMaticControllers.controller('deviceConfigController', function ($scope, $http, 
     }
 
     $scope.loadDevices();
-});
+}]);
 
-jMaticControllers.controller('batteryCheckController', function ($scope, $http, Notification, CCUXMLAPI) {
+jMaticControllers.controller('batteryCheckController', ['$scope', '$http', 'Notification', 'CCUXMLAPI', function ($scope, $http, Notification, CCUXMLAPI) {
 
     finishLoading($scope);
 
@@ -440,9 +440,9 @@ jMaticControllers.controller('batteryCheckController', function ($scope, $http, 
     }
 
     $scope.loadStates();
-});
+}]);
 
-jMaticControllers.controller('sysVarsController', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout) {
+jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notification', 'SharedState', 'CCUXMLAPI', '$timeout', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout) {
 
     finishLoading($scope);
 
@@ -544,9 +544,9 @@ jMaticControllers.controller('sysVarsController', function ($scope, $http, Notif
     }
 
     $scope.loadSysVars();
-});
+}]);
 
-jMaticControllers.controller('appConfigController', function ($scope, $http, Notification, LocalStorage, $translate) {
+jMaticControllers.controller('appConfigController', ['$scope', '$http', 'Notification', 'LocalStorage', '$translate', function ($scope, $http, Notification, LocalStorage, $translate) {
 
     $scope.ccuIP = LocalStorage.get('CCU-IP');
     $scope.currentLang = LocalStorage.get('lang');
@@ -566,9 +566,9 @@ jMaticControllers.controller('appConfigController', function ($scope, $http, Not
     };
 
     finishLoading($scope);
-});
+}]);
 
-jMaticControllers.controller('programController', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout) {
+jMaticControllers.controller('programController', ['$scope', '$http', 'Notification', 'SharedState', 'CCUXMLAPI', '$timeout', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout) {
 
     finishLoading($scope);
 
@@ -642,10 +642,10 @@ jMaticControllers.controller('programController', function ($scope, $http, Notif
     }
     
     $scope.loadPrograms();
-});
+}]);
 
 // Startup controller
-jMaticControllers.controller('MainController', function ($rootScope, $scope) {
+jMaticControllers.controller('MainController', ['$rootScope', '$scope', function ($rootScope, $scope) {
 
     // User agent displayed in home page
     $scope.userAgent = navigator.userAgent;
@@ -658,4 +658,4 @@ jMaticControllers.controller('MainController', function ($rootScope, $scope) {
     $rootScope.$on('$routeChangeSuccess', function () {
         $rootScope.loading = false;
     });
-});
+}]);

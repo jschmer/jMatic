@@ -2,7 +2,7 @@
 var jMaticApp = angular
     .module('jMaticApp', ['ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers', 'pascalprecht.translate'])
 
-    .service('Notification', function (toasty) {
+    .service('Notification', ['toasty', function (toasty) {
         this.error = function (message, timeout) {
             console.error(message);
             toasty.pop.error({
@@ -26,9 +26,9 @@ var jMaticApp = angular
                 timeout: isInt(timeout) ? timeout : 0
             });
         };
-    })
+    }])
 
-    .service("LocalStorage", function (SharedState) {
+    .service("LocalStorage", ['SharedState', function (SharedState) {
         this.loadDevices = function () {
             var registeredDevices = localStorage.registeredDevices;
             try {
@@ -63,9 +63,9 @@ var jMaticApp = angular
         this.set = function (key, value) {
             localStorage[key] = value;
         };
-    })
+    }])
 
-    .factory("CCUXMLAPI", function (LocalStorage, $http, Notification) {
+    .factory("CCUXMLAPI", ['LocalStorage', '$http', 'Notification', function (LocalStorage, $http, Notification) {
         function getIP() {
             return LocalStorage.get('CCU-IP');
         }
@@ -330,7 +330,7 @@ var jMaticApp = angular
                 });
             },
         };
-    })
+    }])
 
     .config(['$routeProvider', '$translateProvider', '$animateProvider', function ($routeProvider, $translateProvider, $animateProvider) {
         $routeProvider.
@@ -390,16 +390,16 @@ var jMaticApp = angular
         $animateProvider.classNameFilter(/^((?!(fa-spinner)).)*$/);
     }])
 
-    .run(function (LocalStorage, $translate) {
+    .run(['LocalStorage', '$translate', function (LocalStorage, $translate) {
         var currentLang = LocalStorage.get('lang');
         if (typeof (currentLang) !== "undefined")
             $translate.use(currentLang);
-    })
+    }])
 ;
 
 
 // enable auto-focus attribute
-jMaticApp.directive('autoFocus', function ($timeout) {
+jMaticApp.directive('autoFocus', ['$timeout', function ($timeout) {
     return {
         restrict: 'AC',
         link: function (_scope, _element) {
@@ -408,7 +408,7 @@ jMaticApp.directive('autoFocus', function ($timeout) {
             }, 0);
         }
     };
-});
+}]);
 
 
 function findDevice(deviceArray, deviceId) {

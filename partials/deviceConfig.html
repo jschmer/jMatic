@@ -24,14 +24,14 @@
     <div class="list-group" ng-hide="loading">
         <span ng-repeat="device in devices | orderBy: listOrder" class="list-group-item">
             <span ng-click="toggleSubscription(device.id)" class="pointable">
-                <span class="config-list-config-state">
-                    <i class="fa fa-fw" ng-class="[
-                        !device.available ? 'fa-question red' : ''
-                       ]"></i>
-                </span>
                 <span class="config-list-subscription-state">
                     <i class="fa fa-fw" ng-class="[
                         device.subscribed ? 'fa-check green' : ''
+                       ]"></i>
+                </span>
+                <span class="config-list-config-state">
+                    <i class="fa" ng-class="[
+                        !device.available ? 'fa-question red' : ''
                        ]"></i>
                 </span>
                 <span>{{device.name}}</span>

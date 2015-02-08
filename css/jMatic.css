@@ -169,11 +169,11 @@ tr.program .id {
     padding-left: 20px;
 }
 
-.device-state .channel.stack {
+.device-state.stack .channel {
     display: block;
 }
 
-.device-state .channel.flow {
+.device-state.flow .channel {
     display: inline-block;
 }
 

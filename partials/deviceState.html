@@ -24,23 +24,22 @@
 <div class="scrollable-content">
     <p ng-show="noSubscribedDevices">No subscribed devices!</p>
     <div class="list-group">
-        <span ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
+        <div ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
             <div class="device-info">
                 <span class="device-loader"><span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span></span>
                 <span class="device-name pointable" ng-click="editDevice(device.id)">{{device.name}}</span>
                 <span ui-show="showChannelNames" class="device-type label" ng-class="device.type">{{device.type}}</span>
             </div>
-            <div class="device-state">
+            <div class="device-state" ui-class="{
+                        'flow': channelsStacked==false,
+                        'stack': channelsStacked==true,
+                      }">
                 <span class="channel"
                       ng-hide="data.ui.hide"
                       ng-repeat="(propname, data) in device.state"
                       ng-class="[(data.ui.thresholdExceeded==true ? 'threshold' : ''),
                                  (data.ui.changed==true ? 'changed' : ''),
-                      ]"
-                      ui-class="{
-                        'flow': channelsStacked==false,
-                        'stack': channelsStacked==true,
-                      }">
+                      ]">
                     <span class=" channel-icon" ng-class="['jmatic_channel_'+data.name,
                         (data.name=='STATE' && data.value==true ? 'jmatic_channel_OPEN' : ''),
                         (data.name=='STATE' && data.value==false ? 'jmatic_channel_CLOSED' : ''),
@@ -53,6 +52,6 @@
                     <span>No data fetched yet!</span>
                 </span>
             </div>
-        </span>
+        </div>
     </div>
 </div>

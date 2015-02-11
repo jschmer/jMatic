@@ -2,6 +2,10 @@
 
 var jMaticControllers = angular.module('jMaticControllers', []);
 
+jMaticControllers.run(function ($rootScope) {
+    $rootScope.HomematicType = HomematicType;
+});
+
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
@@ -98,7 +102,6 @@ jMaticControllers.controller('editDeviceStateController', ['$scope', '$http', 'S
 
     SharedState.initialize($scope, "editChannelDialog");
     SharedState.turnOff('editChannelDialog');
-    $scope.HomematicType = HomematicType;
     $scope.tryEditChannel = function (channelState) {
         if (channelState.writeable) {
             $scope.editChannel = copy(channelState);
@@ -446,7 +449,6 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
 
     finishLoading($scope);
 
-    $scope.HomematicType = HomematicType;
     $scope.systemVars = []
 
     $scope.loadSysVars = function () {

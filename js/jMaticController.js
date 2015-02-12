@@ -86,7 +86,7 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
         {
             var device = $scope.devices[i];
             if (device.subscribed) {
-                if (device.type === "UserdefinedVirtualGroup") {
+                if (device.type === userdefinedGroupType) {
                     // add all devices that are referenced by this group
                     for (var j = 0; j < device.config.length; ++j) {
                         var cfg = device.config[j];
@@ -153,11 +153,8 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
     finishLoading($scope);
 
     $scope.devices = LocalStorage.loadDevices();
-    // invalidate the availability of all devices before loading from the CCU to flag missing device configurations
-    for (var i = 0; i < $scope.devices.length; ++i)
-        $scope.devices[i].available = false;
 
-    // load user defined groups
+    // load user defined groups from hardcoded userdefined_groups object
     if (typeof (userdefined_groups) !== "undefined" && typeof (userdefined_groups.length) !== "undefined") {
         var updateCache = false;
 
@@ -206,6 +203,12 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
 
     $scope.loadDevices = function () {
         startLoading($scope);
+
+        // invalidate the availability of all devices before loading from the CCU to flag redundant/missing device configurations,
+        // excluding user defined groups (these aren't on the CCU anyway!)
+        for (var i = 0; i < $scope.devices.length; ++i)
+            if ($scope.devices[i].type !== userdefinedGroupType)
+                $scope.devices[i].available = false;
 
         CCUXMLAPI.DeviceList({
             success: function (deviceArray) {
@@ -280,8 +283,6 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
             Notification.error("Device with id " + deviceId + " not found!");
         }
     }
-
-    $scope.loadDevices();
 }]);
 
 jMaticControllers.controller('batteryCheckController', ['$scope', '$http', 'Notification', 'CCUXMLAPI', function ($scope, $http, Notification, CCUXMLAPI) {

@@ -4,6 +4,11 @@
 <div class="scrollable-header">
     <div class="section section-break">
         <span class="btn-group">
+            <a href class="btn btn-default no-outline no-focus" ng-click="loadDevices()">
+                <i class="fa fa-fw fa-refresh" ng-class="{'fa-spin': loading}"></i>
+            </a>
+        </span>
+        <span class="btn-group">
             <a href class="btn btn-default" ng-class="[listOrder=='name' ? 'active' : '']"  ng-click="setListOrder('name')"><span translate="NAME"></span></a>
             <a href class="btn btn-default" ng-class="[listOrder=='type' ? 'active' : '']" ng-click="setListOrder('type')"><span translate="TYPE"></span></a>
         </span>
@@ -14,15 +19,16 @@
             <a href class="btn btn-default" ui-class="{'active': showLegend}" ui-toggle="showLegend"><span translate="LEGEND"></span></a>
         </span>
         <div ui-show="showLegend">
-            <div><i class="fa fa-check green fa-fw"></i> = <span translate="DEVICE_REGISTERED"></span></div>
-            <div><i class="fa fa-question red fa-fw"></i> = <span translate="DEVICE_CONFIG_MISSING_ON_CCU"></span></div>
-            <div><i class="fa fa-close red fa-fw"></i> = <span translate="DEVICE_DELETE"></span></div>
+            <div><i class="fa fa-fw fa-refresh"></i> = <span translate="DEVICE_CONFIG_SYNCHRONIZE"></span></div>
+            <div><i class="fa fa-fw fa-check green"></i> = <span translate="DEVICE_REGISTERED"></span></div>
+            <div><i class="fa fa-fw fa-question red"></i> = <span translate="DEVICE_CONFIG_MISSING_ON_CCU"></span></div>
+            <div><i class="fa fa-fw fa-close red"></i> = <span translate="DEVICE_DELETE"></span></div>
         </div>
     </div>
 </div>
 <div class="scrollable-content">
     <div class="list-group" ng-hide="loading">
-        <span ng-repeat="device in devices | orderBy: listOrder" class="list-group-item">
+        <span ng-repeat="device in devices | orderBy: listOrder track by device.id" class="list-group-item">
             <span ng-click="toggleSubscription(device.id)" class="pointable">
                 <span class="config-list-subscription-state">
                     <i class="fa fa-fw" ng-class="[

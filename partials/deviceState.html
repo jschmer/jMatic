@@ -40,7 +40,7 @@
     </style>
     <p ng-show="noSubscribedDevices">No subscribed devices!</p>
     <div class="list-group">
-        <div ng-repeat="device in devices | orderBy: 'name'" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
+        <div ng-repeat="device in devices | orderBy: 'name' track by device.id" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
             <div class="device-info">
                 <span class="device-loader"><span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span></span>
                 <span class="device-name">{{device.name}}</span>

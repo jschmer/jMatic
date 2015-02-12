@@ -21,6 +21,7 @@
         'LEGEND': 'Legend',
         'DEVICE_DELETE': 'Delete device in jMatic',
         'DEVICE_CONFIG_MISSING_ON_CCU': 'Device configuration is missing on your CCU (device was probably deleted there!)',
+        'DEVICE_CONFIG_SYNCHRONIZE': 'Synchronize device configuration in jMatic with your devices registered on your CCU',
         'DEVICE_REGISTERED': 'Device is registered in jMatic',
         'DETAILS': 'Details',
         'ID': 'Id',
@@ -45,6 +46,7 @@
         'LEGEND': 'Legende',
         'DEVICE_DELETE': 'Konfiguration in jMatic löschen',
         'DEVICE_CONFIG_MISSING_ON_CCU': 'Geräte-Konfiguration fehlt auf deiner CCU-Zentrale (Gerät wurde wahrscheinlich dort gelöscht!)',
+        'DEVICE_CONFIG_SYNCHRONIZE': 'Geräte-Konfigurationen in jMatic mit den Konfiguration auf der CCU-Zentrale synchronisieren',
         'DEVICE_REGISTERED': 'Gerät ist in jMatic registriert',
         'DESCRIPTION': 'Beschreibung',
     }

@@ -192,7 +192,7 @@ function parseStates(devices, stateObject) {
     for (var i = 0; i < devices.length; ++i) {
         var device = devices[i];
 
-        if (device.type === "UserdefinedVirtualGroup") {
+        if (device.type === userdefinedGroupType) {
             //console.log(device.config);
             parseUserdefinedVirtualGroupState(devices[i], stateObject);
         }

@@ -247,7 +247,7 @@ tr.program .id {
     font-weight: bold;
 }
 
-.writeable {
+.editable.writeable {
     cursor: pointer;
 }
 

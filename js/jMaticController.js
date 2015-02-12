@@ -9,7 +9,7 @@ jMaticControllers.run(function ($rootScope) {
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$location', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI) {
+jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$location', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$timeout', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI, $timeout) {
 
     LocalStorage.initSharedState("showChannelNames", $scope);
     LocalStorage.initSharedState("channelsStacked", $scope);
@@ -19,10 +19,64 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
         LocalStorage.set(propertyName, SharedState.get(propertyName));
     }
 
-    $scope.editDevice = function (deviceId) {
-        $location.path('/editDeviceState/' + deviceId);
+    // region: editing channel
+    SharedState.initialize($scope, "editMode");
+    SharedState.turnOff('editMode');
+    SharedState.initialize($scope, "editChannelDialog");
+    SharedState.turnOff('editChannelDialog');
+    $scope.tryEditChannel = function (channelState) {
+        if (SharedState.isActive("editMode") && channelState.writeable) {
+            $scope.editChannel = copy(channelState);
+            SharedState.turnOn('editChannelDialog');
+        }
     }
 
+    $scope.SaveChanges = function () {
+        var valueToSend = $scope.editChannel.displayValue;
+
+        // map from display value to real value
+        if ($scope.editChannel.valueMapping != null) {
+            for (var key in $scope.editChannel.valueMapping) {
+                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
+                    var mappingValue = $scope.editChannel.valueMapping[key];
+                    if (mappingValue == valueToSend) {
+                        valueToSend = key;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $scope.changeChannelValue($scope.editChannel.id, valueToSend);
+    }
+
+    $scope.changeChannelValue = function (id, value) {
+        startLoading($scope);
+
+        CCUXMLAPI.ChannelEdit(id, value, {
+            success: function (result) {
+                if (result.changed._id == id && result.changed._new_value == value) {
+                    Notification.success("Write succeeded!", 2000);
+
+                    // write succeeded, update the state after giving the CCU some time to update its state...
+                    $timeout(function () {
+                        $scope.loadStates();
+                        finishLoading($scope);
+                    }, 500);
+                }
+                else {
+                    var message = "Failed writing value " + value + " to channel " + id;
+                    Notification.error(message);
+                    console.error(message, data, status, headers, config);
+                }
+            },
+            error: function () {
+                finishLoading($scope);
+            }
+        });
+    }
+
+    // region: loading device data
     $scope.loadStates = function () {
         startLoading($scope);
 
@@ -88,138 +142,6 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
     $scope.devices = LocalStorage.loadDevices();
     $scope.lastRefreshTime = LocalStorage.get("lastRefreshTime");
     $scope.loadStates();
-
-    finishLoading($scope);
-}]);
-
-jMaticControllers.controller('editDeviceStateController', ['$scope', '$http', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$routeParams', '$timeout', function ($scope, $http, SharedState, Notification, LocalStorage, CCUXMLAPI, $routeParams, $timeout) {
-
-    LocalStorage.initSharedState("showChannelNames", $scope);
-    $scope.toggleAndSaveSharedState = function (propertyName) {
-        SharedState.toggle(propertyName);
-        LocalStorage.set(propertyName, SharedState.get(propertyName));
-    }
-
-    SharedState.initialize($scope, "editChannelDialog");
-    SharedState.turnOff('editChannelDialog');
-    $scope.tryEditChannel = function (channelState) {
-        if (channelState.writeable) {
-            $scope.editChannel = copy(channelState);
-            SharedState.turnOn('editChannelDialog');
-        }
-    }
-
-    $scope.SaveChanges = function () {
-        var valueToSend = $scope.editChannel.displayValue;
-
-        // map from display value to real value
-        if ($scope.editChannel.valueMapping != null) {
-            for (var key in $scope.editChannel.valueMapping) {
-                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
-                    var mappingValue = $scope.editChannel.valueMapping[key];
-                    if (mappingValue == valueToSend) {
-                        valueToSend = key;
-                        break;
-                    }
-                }
-            }
-        }
-
-        $scope.changeChannelValue($scope.editChannel.id, valueToSend);
-    }
-
-    $scope.changeChannelValue = function (id, value) {
-        startLoading($scope);
-
-        CCUXMLAPI.ChannelEdit(id, value, {
-            success: function (result) {
-                if (result.changed._id == id && result.changed._new_value == value) {
-                    Notification.success("Write succeeded!", 2000);
-
-                    // write succeeded, update the state after giving the CCU some time to update its state...
-                    $timeout(function () {
-                        $scope.loadStates();
-                        finishLoading($scope);
-                    }, 500);
-                }
-                else {
-                    var message = "Failed writing value " + value + " to channel " + id;
-                    Notification.error(message);
-                    console.error(message, data, status, headers, config);
-                }
-            },
-            error: function () {
-                finishLoading($scope);
-            }
-        });
-    }
-
-    $scope.loadStates = function () {
-
-        startLoading($scope);
-
-        var deviceIds = []
-        var device = $scope.editedDevice;
-        if (device.type === "UserdefinedVirtualGroup") {
-            // add all devices that are referenced by this group
-            for (var j = 0; j < device.config.length; ++j) {
-                var cfg = device.config[j];
-                if (deviceIds.indexOf(cfg.device_id) == -1)
-                    deviceIds.push(cfg.device_id);
-            }
-        }
-        else {
-            deviceIds.push(device.id);
-        }
-
-        if (deviceIds.length == 0) {
-            Notification.error("Some internal error because the edited device doesn't reference any device ids?!");
-            return;
-        }
-
-        // execute query
-        CCUXMLAPI.DeviceState(deviceIds,
-            {
-                success: function (deviceStates) {
-                    try {
-                        parseStates([device], deviceStates);
-
-                        var d = new Date();
-                        $scope.lastRefreshTime = d.toLocaleDateString() + " " + d.toLocaleTimeString();
-                        LocalStorage.set("lastRefreshTime", $scope.lastRefreshTime);
-
-                        LocalStorage.saveDevices($scope.devices);
-                    }
-                    catch (e) {
-                        Notification.error("Failed parsing device states! " + e);
-                        console.error(e);
-                    }
-                    finally {
-                        finishLoading($scope);
-                    }
-                },
-                error: function () {
-                    finishLoading($scope);
-                }
-            }
-        );
-    }
-
-    $scope.devices = LocalStorage.loadDevices();
-    $scope.lastRefreshTime = LocalStorage.get("lastRefreshTime");
-
-    var editedDeviceId = $routeParams.deviceId;
-    $scope.editedDevice = null;
-    for (var i = 0; i < $scope.devices.length; ++i) {
-        if ($scope.devices[i].id == editedDeviceId) {
-            $scope.editedDevice = $scope.devices[i];
-            break;
-        }
-    }
-
-    if ($scope.editedDevice == null) {
-        Notification.error("Device with id '" + editedDeviceId + "' not found!");
-    }
 
     finishLoading($scope);
 }]);

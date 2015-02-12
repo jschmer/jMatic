@@ -339,11 +339,6 @@ var jMaticApp = angular
                 controller: 'deviceStateController',
                 reloadOnSearch: false
             }).
-            when('/editDeviceState/:deviceId', {
-                templateUrl: 'editDeviceState.html',
-                controller: 'editDeviceStateController',
-                reloadOnSearch: false
-            }).
             when('/deviceConfig', {
                 templateUrl: 'deviceConfig.html',
                 controller: 'deviceConfigController',

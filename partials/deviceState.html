@@ -9,13 +9,13 @@
             </a>
         </span>
         <span class="btn-group">
+            <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('channelsStacked')">
+                <i ui-hide="channelsStacked" class="fa fa-fw fa-list"></i>
+                <i ui-show="channelsStacked" class="fa fa-fw fa-th-large"></i>
+            </a>
             <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('showChannelNames')">
                 <span ui-hide="showChannelNames" translate="SHOW_NAMES"></span>
                 <span ui-show="showChannelNames" translate="HIDE_NAMES"></span>
-            </a>
-            <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('channelsStacked')">
-                <span ui-hide="channelsStacked" translate="STACK_LAYOUT"></span>
-                <span ui-show="channelsStacked" translate="FLOW_LAYOUT"></span>
             </a>
         </span>
         <span class="btn-group">

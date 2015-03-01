@@ -16,7 +16,7 @@ Prerequisites
 - HTML5 compatible browser (for persistence in localStorage)
 - Tested with
   - Firefox 31
-  - Internet Explorer 11 (not working when launching the file::// directly!)
+  - Internet Explorer 11 (localStorage not working when launching the file::// directly!)
   - Google Chrome 39
   - Google Chrome for Android 39
 
@@ -48,8 +48,7 @@ Or host it on a webserver. IE11 only works with a hosted version.
 
 Create package
 --------------
-run:
-    npm install & bower install & grunt build
+run: `npm install & bower install & grunt build`
 
 Note: grunt build needs python installed for compiling views into the angular template cache!
 

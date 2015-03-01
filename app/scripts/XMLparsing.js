@@ -1,5 +1,7 @@
-﻿function createDeviceModel(deviceNode) {
-    deviceObj = new Device();
+﻿"use strict";
+
+function createDeviceModel(deviceNode) {
+    var deviceObj = new Device();
     deviceObj.id = parseInt(deviceNode._ise_id);
     deviceObj.name = deviceNode._name;
     deviceObj.type = deviceTypeNames[deviceNode._device_type];
@@ -201,7 +203,7 @@ function parseStates(devices, stateObject) {
 }
 
 function parseState(device, stateObjectForDevice) {
-    oldState = device.state;
+    var oldState = device.state;
     device.state = {};
 
     var data = getDeviceDataPointsForType(device.type);
@@ -226,7 +228,7 @@ function parseState(device, stateObjectForDevice) {
 }
 
 function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
-    oldState = userdefinedGroup.state;
+    var oldState = userdefinedGroup.state;
     userdefinedGroup.state = {};
 
     // parse all data defined in userdefinedGroup.config and

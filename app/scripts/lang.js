@@ -1,4 +1,6 @@
-﻿var lang = {
+﻿"use strict";
+
+var lang = {
     "en": {
         'JMATIC': 'jMatic',
         'TITLE_DEVICE_STATE': 'Device State',
@@ -26,6 +28,8 @@
         'DETAILS': 'Details',
         'ID': 'Id',
         'DESCRIPTION': 'Description',
+        'ERROR': 'Error',
+        'SUCCESS': 'Success',
     },
     "de": {
         'TITLE_DEVICE_STATE': 'Gerätestatus',
@@ -49,5 +53,7 @@
         'DEVICE_CONFIG_SYNCHRONIZE': 'Geräte-Konfigurationen in jMatic mit den Konfiguration auf der CCU-Zentrale synchronisieren',
         'DEVICE_REGISTERED': 'Gerät ist in jMatic registriert',
         'DESCRIPTION': 'Beschreibung',
+        'ERROR': 'Fehler',
+        'SUCCESS': 'Erfolgreich',
     }
 };

@@ -1,4 +1,4 @@
-﻿
+﻿"use strict";
 
 var jMaticControllers = angular.module('jMaticControllers', []);
 
@@ -82,7 +82,7 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
 
         // gather all device ids we need to query
         var deviceIds = []
-        for (i = 0; i < $scope.devices.length; ++i)
+        for (var i = 0; i < $scope.devices.length; ++i)
         {
             var device = $scope.devices[i];
             if (device.subscribed) {
@@ -216,7 +216,7 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
 
                 try {
                     for (var i = 0; i < deviceArray.length; i += 1) {
-                        device = deviceArray[i];
+                        var device = deviceArray[i];
                         device = createDeviceModel(device);
                         device.available = true;
 

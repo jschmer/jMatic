@@ -1,3 +1,5 @@
+"use strict";
+
 var userdefined_groups = [
     {
         id: 0,

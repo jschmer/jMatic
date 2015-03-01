@@ -1,30 +1,66 @@
-﻿var x2js = new X2JS();
+﻿"use strict";
+
+var x2js = new X2JS();
 var jMaticApp = angular
     .module('jMaticApp', ['ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers', 'pascalprecht.translate'])
 
-    .service('Notification', ['toasty', function (toasty) {
-        this.error = function (message, timeout) {
-            console.error(message);
-            toasty.pop.error({
-                title: "Error",
-                msg: message,
-                sound: false,
-                showClose: true,
-                clickToClose: true,
-                timeout: isInt(timeout) ? timeout : 0
+    .service('Notification', ['toasty', '$translate', function (toasty, $translate) {
+        function isUpper(str) {
+            return str == str.toUpperCase();
+        }
+
+        function launchError(messageText, timeout) {
+            $translate('ERROR').then(function (error) {
+                toasty.pop.error({
+                    title: error,
+                    msg: messageText,
+                    sound: false,
+                    showClose: true,
+                    clickToClose: true,
+                    timeout: isInt(timeout) ? timeout : 0
+                });
             });
+        }
+
+        function launchSuccess(messageText, timeout) {
+            $translate('SUCCESS').then(function (success) {
+                toasty.pop.success({
+                    title: success,
+                    msg: messageText,
+                    sound: false,
+                    showClose: true,
+                    clickToClose: true,
+                    timeout: isInt(timeout) ? timeout : 0
+                });
+            });
+        }
+
+        this.error = function (message /* or translation id */, timeout) {
+            console.error(message);
+
+            // all uppercase? => translation ID
+            if (isUpper(message)) {
+                $translate(message).then(function (translatedMessage) {
+                    launchError(translatedMessage, timeout);
+                });
+            }
+            else {
+                launchError(message, timeout);
+            }
         };
 
-        this.success = function (message, timeout) {
+        this.success = function (message /* or translation id */, timeout) {
             console.info(message);
-            toasty.pop.success({
-                title: "Success",
-                msg: message,
-                sound: false,
-                showClose: true,
-                clickToClose: true,
-                timeout: isInt(timeout) ? timeout : 0
-            });
+
+            // all uppercase? => translation ID
+            if (isUpper(message)) {
+                $translate(message).then(function (translatedMessage) {
+                    launchSuccess(translatedMessage, timeout);
+                });
+            }
+            else {
+                launchSuccess(message, timeout);
+            }
         };
     }])
 
@@ -65,7 +101,7 @@ var jMaticApp = angular
         };
     }])
 
-    .factory("CCUXMLAPI", ['LocalStorage', '$http', 'Notification', function (LocalStorage, $http, Notification) {
+    .factory("CCUXMLAPI", ['LocalStorage', '$http', 'Notification', '$translate', function (LocalStorage, $http, Notification, $translate) {
         function getIP() {
             return LocalStorage.get('CCU-IP');
         }
@@ -370,7 +406,7 @@ var jMaticApp = angular
 
         // load defined languages
         if (typeof (lang) !== "undefined") {
-            for (keycode in lang) {
+            for (var keycode in lang) {
                 if (lang.hasOwnProperty(keycode)) {
                     $translateProvider.translations(keycode, lang[keycode]);
                 }
@@ -407,7 +443,7 @@ jMaticApp.directive('autoFocus', ['$timeout', function ($timeout) {
 
 
 function findDevice(deviceArray, deviceId) {
-    for (i = 0; i < deviceArray.length; ++i) {
+    for (var i = 0; i < deviceArray.length; ++i) {
         if (deviceArray[i].id == deviceId)
             return i;
     }
@@ -416,7 +452,7 @@ function findDevice(deviceArray, deviceId) {
 
 function removeDevice(deviceArray, deviceId) {
     var index = -1;
-    for (i = 0; i < deviceArray.length; ++i) {
+    for (var i = 0; i < deviceArray.length; ++i) {
         if (deviceArray[i].id == deviceId) {
             index = i;
             break;

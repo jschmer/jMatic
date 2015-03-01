@@ -1,4 +1,6 @@
-﻿// map device type code to display name
+﻿"use strict";
+
+// map device type code to display name
 var deviceTypeNames = {
     'HM-CC-VG-1': 'VirtualGroup',
     'HM-Sec-SCo': 'WindowSensor',
@@ -243,7 +245,7 @@ var DeviceDataPoints = new function () {
     this.getByName = function (name, index) {
         index = (typeof index !== 'undefined' ? index : 0);
 
-        for (propname in this.DataPoint) {
+        for (var propname in this.DataPoint) {
             if (this.DataPoint.hasOwnProperty(propname)) {
                 var datapoint = this.DataPoint[propname];
                 if (datapoint.datapointName === name)

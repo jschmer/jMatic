@@ -1,0 +1,22 @@
+<div ui-content-for="title">
+    <span translate>TITLE_SYSVARS</span>
+</div>
+
+<div class="scrollable-content">
+    <div ng-show="loading" class="app-content-loading">
+        <i class="fa fa-spinner fa-spin centered-loading-spinner fa-3x"></i>
+    </div>
+    <table class="systemVariables">
+        <tbody>
+            <tr ng-repeat="var in systemVars | orderBy:'name'" ng-hide="loading" class="systemVariable pointable" ng-click="ShowInputDialog(var)" ui-turn-on="editChannelDialog">
+                <td class="title">{{var.name}}</td>
+                <td class="equals">=</td>
+                <td class="value">{{var.displayValue}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div ui-content-for="modals">
+    <div ng-include src="'views/partials/editChannelDialog.html'"></div>
+</div>

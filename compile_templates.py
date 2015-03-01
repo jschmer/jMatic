@@ -12,6 +12,7 @@ def regex_walk(regex, top='.'):
   return matches
 
 def compile_template(template_name, template_content, module_name='templates'):
+  template_name = template_name.replace("\\", "/")
   print("Compiling {}".format(template_name))
   
   template_content_lines = template_content.splitlines()
@@ -37,10 +38,10 @@ def compile_template(template_name, template_content, module_name='templates'):
 """.format(module_name, template_name, javascript_template_content_string)
 
 def compile(templates_regex, stripPrefix, outputpath, moduleName):
-  templateFiles = regex_walk(templates_regex, 'partials')
+  templateFiles = regex_walk(templates_regex, 'app')
 
   #print(templateFiles)
-  print()
+  #print()
 
   with open(outputpath, "w") as templateFile:
     for template in templateFiles:
@@ -54,7 +55,7 @@ def compile(templates_regex, stripPrefix, outputpath, moduleName):
         templateFile.write(compiledTemplate);
 
 def compile_jMatic():
-  compile(r'partials\\.+\.html', r'partials\\', 'js\compiled_templates.js', 'jMaticApp')
+  compile(r'app\\views\\partials\\.+\.html', r'app\\', 'app\scripts\compiled_templates.js', 'jMaticApp')
 
 if __name__=='__main__':
   compile_jMatic()

@@ -1,0 +1,83 @@
+<div ui-content-for="title">
+    <span translate>TITLE_DEVICE_STATE</span>
+</div>
+<div class="scrollable-header">
+    <div class="section section-break">
+        <span class="btn-group">
+            <a href class="btn btn-default no-outline no-focus" ng-click="loadStates()">
+                <i class="fa fa-fw fa-refresh" ng-class="{'fa-spin': loading}"></i>
+            </a>
+        </span>
+        <span class="btn-group">
+            <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('channelsStacked')">
+                <i ui-hide="channelsStacked" class="fa fa-fw fa-list"></i>
+                <i ui-show="channelsStacked" class="fa fa-fw fa-th-large"></i>
+            </a>
+            <a href class="btn btn-default no-outline no-focus" ng-click="toggleAndSaveSharedState('showChannelNames')">
+                <span ui-hide="showChannelNames" translate="SHOW_NAMES"></span>
+                <span ui-show="showChannelNames" translate="HIDE_NAMES"></span>
+            </a>
+        </span>
+        <span class="btn-group">
+            <a href class="btn btn-default no-outline no-focus" ui-class="{'active': editMode}" ui-toggle="editMode">
+                <i class="fa fa-fw fa-edit"></i>
+            </a>
+        </span>
+        <span class="last-refresh">{{lastRefreshTime}}</span>
+    </div>
+</div>
+<div class="scrollable-content">
+    <style>
+        .channel .editIcon {
+            display: none;
+            padding-left: 5px;
+            color: orange;
+        }
+
+        .channel.writeable .editIcon {
+            display: inline-block;
+        }
+    </style>
+    <p ng-show="noSubscribedDevices">No subscribed devices!</p>
+    <div class="list-group">
+        <div ng-repeat="device in devices | orderBy: 'name' track by device.id" class="list-group-item device" ng-class="'jmatic_device_'+device.type" ng-show="device.subscribed">
+            <div class="device-info">
+                <span class="device-loader"><span ng-show="loading"><i class="fa fa-spinner fa-spin loading-spinner"></i></span></span>
+                <span class="device-name">{{device.name}}</span>
+                <span ui-show="showChannelNames" class="device-type label" ng-class="device.type">{{device.type}}</span>
+            </div>
+            <div class="device-state" ui-class="{
+                        'flow': channelsStacked==false,
+                        'stack': channelsStacked==true,
+                      }">
+                <span class="channel"
+                      ng-hide="data.ui.hide"
+                      ng-repeat="(propname, data) in device.state"
+                      ng-class="[(data.ui.thresholdExceeded==true ? 'threshold' : ''),
+                                 (data.ui.changed==true ? 'changed' : ''),
+                                 (data.writeable==true ? 'writeable' : '')
+                      ]"
+                      ui-class="{
+                        'editable': editMode
+                      }"
+                      ng-click="tryEditChannel(data)">
+                    <span class="channel-icon" ng-class="['jmatic_channel_'+data.name,
+                        (data.name=='STATE' && data.value==true ? 'jmatic_channel_OPEN' : ''),
+                        (data.name=='STATE' && data.value==false ? 'jmatic_channel_CLOSED' : ''),
+                    ]"></span>
+                    <span ui-show="showChannelNames" class="channel_title">{{data.displayName}}: </span>
+                    <span class="channel_value">{{data.displayValue}}</span>
+                    <span class="channel_unit">{{data.unit}}</span>
+                    <span ui-show="editMode"><i class="fa fa-edit editIcon"></i></span>
+                </span>
+                <span ng-show="device.state==null">
+                    <span>No data fetched yet!</span>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ui-content-for="modals">
+    <div ng-include src="'views/partials/editChannelDialog.html'"></div>
+</div>

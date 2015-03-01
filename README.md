@@ -46,6 +46,13 @@ Usage
 Either copy jMatic to your device and launch index.html locally with a browser and bookmark it.
 Or host it on a webserver. IE11 only works with a hosted version.
 
+Create package
+--------------
+run:
+    npm install & bower install & grunt build
+
+Note: grunt build needs python installed for compiling views into the angular template cache!
+
 Views
 -----
 Device State  

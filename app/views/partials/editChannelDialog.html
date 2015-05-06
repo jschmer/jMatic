@@ -18,8 +18,10 @@
                         <select auto-focus ng-model="editChannel.displayValue" ng-options="data for (propname, data) in editChannel.valueMapping"></select>
                     </div>
                     <div ng-if="editChannel.homematicType==HomematicType.number">
+                        <knob knob-data="editChannel.displayValue" knob-options="knob_options"></knob>
+                        <br />
                         <p ng-show="editChannel.constraints.min">[{{editChannel.constraints.min}}, {{editChannel.constraints.max}}]</p>
-                        <input auto-focus ng-model="editChannel.displayValue" type="number" name="number" ng-class="!inputForm.number.$valid ? 'error' : ''" min="{{editChannel.constraints.min}}" max="{{editChannel.constraints.max}}" step="0.5" required />
+                        <input ng-model="editChannel.displayValue" type="number" name="number" ng-class="!inputForm.number.$valid ? 'error' : ''" min="{{editChannel.constraints.min}}" max="{{editChannel.constraints.max}}" step="0.5" required />
                         <span ng-show="!inputForm.number.$valid">
                             <span ng-show="inputForm.number.$error.min">Out of range: Minimum</span>
                             <span ng-show="inputForm.number.$error.max">Out of range: Maximum</span>

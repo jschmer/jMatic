@@ -442,6 +442,34 @@ jMaticApp.directive('autoFocus', ['$timeout', function ($timeout) {
 }]);
 
 
+jMaticApp.directive('knob', ['$timeout', function ($timeout) {
+    'use strict';
+    return {
+        restrict: 'EA',
+        replace: true,
+        template: '<input value="{{ knobData }}"/>',
+        scope: {
+            knobData: '=',
+            knobOptions: '&'
+        },
+        link: function ($scope, $element) {
+            var knobInit = $scope.knobOptions() || {};
+            knobInit.release = function (newValue) {
+                $timeout(function () {
+                    $scope.knobData = newValue;
+                    $scope.$apply();
+                });
+            };
+            $scope.$watch('knobData', function (newValue, oldValue) {
+                if (newValue != oldValue) {
+                    $($element).val(newValue).change();
+                }
+            });
+            $($element).val($scope.knobData).knob(knobInit);
+        }
+    };
+}]);
+
 function findDevice(deviceArray, deviceId) {
     for (var i = 0; i < deviceArray.length; ++i) {
         if (deviceArray[i].id == deviceId)

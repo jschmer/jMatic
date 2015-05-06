@@ -4,6 +4,22 @@ var jMaticControllers = angular.module('jMaticControllers', []);
 
 jMaticControllers.run(function ($rootScope) {
     $rootScope.HomematicType = HomematicType;
+    $rootScope.knob_options = {
+        min: 0,
+        max: 1,
+        step: 0.5,
+        angleOffset: -125,
+        angleArc: 250,
+        lineCap: "round"
+    }
+
+    $rootScope.setKnobMinMax = function(min, max)
+    {
+        $.extend($rootScope.knob_options, {
+            min: min,
+            max: max
+        });
+    }
 });
 
 function startLoading(scope) { scope.loading = true; }
@@ -27,6 +43,7 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
     $scope.tryEditChannel = function (channelState) {
         if (SharedState.isActive("editMode") && channelState.writeable) {
             $scope.editChannel = copy(channelState);
+            $scope.setKnobMinMax($scope.editChannel.constraints.min, $scope.editChannel.constraints.max);
             SharedState.turnOn('editChannelDialog');
         }
     }
@@ -421,6 +438,7 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
         jQuery.extend(dialogSysVarData, systemVariableData);
 
         $scope.editChannel = dialogSysVarData;
+        $scope.setKnobMinMax($scope.editChannel.constraints.min, $scope.editChannel.constraints.max);
     };
 
     $scope.SaveChanges = function () {

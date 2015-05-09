@@ -14,9 +14,9 @@
 
 .centered-loading-spinner {
   position: absolute;
-  font-size: 50px;
+  font-size: 6rem;
   left: 50%;
-  margin-left: -25px;
+  margin-left: -3rem;
 }
 
 .no-outline {
@@ -27,8 +27,39 @@
     background-color: inherit;
 }
 
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+@media only screen and (max-width: 479px)
+{
+    body {
+        font-size: 1.4em;
+    }
+}
 
-/* to mitigate the zoom-in on input focus un mobile devices */
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+@media only screen and (min-width: 480px) and (max-width: 767px)
+{
+    body {
+        font-size: 1.5em;
+    }
+}
+
+/* Tablet Portrait size to standard 960 (devices and browsers) */
+@media only screen and (min-width: 768px) and (max-width: 1023px)
+{
+    body {
+        font-size: 1.6em;
+    }
+}
+
+/* Desktop */
+@media screen and (min-width : 1024px)
+{
+    body {
+        font-size: 1.6em;
+    }
+} 
+
+/* to mitigate the zoom-in on input focus on mobile devices */
 @media only screen
 and (min-device-width:320px)
 and (max-device-width:480px)
@@ -139,8 +170,8 @@ tr.program .id {
     background-image: none;
     white-space: nowrap;
     padding: 6px 12px;
-    font-size: 14px;
-    line-height: 1.4285;
+    font-size: 1em;
+    line-height: 1.5em;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
@@ -161,7 +192,7 @@ tr.program .id {
 
 .device-info .device-loader {
     display: inline-block;
-    width: 15px;
+    width: 1.1em;
 }
 
 .device-state .channel {
@@ -179,11 +210,11 @@ tr.program .id {
 
 .device-state .channel-icon {
     display: inline-block;
-    background-size: 20px 20px;
+    background-size: 1.5em 1.5em;
     background-position: center center;
     background-repeat: no-repeat;
-    width: 20px;
-    height: 20px;
+    width:  1.5em;
+    height: 1.5em;
     vertical-align: bottom;
 }
 
@@ -192,7 +223,7 @@ tr.program .id {
 }
 
 .battery-checklist-item .channel {
-    background-size: 20px 20px;
+    background-size: 1.35em 1.35em;
     background-repeat: no-repeat;
     padding-left: 23px;
 }

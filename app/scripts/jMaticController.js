@@ -25,7 +25,7 @@ jMaticControllers.run(function ($rootScope) {
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$location', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$timeout', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI, $timeout) {
+jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$location', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$timeout', '$interval', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI, $timeout, $interval) {
 
     LocalStorage.initSharedState("showChannelNames", $scope);
     LocalStorage.initSharedState("channelsStacked", $scope);
@@ -161,6 +161,16 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
     $scope.loadStates();
 
     finishLoading($scope);
+
+    var refreshPromise; 
+    $scope.$on("$destroy", function () {
+        if (refreshPromise) {
+            $interval.cancel(refreshPromise);
+        }
+    });
+    var refreshInterval = parseInt(LocalStorage.get("deviceStateReloadInterval"));
+    if (refreshInterval > 0)
+        refreshPromise = $interval($scope.loadStates, refreshInterval);
 }]);
 
 jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Notification', 'LocalStorage', 'CCUXMLAPI', function ($scope, $http, Notification, LocalStorage, CCUXMLAPI) {
@@ -492,6 +502,12 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
 jMaticControllers.controller('appConfigController', ['$scope', '$http', 'Notification', 'LocalStorage', '$translate', function ($scope, $http, Notification, LocalStorage, $translate) {
 
     $scope.ccuIP = LocalStorage.get('CCU-IP');
+    $scope.deviceStateReloadInterval = LocalStorage.get('deviceStateReloadInterval');
+    if (!$scope.deviceStateReloadInterval)
+        $scope.deviceStateReloadInterval = 0;
+    else
+        $scope.deviceStateReloadInterval = parseInt($scope.deviceStateReloadInterval) / 1000;
+
     $scope.currentLang = LocalStorage.get('lang');
     if (typeof ($scope.currentLang) === "undefined")
         $scope.currentLang = $translate.use();
@@ -499,6 +515,12 @@ jMaticControllers.controller('appConfigController', ['$scope', '$http', 'Notific
     $scope.$watch("ccuIP", function (newValue, oldValue) {
         if ($scope.ccuIP.length > 0) {
             LocalStorage.set('CCU-IP', $scope.ccuIP);
+        }
+    });
+
+    $scope.$watch("deviceStateReloadInterval", function (newValue, oldValue) {
+        if (parseInt($scope.deviceStateReloadInterval) >= 0) {
+            LocalStorage.set('deviceStateReloadInterval', parseInt($scope.deviceStateReloadInterval)*1000);
         }
     });
 

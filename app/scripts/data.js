@@ -149,8 +149,11 @@ var ThresholdFunctions = {
     controlMode: function (value) {
         return value != ControlModeState.Auto;
     },
-    temperatureThreshold: function (value) {
+    currentTemperatureThreshold: function (value) {
         return value < 17;
+    },
+    setTemperatureThreshold: function (value) {
+        return value < 17 || value > 21 ;
     },
     trueState: function (value) { return value == true; }
 }
@@ -211,7 +214,7 @@ var DeviceDataPoints = new function () {
         }),
         SetTemperature: new DataPoint_t({
             datapointName: "SET_TEMPERATURE",
-            thresholdIf: ThresholdFunctions.temperatureThreshold,
+            thresholdIf: ThresholdFunctions.setTemperatureThreshold,
             writeable: true,
             constraints: {
                 min: 4.5,
@@ -220,7 +223,7 @@ var DeviceDataPoints = new function () {
         }),
         ActualTemperature: new DataPoint_t({
             datapointName: "ACTUAL_TEMPERATURE",
-            thresholdIf: ThresholdFunctions.temperatureThreshold
+            thresholdIf: ThresholdFunctions.currentTemperatureThreshold
         }),
         State: new DataPoint_t({
             datapointName: "STATE",

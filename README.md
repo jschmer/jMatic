@@ -57,6 +57,7 @@ Views
 Device State  
 ![Device States](./doc/screenshots/DeviceState_Flow.png?raw=true)
 ![Device States with channel nammes](./doc/screenshots/DeviceState_Names.png?raw=true)
+![Editing a device state](./doc/screenshots/DeviceState_EditRemperature.png?raw=true)
 
 Device Subscription  
 ![Device Subscription](./doc/screenshots/DeviceSubscription.png?raw=true)
@@ -66,7 +67,6 @@ Battery Check
 
 System Variables  
 ![System Variables](./doc/screenshots/SystemVariables.png?raw=true)
-![System Variables Edit](./doc/screenshots/SystemVariables_EditNumber.png?raw=true)
 
 Settings  
 ![Settings](./doc/screenshots/Settings.png?raw=true)

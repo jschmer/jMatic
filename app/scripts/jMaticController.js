@@ -42,7 +42,20 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
     SharedState.turnOff('editChannelDialog');
     $scope.tryEditChannel = function (channelState) {
         if (SharedState.isActive("editMode") && channelState.writeable) {
+            var customTemperatureRange = LocalStorage.get('customTemperatureRange');
+            try {
+                customTemperatureRange = JSON.parse(customTemperatureRange);
+            } catch (e) {
+                // use a fallback
+                customTemperatureRange = [10, 25];
+            }
+
             $scope.editChannel = copy(channelState);
+            // set custom number constraint for knob
+            if ($scope.editChannel.name == 'SET_TEMPERATURE') {
+                $scope.editChannel.constraints.min = customTemperatureRange[0];
+                $scope.editChannel.constraints.max = customTemperatureRange[1];
+            }
             $scope.setKnobMinMax($scope.editChannel.constraints.min, $scope.editChannel.constraints.max);
             SharedState.turnOn('editChannelDialog');
         }
@@ -512,6 +525,17 @@ jMaticControllers.controller('appConfigController', ['$scope', '$http', 'Notific
     if (typeof ($scope.currentLang) === "undefined")
         $scope.currentLang = $translate.use();
 
+    var customTemperatureRange = LocalStorage.get('customTemperatureRange');
+    try {
+        customTemperatureRange = JSON.parse(customTemperatureRange);
+    } catch (e) {
+        // use a fallback
+        customTemperatureRange = [10, 25];
+    }
+
+    $scope.customTemperatureRangeMin = customTemperatureRange[0];
+    $scope.customTemperatureRangeMax = customTemperatureRange[1];
+
     $scope.$watch("ccuIP", function (newValue, oldValue) {
         if ($scope.ccuIP.length > 0) {
             LocalStorage.set('CCU-IP', $scope.ccuIP);
@@ -521,6 +545,18 @@ jMaticControllers.controller('appConfigController', ['$scope', '$http', 'Notific
     $scope.$watch("deviceStateReloadInterval", function (newValue, oldValue) {
         if (parseInt($scope.deviceStateReloadInterval) >= 0) {
             LocalStorage.set('deviceStateReloadInterval', parseInt($scope.deviceStateReloadInterval)*1000);
+        }
+    });
+
+    $scope.$watch("customTemperatureRangeMin", function (newValue, oldValue) {
+        if (parseInt($scope.customTemperatureRangeMin) >= 0) {
+            LocalStorage.set('customTemperatureRange', JSON.stringify([$scope.customTemperatureRangeMin, $scope.customTemperatureRangeMax]));
+        }
+    });
+
+    $scope.$watch("customTemperatureRangeMax", function (newValue, oldValue) {
+        if (parseInt($scope.customTemperatureRangeMax) >= 0) {
+            LocalStorage.set('customTemperatureRange', JSON.stringify([$scope.customTemperatureRangeMin, $scope.customTemperatureRangeMax]));
         }
     });
 

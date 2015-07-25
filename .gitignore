@@ -3,6 +3,8 @@
 
 # auto-generated app stuff
 app/scripts/compiled_templates.js
+app/*
+!app/index.html
 
 # auto-generated python stuff
 __pycache__/

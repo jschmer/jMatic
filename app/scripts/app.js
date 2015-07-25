@@ -125,11 +125,30 @@ var jMaticApp = angular
                  .error(params.error);
         }
 
-        function genericErrorFn(message, response, status, headers, config, errorCallback) {
-            Notification.error(message);
-            console.error(message, response, status, headers, config);
+        // when CCU isn't reachable
+        function genericErrorFn(messageID, response, status, headers, config, errorCallback) {
+            $translate(messageID).then(function (text) {
+                $translate('CCU_REACHABLE').then(function (ccu_text) {
+                    Notification.error(text + ' ' + ccu_text);
+                    console.error(text + ' ' + ccu_text, response, status, headers, config);
+                });
+            });
+
 
             if (errorCallback) errorCallback();
+        }
+
+        function warn_NoDeviceStates() {
+            $translate('WARN_NODEVICESTATES').then(function (text) {
+                Notification.error(text);
+            });
+        }
+
+        function error_FailedParsingDeviceStates(except) {
+            $translate('ERROR_FAILEDPARSINGDEVICESTATES').then(function (text) {
+                Notification.error(text + ' ' + except);
+                console.error(text + ' ' + except);
+            });
         }
 
         // Executes HTTP GET requests on the CCU and converts the response to JSON
@@ -147,7 +166,7 @@ var jMaticApp = angular
                         try {
                             var deviceStates = x2js.xml_str2json(response).stateList.device;
                             if (deviceStates == null) {
-                                Notification.error("No device states received!");
+                                warn_NoDeviceStates();
                                 return;
                             }
                             console.log("OK converting device states to json!");
@@ -156,15 +175,14 @@ var jMaticApp = angular
                             deviceStates = makeArrayIfOnlyOneObject(deviceStates);
                         }
                         catch (e) {
-                            Notification.error("Failed parsing device states! " + e);
-                            console.error(e);
+                            error_FailedParsingDeviceStates(e);
                             return;
                         }
 
                         if (callbacks.success) callbacks.success(deviceStates);
                     },
                     error: function (response, status, headers, config) {
-                        genericErrorFn("Failed getting device states! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                        genericErrorFn('ERROR_FAILEDGETTINGDEVICESTATES', response, status, headers, config, callbacks.error);
                     }
                 });
 
@@ -186,7 +204,7 @@ var jMaticApp = angular
                         try {
                             var deviceStates = x2js.xml_str2json(response).state.device;
                             if (deviceStates == null) {
-                                Notification.error("No device states received!");
+                                warn_NoDeviceStates();
                                 return;
                             }
                             console.log("OK converting device states to json!");
@@ -195,15 +213,14 @@ var jMaticApp = angular
                             deviceStates = makeArrayIfOnlyOneObject(deviceStates);
                         }
                         catch (e) {
-                            Notification.error("Failed parsing device states! " + e);
-                            console.error(e);
+                            error_FailedParsingDeviceStates(e);
                             return;
                         }
 
                         if (callbacks.success) callbacks.success(deviceStates);
                     },
                     error: function (response, status, headers, config) {
-                        genericErrorFn("Failed getting device states! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                        genericErrorFn('ERROR_FAILEDGETTINGDEVICESTATES', response, status, headers, config, callbacks.error);
                     }
                 });
             },
@@ -218,7 +235,9 @@ var jMaticApp = angular
                         try {
                             var deviceArray = x2js.xml_str2json(response).deviceList.device;
                             if (deviceArray == null) {
-                                Notification.error("No device states received!");
+                                $translate('WARN_NODEVICES').then(function (text) {
+                                    Notification.error(text);
+                                });
                                 return;
                             }
                             console.log("OK converting device list to json!");
@@ -227,15 +246,17 @@ var jMaticApp = angular
                             deviceArray = makeArrayIfOnlyOneObject(deviceArray);
                         }
                         catch (e) {
-                            Notification.error("Failed parsing devices! " + e);
-                            console.error(e);
+                            $translate('ERROR_FAILEDPARSINGDEVICES').then(function (text) {
+                                Notification.error(text + ' ' + e);
+                                console.error(text + ' ' + e);
+                            });
                             return;
                         }
 
                         if (callbacks.success) callbacks.success(deviceArray);
                     },
                     error: function (response, status, headers, config) {
-                        genericErrorFn("Failed getting devices! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                        genericErrorFn('ERROR_FAILEDGETTINGDEVICES', response, status, headers, config, callbacks.error);
                     }
                 });
             },
@@ -250,7 +271,9 @@ var jMaticApp = angular
                         try {
                             var sysVars = x2js.xml_str2json(response).systemVariables.systemVariable;
                             if (sysVars == null) {
-                                Notification.error("No system variables received!");
+                                $translate('WARN_NOSYSVARS').then(function (text) {
+                                    Notification.error(text);
+                                });
                                 return;
                             }
                             console.log("OK converting system variable list to json!");
@@ -259,15 +282,17 @@ var jMaticApp = angular
                             sysVars = makeArrayIfOnlyOneObject(sysVars);
                         }
                         catch (e) {
-                            Notification.error("Failed parsing system variables! " + e);
-                            console.error(e);
+                            $translate('ERROR_FAILEDPARSINGSYSVARS').then(function (text) {
+                                Notification.error(text + ' ' + e);
+                                console.error(text + ' ' + e);
+                            });
                             return;
                         }
 
                         if (callbacks.success) callbacks.success(sysVars);
                     },
                     error: function (response, status, headers, config) {
-                        genericErrorFn("Failed getting system variable list! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                        genericErrorFn('ERROR_FAILEDGETTINGSYSVARS', response, status, headers, config, callbacks.error);
                     }
                 });
             },
@@ -284,23 +309,26 @@ var jMaticApp = angular
                             var result = x2js.xml_str2json(response).result;
                             if (result == null) {
                                 // write failed
-                                var message = "Writing " + value + " to system variable with id " + id + " failed!";
-                                Notification.error(message);
-                                console.error(message, response, status, headers, config);
+                                $translate('WARN_FAILEDWRITINGDATAPOINT', { value: value, id: id }).then(function (text) {
+                                    Notification.error(text);
+                                    console.error(text, response, status, headers, config);
+                                });
                                 return;
                             }
                             console.log("OK converting write result to json!");
                         }
                         catch (e) {
-                            Notification.error("Failed parsing device states! " + e);
-                            console.error(e);
+                            $translate('WARN_FAILEDWRITINGDATAPOINT', { value: value, id: id }).then(function (text) {
+                                Notification.error(text + ' ' + e);
+                                console.error(text + ' ' + e);
+                            });
                             return;
                         }
 
                         if (callbacks.success) callbacks.success(result);
                     },
                     error: function (response, status, headers, config) {
-                        genericErrorFn("Failed writing channel state! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                        genericErrorFn('ERROR_FAILEDWRITINGCHANNEL', response, status, headers, config, callbacks.error);
                     }
                 });
             },
@@ -315,7 +343,9 @@ var jMaticApp = angular
                         try {
                             var programList = x2js.xml_str2json(response).programList.program;
                             if (programList == null) {
-                                Notification.error("No programs received!");
+                                $translate('WARN_NOPROGRAMS').then(function (text) {
+                                    Notification.error(text);
+                                });
                                 return;
                             }
                             console.log("OK converting program list to json!");
@@ -324,15 +354,17 @@ var jMaticApp = angular
                             programList = makeArrayIfOnlyOneObject(programList);
                         }
                         catch (e) {
-                            Notification.error("Failed parsing program list! " + e);
-                            console.error(e);
+                            $translate('ERROR_FAILEDPARSINGPROGRAMLIST').then(function (text) {
+                                Notification.error(text + ' ' + e);
+                                console.error(text + ' ' + e);
+                            });
                             return;
                         }
 
                         if (callbacks.success) callbacks.success(programList);
                     },
                     error: function (response, status, headers, config) {
-                        genericErrorFn("Failed getting program list! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                        genericErrorFn('ERROR_FAILEDGETTINGPROGRAMLIST', response, status, headers, config, callbacks.error);
                     }
                 });
             },
@@ -347,21 +379,25 @@ var jMaticApp = angular
                         try {
                             var result = x2js.xml_str2json(response).result.started;
                             if (result == null) {
-                                Notification.error("Running program with id " + id + " failed!");
+                                $translate('WARN_FAILEDRUNNINGPROGRAM', { id: id }).then(function (text) {
+                                    Notification.error(text);
+                                });
                                 return;
                             }
                             console.log("OK converting result of running program to json!");
                         }
                         catch (e) {
-                            Notification.error("Failed running program! " + e);
-                            console.error(e);
+                            $translate('WARN_FAILEDRUNNINGPROGRAM', { id: id }).then(function (text) {
+                                Notification.error(text + ' ' + e);
+                                console.error(text + ' ' + e);
+                            });
                             return;
                         }
 
                         if (callbacks.success) callbacks.success(result);
                     },
                     error: function (response, status, headers, config) {
-                        genericErrorFn("Failed running program " + id + "! Is your CCU reachable?", response, status, headers, config, callbacks.error);
+                        genericErrorFn('ERROR_FAILEDRUNNINGPROGRAM', response, status, headers, config, callbacks.error);
                     }
                 });
             },

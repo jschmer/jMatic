@@ -1,6 +1,29 @@
 ﻿"use strict";
 
+// datapoint name translations
+var Translation = {
+    "LOWBAT": "Low Battery",
+    "BATTERY_STATE": "Battery",
+    "ACTUAL_HUMIDITY": "Luftfeuchte",
+    "ACTUAL_TEMPERATURE": "Temperatur",
+    "SET_TEMPERATURE": "Zieltemperatur",
+    "VALVE_STATE": "Ventilstatus",
+    "ERROR": "Sabotage",
+    "STATE": "Status",
+    "CONTROL_MODE": "Modus",
+    "FAULT_REPORTING": "Fehler",
+}
+function translate(string) {
+    // if has translation: translate
+    if (Translation.hasOwnProperty(string))
+        return Translation[string];
+        // else: return input string
+    else
+        return string;
+}
+
 // map device type code to display name
+// TODO: translate properly with the $translate service
 var deviceTypeNames = {
     'HM-CC-VG-1': 'VirtualGroup',
     'HM-Sec-SCo': 'WindowSensor',
@@ -59,28 +82,6 @@ var HMdataType = {
     20: Type.string
 }
 
-// datapoint name translations
-var Translation = {
-    "LOWBAT": "Low Battery",
-    "BATTERY_STATE": "Battery",
-    "ACTUAL_HUMIDITY": "Luftfeuchte",
-    "ACTUAL_TEMPERATURE": "Temperatur",
-    "SET_TEMPERATURE": "Zieltemperatur",
-    "VALVE_STATE": "Ventilstatus",
-    "ERROR": "Sabotage",
-    "STATE": "Status",
-    "CONTROL_MODE": "Modus",
-    "FAULT_REPORTING": "Fehler",
-}
-function translate(string) {
-    // if has translation: translate
-    if (Translation.hasOwnProperty(string))
-        return Translation[string];
-        // else: return input string
-    else
-        return string;
-}
-
 // datapoint value translations
 var ControlModeState = {
     Auto: 0,
@@ -88,6 +89,7 @@ var ControlModeState = {
     Party: 2,
     Boost: 3
 }
+// TODO: translate properly with the $translate service
 var ControlModeStates = {
     0: "Auto",
     1: "Manuell",
@@ -98,6 +100,7 @@ function getControlModeString(mode) {
     return ControlModeStates[mode];
 }
 
+// TODO: translate properly with the $translate service
 var FaultReportingStates = {
     0: "Kein Fehler",
     1: "VALVE_TIGHT",
@@ -116,6 +119,7 @@ var ErrorState = {
     NoError: 0,
     Error: 1
 }
+// TODO: translate properly with the $translate service
 var ErrorStates = {
     0: "Nein",
     1: "Ja",
@@ -124,6 +128,7 @@ function getErrorString(state) {
     return ErrorStates[state];
 }
 
+// TODO: translate properly with the $translate service
 function getWindowOpenClosedString(state) {
     if (state == false)
         return "Zu";

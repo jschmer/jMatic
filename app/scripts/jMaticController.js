@@ -25,7 +25,7 @@ jMaticControllers.run(function ($rootScope) {
 function startLoading(scope) { scope.loading = true; }
 function finishLoading(scope) { scope.loading = false; }
 
-jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$location', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$timeout', '$interval', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI, $timeout, $interval) {
+jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$location', 'SharedState', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$timeout', '$interval', '$translate', function ($scope, $http, $location, SharedState, Notification, LocalStorage, CCUXMLAPI, $timeout, $interval, $translate) {
 
     LocalStorage.initSharedState("showChannelNames", $scope);
     LocalStorage.initSharedState("channelsStacked", $scope);
@@ -86,7 +86,9 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
         CCUXMLAPI.ChannelEdit(id, value, {
             success: function (result) {
                 if (result.changed._id == id && result.changed._new_value == value) {
-                    Notification.success("Write succeeded!", 2000);
+                    $translate('CHANGESUCCESS').then(function (text) {
+                        Notification.success(text, 2000);
+                    });
 
                     // write succeeded, update the state after giving the CCU some time to update its state...
                     $timeout(function () {
@@ -95,9 +97,10 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
                     }, 500);
                 }
                 else {
-                    var message = "Failed writing value " + value + " to channel " + id;
-                    Notification.error(message);
-                    console.error(message, data, status, headers, config);
+                    $translate('WARN_FAILEDWRITINGDATAPOINT', {value: value, id: id}).then(function (text) {
+                        Notification.error(text);
+                        console.error(text, data, status, headers, config);
+                    });
                 }
             },
             error: function () {
@@ -154,8 +157,10 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
                         LocalStorage.saveDevices($scope.devices);
                     }
                     catch (e) {
-                        Notification.error("Failed parsing device states! " + e);
-                        console.error(e);
+                        $translate('ERROR_FAILEDPARSINGDEVICESTATES').then(function (text) {
+                            Notification.error(text + ' ' + e);
+                            console.error(text + ' ' + e);
+                        });
                     }
                     finally {
                         finishLoading($scope);
@@ -186,7 +191,7 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
         refreshPromise = $interval($scope.loadStates, refreshInterval);
 }]);
 
-jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Notification', 'LocalStorage', 'CCUXMLAPI', function ($scope, $http, Notification, LocalStorage, CCUXMLAPI) {
+jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Notification', 'LocalStorage', 'CCUXMLAPI', '$translate', function ($scope, $http, Notification, LocalStorage, CCUXMLAPI, $translate) {
 
     $scope.listOrder = 'name';
 
@@ -275,9 +280,10 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
 
                     $scope.persistDeviceConfig($scope.devices);
                 } catch (e) {
-                    var message = "Failed parsing device list!" + e;
-                    Notification.error(message);
-                    console.error(message, data, status, headers, config);
+                    $translate('ERROR_FAILEDPARSINGDEVICES').then(function (text) {
+                        Notification.error(text + ' ' + e);
+                        console.error(text + ' ' + e);
+                    });
                 }
                 finally {
                     finishLoading($scope);
@@ -316,16 +322,21 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
         if (deviceIndex != -1) {
             var device = $scope.devices[deviceIndex];
             $scope.devices.splice(deviceIndex, 1);
-            Notification.success("Device '" + device.name + "' deleted!", 2000);
+
+            $translate('DEVICEDELETEDSUCCESS', { deviceName: device.name }).then(function (text) {
+                Notification.success(text, 2000);
+            });
             $scope.persistDeviceConfig($scope.devices);
         }
         else {
-            Notification.error("Device with id " + deviceId + " not found!");
+            $translate('ERROR_DEVICENOTFOUND', {deviceId: deviceId}).then(function (text) {
+                Notification.error(text);
+            });
         }
     }
 }]);
 
-jMaticControllers.controller('batteryCheckController', ['$scope', '$http', 'Notification', 'CCUXMLAPI', function ($scope, $http, Notification, CCUXMLAPI) {
+jMaticControllers.controller('batteryCheckController', ['$scope', '$http', 'Notification', 'CCUXMLAPI', '$translate', function ($scope, $http, Notification, CCUXMLAPI, $translate) {
 
     finishLoading($scope);
 
@@ -408,7 +419,7 @@ jMaticControllers.controller('batteryCheckController', ['$scope', '$http', 'Noti
     $scope.loadStates();
 }]);
 
-jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notification', 'SharedState', 'CCUXMLAPI', '$timeout', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout) {
+jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notification', 'SharedState', 'CCUXMLAPI', '$timeout', '$translate', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout, $translate) {
 
     finishLoading($scope);
 
@@ -431,9 +442,10 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
                         $scope.systemVars.push(parsedSysVar);
                     }
                 } catch (e) {
-                    var message = "Failed parsing system variables list!" + e;
-                    Notification.error(message);
-                    console.error(message, data, status, headers, config);
+                    $translate('ERROR_FAILEDPARSINGSYSVARS').then(function (text) {
+                        Notification.error(text + ' ' + e);
+                        console.error(text + ' ' + e);
+                    });
                 } finally {
                     finishLoading($scope);
                 }
@@ -489,7 +501,9 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
         CCUXMLAPI.ChannelEdit(id, value, {
             success: function (result) {
                 if (result.changed._id == id && result.changed._new_value == value) {
-                    Notification.success("Write succeeded!", 2000);
+                    $translate('CHANGESUCCESS').then(function (text) {
+                        Notification.success(text, 2000);
+                    });
 
                     // write succeeded, update the state after giving the CCU some time to update its state...
                     $timeout(function () {
@@ -498,9 +512,10 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
                     }, 500);
                 }
                 else {
-                    var message = "Failed writing value " + value + " to system variable " + id;
-                    Notification.error(message);
-                    console.error(message, data, status, headers, config);
+                    $translate('WARN_FAILEDWRITINGSYSVAR', { value: value, id: id }).then(function (text) {
+                        Notification.error(text);
+                        console.error(message);
+                    });
                 }
             },
             error: function () {
@@ -569,7 +584,7 @@ jMaticControllers.controller('appConfigController', ['$scope', '$http', 'Notific
     finishLoading($scope);
 }]);
 
-jMaticControllers.controller('programController', ['$scope', '$http', 'Notification', 'SharedState', 'CCUXMLAPI', '$timeout', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout) {
+jMaticControllers.controller('programController', ['$scope', '$http', 'Notification', 'SharedState', 'CCUXMLAPI', '$timeout', '$translate', function ($scope, $http, Notification, SharedState, CCUXMLAPI, $timeout, $translate) {
 
     finishLoading($scope);
 
@@ -590,12 +605,15 @@ jMaticControllers.controller('programController', ['$scope', '$http', 'Notificat
             success: function (result) {
                 try {
                     if (result._program_id != prog.id) {
-                        var message = "Running program with id " + prog.id + " failed!";
-                        Notification.error(message);
-                        console.error(message, data, status, headers, config);
+                        $translate('WARN_FAILEDRUNNINGPROGRAM', {id: prog.id}).then(function (text) {
+                            Notification.error(text);
+                            console.error(text);
+                        });
                     }
                     else {
-                        Notification.success("Running program '" + prog.name + "' successful!", 2000);
+                        $translate('RUNNINGPROGRAMSUCCESS', {programName: prog.name}).then(function (text) {
+                            Notification.success(text, 2000);
+                        });
                     }
                 }
                 finally {
@@ -629,9 +647,10 @@ jMaticControllers.controller('programController', ['$scope', '$http', 'Notificat
                         });
                     }
                 } catch (e) {
-                    var message = "Failed parsing system variables list!" + e;
-                    Notification.error(message);
-                    console.error(message, data, status, headers, config);
+                    $translate('ERROR_FAILEDPARSINGPROGRAMLIST').then(function (text) {
+                        Notification.error(text + ' ' + e);
+                        console.error(text + ' ' + e);
+                    });
                 } finally {
                     finishLoading($scope);
                 }

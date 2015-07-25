@@ -1,5 +1,9 @@
 # Data Structures
 ---
+Most of this is derived from the HomeMatic documentation found here: http://www.eq-3.de/downloads.html  
+Search for 'Script' in the category 'HomeMatic' and download type 'Skripte'.
+'HomeMatic Script Teil 4 CCU2 - Datenpunkte' is the most important documentation for jMatic.
+
 
 ### Devices
 ---
@@ -26,7 +30,7 @@ Data for devices is configured in js/data.js.
 First extend the DeviceDataPoints.DataPoint structure with the datapoints you want to use
 for your new device. Datapoints are identified by
 - name
-- channel (defaults to 0, every device has 0 to n channels. The order is defined by the XML-API)
+- channel (defaults to 0, every device has 0 to n channels)
 - optional functions:
   - converting the raw value (e.g. convert true/false to meaningful strings YES/NO, possibly use translation here too)
   - determine if the datapoint should be hidden in the UI (e.g. only show the 'error' state)
@@ -140,6 +144,44 @@ Used in view **Device State**. Affects layout of device channels.
 
 Persisted in ***localStorage.lastRefreshTime***: datetime string  
 Used in view **Device State**. Stores the last time the device states were successfully refreshed.
+
+### Userdefined widgets
+---
+You can compose datapoints from multiple devices into one userdefined widget.
+These are defined in the file 'userdefined_groups.js' and are unique for every HomeMatic installation.
+The sample provided won't work with your setup but you get the idea behind it when looking at it:
+The userdefined_groups variable is just a list of objects defining your custom widgets.
+You need to assign an ID, a name and a config to your widget. The config contains a list of object definitions that
+specify the device and datapoints you want to include for your custom widget.
+An example:
+```javascript
+var userdefined_groups = [
+    {
+        id: 0,
+        name: "Badezimmer",
+        config: [
+            {
+                device_id: 2517, // virtualgroup
+                datapoints: [
+                    DeviceDataPoints.DataPoint.ControlMode.inChannel(1),
+                    DeviceDataPoints.DataPoint.Humidity.inChannel(1),
+                    DeviceDataPoints.DataPoint.ActualTemperature.inChannel(1),
+                    DeviceDataPoints.DataPoint.SetTemperature.inChannel(1),
+                    DeviceDataPoints.DataPoint.State.inChannel(2),
+                ]
+            },
+            {
+                device_id: 2377, // heater
+                datapoints: [
+                    DeviceDataPoints.DataPoint.ValveState.inChannel(4),
+                ]
+            },
+        ]
+    },
+]
+```
+You can get the device_id from the **Device Subscription** view. The HomeMatic documentation 'Datenpunkte' 
+helps finding out in which channel a datapoint is located. The datapoints themselves are found by name inside the channel.
 
 # Misc
 ---

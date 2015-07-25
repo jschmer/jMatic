@@ -23,23 +23,18 @@ Prerequisites
 Features
 --------
 - Device widgets that display only important datapoints of HomeMatic components
-	- Read-only
+	- Read-only datapoints
 	- Write-support for write-enabled datapoints
 	- Highlight datapoints (red font color) if the value exceeds some hardcoded threshold
 	- Highlight changed values (bold font weight)
 - Subscribing to devices
 	- only data for subscribed devices are displayed and refreshed which reduces load on the CCU  
-- Refreshing data manually and on page load
+- Refreshing data manually, on page load and periodically
 - Checking battery for every device
 - Display and modify system variables
-- Running programs
+- Run programs
 - User defined widgets which are composed of arbitrary datapoints from different devices
-	- Currently only hardcoded in JSON-format
-	- UI for dynamic creation is planned
-
-Roadmap
--------
-- UI for dynamic definition of user defined widgets
+	- Currently only hardcoded in JSON-format (userdefined_groups.js)
 
 Usage
 -----

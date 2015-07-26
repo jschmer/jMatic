@@ -199,6 +199,8 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
 
     $scope.devices = LocalStorage.loadDevices();
 
+    $scope.userdefinedGroupType = userdefinedGroupType;
+
     // load user defined groups from hardcoded userdefined_groups object
     if (typeof (userdefined_groups) !== "undefined" && typeof (userdefined_groups.length) !== "undefined") {
         var updateCache = false;
@@ -207,9 +209,28 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
         for (var i = 0; i < userdefined_groups.length; i += 1) {
             var grp = userdefined_groups[i];
 
+            // insert device names in the group config
+            for (var j = 0; j < grp.config.length; j += 1) {
+                var groupdevice = grp.config[j];
+
+                var deviceIndex = findDevice($scope.devices, groupdevice.device_id);
+                if (deviceIndex != -1) {
+                    groupdevice.name = $scope.devices[deviceIndex].name;
+                }
+                else {
+                    groupdevice.name = 'Unknown device';
+                }
+
+                // insert display name for datapoints
+                for (var k = 0; k < groupdevice.datapoints.length; k += 1) {
+                    groupdevice.datapoints[k].displayName = translate(groupdevice.datapoints[k].datapointName);
+                }
+            }
+
             var deviceIndex = findDevice($scope.devices, grp.id);
             if (deviceIndex != -1) {
                 var existingDevice = $scope.devices[deviceIndex];
+
 
                 // got an existing device, update it (and keep the state!)
                 $scope.devices[deviceIndex] = {
@@ -240,6 +261,16 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
 
         if (updateCache)
             LocalStorage.saveDevices($scope.devices);
+    }
+
+    $scope.showDeviceDetails = function (event) {
+        var target = $(event.target);
+        var parent = target.parent().parent();
+        var details = parent.next();
+        details.toggle();
+
+        // switch caret direction
+        target.toggleClass("fa-caret-right fa-caret-down");
     }
 
     $scope.isUserdefinedConfig = function (type) {

@@ -27,25 +27,72 @@
     </div>
 </div>
 <div class="scrollable-content">
+    <style>
+        .device-config {
+            display: table;
+        }
+
+        .device-config-header {
+            display: table-row;
+        }
+
+        .device-config-header > div {
+            display: inline-block;
+        }
+
+        .device-config-details {
+            margin-left: 3em;
+            display: none;
+        }
+
+        .device-config-details .list-group {
+            margin-bottom: 0px !important;
+        }
+
+        .groupdevice-details {
+            margin-left: 1em;
+        }
+    </style>
     <div class="list-group" ng-hide="loading">
-        <span ng-repeat="device in devices | orderBy: listOrder track by device.id" class="list-group-item">
-            <span ng-click="toggleSubscription(device.id)" class="pointable">
-                <span class="config-list-subscription-state">
-                    <i class="fa fa-fw" ng-class="[
+        <div ng-repeat="device in devices | orderBy: listOrder track by device.id" class="list-group-item device-config">
+            <div class="device-config-header">
+                <div ng-click="toggleSubscription(device.id)" class="pointable">
+                    <span class="config-list-subscription-state">
+                        <i class="fa fa-fw" ng-class="[
                         device.subscribed ? 'fa-check green' : ''
                        ]"></i>
-                </span>
-                <span class="config-list-config-state">
-                    <i class="fa" ng-class="[
+                    </span>
+                    <span class="config-list-config-state">
+                        <i class="fa" ng-class="[
                         !device.available ? 'fa-question red' : ''
                        ]"></i>
-                </span>
-                <span>{{device.name}}</span>
-                <span ui-show="showIds"> ({{device.id}})</span>
-                <span class="device-type label" ng-class="device.type">{{device.type}}</span>
-            </span>
-            <i ng-show="!device.available" class="fa fa-close red fa-fw pointable" ng-click="deleteDevice(device.id)"></i>
-        </span>
+                    </span>
+                    <span>{{device.name}}</span>
+                    <span ui-show="showIds"> ({{device.id}})</span>
+                    <span class="device-type label" ng-class="device.type">{{device.type}}</span>
+                </div>
+                <div>
+                    <i ng-show="!device.available" class="fa fa-close red fa-fw pointable" ng-click="deleteDevice(device.id)"></i>
+                    <i ng-show="device.type == userdefinedGroupType" class="fa fa-caret-right fa-fw pointable" ng-click="showDeviceDetails($event)"></i>
+                </div>
+            </div>
+            <div ng-show="device.type == userdefinedGroupType" class="device-config-details">
+                <div class="list-group">
+                    <div ng-repeat="groupdevice in device.config" class="list-group-item">
+                        <div class="groupdevice-header">
+                            <span>{{groupdevice.name}}</span>
+                            <span ui-show="showIds"> ({{groupdevice.device_id}})</span>
+                        </div>
+                        <div class="groupdevice-details list-group">
+                            <div ng-repeat="dp in groupdevice.datapoints" class="list-group-item">
+                                <span>{{dp.displayName}}</span>
+                                <span ui-show="showIds"> ({{dp.channelIndex}})</span>
+                            </div>
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <div ng-show="loading">
         <i class="fa fa-spinner fa-spin fa-3x centered-loading-spinner"></i>

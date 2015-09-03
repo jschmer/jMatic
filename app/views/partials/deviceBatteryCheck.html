@@ -6,7 +6,7 @@
     <div class="list-group battery-checklist" ng-hide="loading">
         <div ng-repeat="state in deviceStates | orderBy:'name'" class="list-group-item battery-checklist-item">
             <span class="config-list-item-state">
-                <i class="fa fa-check" ng-class="[state.lowBat==true?'red':'green']"></i>
+                <i class="fa" ng-class="[state.lowBat==true?'fa-close red ':'fa-check green']"></i>
             </span>
             <span>{{state.name}}</span>
             <ul class="condensed" ng-show="state.channels.length!=0">

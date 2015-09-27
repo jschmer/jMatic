@@ -87,7 +87,7 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
             success: function (result) {
                 if (result.changed._id == id && result.changed._new_value == value) {
                     $translate('CHANGESUCCESS').then(function (text) {
-                        Notification.success(text, 2000);
+                        Notification.success(text);
                     });
 
                     // write succeeded, update the state after giving the CCU some time to update its state...
@@ -357,7 +357,7 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
             $scope.devices.splice(deviceIndex, 1);
 
             $translate('DEVICEDELETEDSUCCESS', { deviceName: device.name }).then(function (text) {
-                Notification.success(text, 2000);
+                Notification.success(text);
             });
             $scope.persistDeviceConfig($scope.devices);
         }
@@ -537,7 +537,7 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
             success: function (result) {
                 if (result.changed._id == id && result.changed._new_value == value) {
                     $translate('CHANGESUCCESS').then(function (text) {
-                        Notification.success(text, 2000);
+                        Notification.success(text);
                     });
 
                     // write succeeded, update the state after giving the CCU some time to update its state...
@@ -647,7 +647,7 @@ jMaticControllers.controller('programController', ['$scope', '$http', 'Notificat
                     }
                     else {
                         $translate('RUNNINGPROGRAMSUCCESS', {programName: prog.name}).then(function (text) {
-                            Notification.success(text, 2000);
+                            Notification.success(text);
                         });
                     }
                 }

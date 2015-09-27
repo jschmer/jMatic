@@ -2,16 +2,20 @@
 
 var x2js = new X2JS();
 var jMaticApp = angular
-    .module('jMaticApp', ['ngRoute', 'ngAnimate', 'toasty', 'mobile-angular-ui', 'jMaticControllers', 'pascalprecht.translate'])
+    .module('jMaticApp', ['ngRoute', 'ngAnimate', 'angular-toasty', 'mobile-angular-ui', 'jMaticControllers', 'pascalprecht.translate'])
 
-    .service('Notification', ['toasty', '$translate', function (toasty, $translate) {
+    .constant('jMaticAppConfig', {
+        successToastTimeout: 3000
+    })
+
+    .service('Notification', ['toasty', '$translate', 'jMaticAppConfig', function (toasty, $translate, jMaticAppConfig) {
         function isUpper(str) {
             return str == str.toUpperCase();
         }
 
         function launchError(messageText, timeout) {
             $translate('ERROR').then(function (error) {
-                toasty.pop.error({
+                toasty.error({
                     title: error,
                     msg: messageText,
                     sound: false,
@@ -24,13 +28,13 @@ var jMaticApp = angular
 
         function launchSuccess(messageText, timeout) {
             $translate('SUCCESS').then(function (success) {
-                toasty.pop.success({
+                toasty.success({
                     title: success,
                     msg: messageText,
                     sound: false,
                     showClose: true,
                     clickToClose: true,
-                    timeout: isInt(timeout) ? timeout : 0
+                    timeout: isInt(timeout) ? timeout : jMaticAppConfig.successToastTimeout
                 });
             });
         }
@@ -409,7 +413,7 @@ var jMaticApp = angular
         };
     }])
 
-    .config(['$routeProvider', '$translateProvider', '$animateProvider', function ($routeProvider, $translateProvider, $animateProvider) {
+    .config(['$routeProvider', '$translateProvider', '$animateProvider', 'toastyConfigProvider', function ($routeProvider, $translateProvider, $animateProvider, toastyConfigProvider) {
         $routeProvider.
             when('/deviceState', {
                 templateUrl: 'views/partials/deviceState.html',
@@ -460,6 +464,12 @@ var jMaticApp = angular
 
         // disable animations for ng-show/hide for elements with fa-spinner class
         $animateProvider.classNameFilter(/^((?!(fa-spinner)).)*$/);
+
+        toastyConfigProvider.setConfig({
+            limit: 3,
+            sound: false,
+            shake: false
+        });
     }])
 
     .run(['LocalStorage', '$translate', function (LocalStorage, $translate) {

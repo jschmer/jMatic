@@ -62,6 +62,11 @@ var jMaticApp = angular
                 launchSuccess(message, timeout);
             }
         };
+
+        this.clear = function()
+        {
+            toasty.clear();
+        }
     }])
 
     .service("LocalStorage", ['SharedState', function (SharedState) {

@@ -155,6 +155,7 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
                         LocalStorage.set("lastRefreshTime", $scope.lastRefreshTime);
 
                         LocalStorage.saveDevices($scope.devices);
+                        Notification.clear();
                     }
                     catch (e) {
                         $translate('ERROR_FAILEDPARSINGDEVICESTATES').then(function (text) {
@@ -310,6 +311,7 @@ jMaticControllers.controller('deviceConfigController', ['$scope', '$http', 'Noti
                     }
 
                     $scope.persistDeviceConfig($scope.devices);
+                    Notification.clear();
                 } catch (e) {
                     $translate('ERROR_FAILEDPARSINGDEVICES').then(function (text) {
                         Notification.error(text + ' ' + e);
@@ -432,6 +434,7 @@ jMaticControllers.controller('batteryCheckController', ['$scope', '$http', 'Noti
 
                         $scope.deviceStates.push(deviceData);
                     }
+                    Notification.clear();
                 }
                 catch (e) {
 
@@ -472,6 +475,7 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
                         var parsedSysVar = parseSystemVariable(sysVar);
                         $scope.systemVars.push(parsedSysVar);
                     }
+                    Notification.clear();
                 } catch (e) {
                     $translate('ERROR_FAILEDPARSINGSYSVARS').then(function (text) {
                         Notification.error(text + ' ' + e);
@@ -677,6 +681,7 @@ jMaticControllers.controller('programController', ['$scope', '$http', 'Notificat
                             active: prog._active
                         });
                     }
+                    Notification.clear();
                 } catch (e) {
                     $translate('ERROR_FAILEDPARSINGPROGRAMLIST').then(function (text) {
                         Notification.error(text + ' ' + e);

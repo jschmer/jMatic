@@ -1,4 +1,4 @@
-"use strict";
+﻿"use strict";
 
 var userdefined_groups = [
     {
@@ -66,6 +66,28 @@ var userdefined_groups = [
             },
             {
                 device_id: 2147, // heater window
+                datapoints: [
+                    DeviceDataPoints.DataPoint.ValveState.inChannel(4),
+                ]
+            },
+        ]
+    },
+    {
+        id: 3,
+        name: "Küche",
+        config: [
+            {
+                device_id: 2997, // virtualgroup
+                datapoints: [
+                    DeviceDataPoints.DataPoint.ControlMode.inChannel(1),
+                    DeviceDataPoints.DataPoint.Humidity.inChannel(1),
+                    DeviceDataPoints.DataPoint.ActualTemperature.inChannel(1),
+                    DeviceDataPoints.DataPoint.SetTemperature.inChannel(1),
+                    DeviceDataPoints.DataPoint.State.inChannel(2),
+                ]
+            },
+            {
+                device_id: 2918, // heater
                 datapoints: [
                     DeviceDataPoints.DataPoint.ValveState.inChannel(4),
                 ]

@@ -29,6 +29,7 @@ var deviceTypeNames = {
     'HM-Sec-SCo': 'WindowSensor',
     'HM-CC-RT-DN': 'Heater',
     'HM-TC-IT-WM-W-EU': 'Thermostat',
+    'HM-ES-PMSw1-Pl': 'WirelessOutlet'
 }
 var userdefinedGroupType = 'UserdefinedVirtualGroup';
 
@@ -136,6 +137,13 @@ function getWindowOpenClosedString(state) {
         return "Auf";
 }
 
+function getSwitchOnOffString(state) {
+    if (state == false)
+        return "Aus";
+    else
+        return "An";
+}
+
 // datapoint state functions (hide if, threshold if)
 var HideFunctions = {
     hideIfFalse: function(value) {
@@ -230,7 +238,7 @@ var DeviceDataPoints = new function () {
             datapointName: "ACTUAL_TEMPERATURE",
             thresholdIf: ThresholdFunctions.currentTemperatureThreshold
         }),
-        State: new DataPoint_t({
+        WindowState: new DataPoint_t({
             datapointName: "STATE",
             valueConversionFn: getWindowOpenClosedString,
             thresholdIf: ThresholdFunctions.trueState // window open
@@ -248,6 +256,15 @@ var DeviceDataPoints = new function () {
             thresholdIf: ThresholdFunctions.always
         }),
         ValveState: new DataPoint_t({ datapointName: "VALVE_STATE" }),
+        Power: new DataPoint_t({ datapointName: "POWER" }),
+        Current: new DataPoint_t({ datapointName: "CURRENT" }),
+        Voltage: new DataPoint_t({ datapointName: "VOLTAGE" }),
+        Frequency: new DataPoint_t({ datapointName: "FREQUENCY" }),
+        SwitchState: new DataPoint_t({
+            datapointName: "STATE",
+            valueConversionFn: getSwitchOnOffString,
+            writeable: true
+        }),
     };
 
     this.getByName = function (name, index) {
@@ -276,7 +293,7 @@ var DeviceDataPoints = new function () {
             this.DataPoint.Humidity.inChannel(1),
             this.DataPoint.SetTemperature.inChannel(1),
             this.DataPoint.ActualTemperature.inChannel(1),
-            this.DataPoint.State.inChannel(2),
+            this.DataPoint.WindowState.inChannel(2),
         ]
     };
 
@@ -284,7 +301,7 @@ var DeviceDataPoints = new function () {
         forDevice: 'WindowSensor',
         datapoints: [
             this.DataPoint.LowBat,
-            this.DataPoint.State.inChannel(1),
+            this.DataPoint.WindowState.inChannel(1),
             this.DataPoint.Error.inChannel(1),
         ]}
     ;
@@ -309,6 +326,16 @@ var DeviceDataPoints = new function () {
             this.DataPoint.Humidity.inChannel(2),
             this.DataPoint.ActualTemperature.inChannel(2),
             this.DataPoint.SetTemperature.inChannel(2),
+        ]
+    };
+
+    this.WirelessOutlet = {
+        forDevice: 'HM-ES-PMSw1-Pl', //'WirelessOutlet',
+        datapoints: [
+            this.DataPoint.SwitchState.inChannel(1),
+            this.DataPoint.Power.inChannel(2),
+            this.DataPoint.Current.inChannel(2),
+            this.DataPoint.Voltage.inChannel(2),
         ]
     };
 }

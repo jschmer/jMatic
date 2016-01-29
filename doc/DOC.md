@@ -167,7 +167,7 @@ var userdefined_groups = [
                     DeviceDataPoints.DataPoint.Humidity.inChannel(1),
                     DeviceDataPoints.DataPoint.ActualTemperature.inChannel(1),
                     DeviceDataPoints.DataPoint.SetTemperature.inChannel(1),
-                    DeviceDataPoints.DataPoint.State.inChannel(2),
+                    DeviceDataPoints.DataPoint.WindowState.inChannel(2),
                 ]
             },
             {

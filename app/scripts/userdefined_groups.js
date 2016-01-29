@@ -12,7 +12,7 @@ var userdefined_groups = [
                     DeviceDataPoints.DataPoint.Humidity.inChannel(1),
                     DeviceDataPoints.DataPoint.ActualTemperature.inChannel(1),
                     DeviceDataPoints.DataPoint.SetTemperature.inChannel(1),
-                    DeviceDataPoints.DataPoint.State.inChannel(2),
+                    DeviceDataPoints.DataPoint.WindowState.inChannel(2),
                 ]
             },
             {
@@ -30,7 +30,7 @@ var userdefined_groups = [
             {
                 device_id: 2632, // window sensor
                 datapoints: [
-                    DeviceDataPoints.DataPoint.State.inChannel(1),
+                    DeviceDataPoints.DataPoint.WindowState.inChannel(1),
                 ]
             },
             {
@@ -55,7 +55,7 @@ var userdefined_groups = [
                     DeviceDataPoints.DataPoint.Humidity.inChannel(1),
                     DeviceDataPoints.DataPoint.ActualTemperature.inChannel(1),
                     DeviceDataPoints.DataPoint.SetTemperature.inChannel(1),
-                    DeviceDataPoints.DataPoint.State.inChannel(2),
+                    DeviceDataPoints.DataPoint.WindowState.inChannel(2),
                 ]
             },
             {
@@ -83,7 +83,7 @@ var userdefined_groups = [
                     DeviceDataPoints.DataPoint.Humidity.inChannel(1),
                     DeviceDataPoints.DataPoint.ActualTemperature.inChannel(1),
                     DeviceDataPoints.DataPoint.SetTemperature.inChannel(1),
-                    DeviceDataPoints.DataPoint.State.inChannel(2),
+                    DeviceDataPoints.DataPoint.WindowState.inChannel(2),
                 ]
             },
             {

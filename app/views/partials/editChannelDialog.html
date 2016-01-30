@@ -14,8 +14,19 @@
                             background-color: #FF3333;
                         }
                     </style>
-                    <div ng-if="editChannel.homematicType==HomematicType.logic||editChannel.homematicType==HomematicType.option">
-                        <select auto-focus ng-model="editChannel.displayValue" ng-options="data for (propname, data) in editChannel.valueMapping"></select>
+                    <div ng-if="editChannel.homematicType==HomematicType.logic">
+                        <!-- Shamelessly taken from https://proto.io/freebies/onoff/ -->
+                        <div class="onoffswitch">
+                            <input auto-focus ng-model="editChannel.value"
+                                   type="checkbox" class="onoffswitch-checkbox" name="onoffswitch" id="myonoffswitch">
+                            <label class="onoffswitch-label" for="myonoffswitch">
+                                <span class="onoffswitch-inner"></span>
+                                <span class="onoffswitch-switch"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div ng-if="editChannel.homematicType==HomematicType.option">
+                        <select auto-focus ng-model="editChannel.displayValue" ng-options="displayValue for (key, displayValue) in editChannel.valueMapping"></select>
                     </div>
                     <div ng-if="editChannel.homematicType==HomematicType.number">
                         <knob knob-data="editChannel.displayValue" knob-options="knob_options"></knob>

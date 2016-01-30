@@ -51,6 +51,7 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
             }
 
             $scope.editChannel = copy(channelState);
+
             // set custom number constraint for knob
             if ($scope.editChannel.name == 'SET_TEMPERATURE') {
                 $scope.editChannel.constraints.min = customTemperatureRange[0];
@@ -64,17 +65,25 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
     $scope.SaveChanges = function () {
         var valueToSend = $scope.editChannel.displayValue;
 
-        // map from display value to real value
-        if ($scope.editChannel.valueMapping != null) {
-            for (var key in $scope.editChannel.valueMapping) {
-                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
-                    var mappingValue = $scope.editChannel.valueMapping[key];
-                    if (mappingValue == valueToSend) {
-                        valueToSend = key;
-                        break;
+        if ($scope.editChannel.homematicType == HomematicType.option)
+        {
+            // map from display value to real value
+            if ($scope.editChannel.valueMapping != null) {
+                for (var key in $scope.editChannel.valueMapping) {
+                    if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
+                        var mappingValue = $scope.editChannel.valueMapping[key];
+                        if (mappingValue == valueToSend) {
+                            valueToSend = key;
+                            break;
+                        }
                     }
                 }
             }
+        }
+        else if ($scope.editChannel.homematicType == HomematicType.logic) {
+            // all the values are strings in the CCU API! So stringify the value
+            // so that we can check against the result correctly
+            valueToSend = ""+$scope.editChannel.value;
         }
 
         $scope.changeChannelValue($scope.editChannel.id, valueToSend);

@@ -12,7 +12,7 @@ function createDeviceModel(deviceNode) {
     return deviceObj;
 }
 
-function createChannelModel(id, name, displayName, valueType, homematicType, displayValue, value, min, max, unit, valueMapping, hide, thresholdExceeded, writeable) {
+function createChannelModel(id, name, displayName, overrideName, valueType, homematicType, displayValue, value, min, max, unit, valueMapping, hide, thresholdExceeded, writeable) {
     var channel = {}
 
     if (typeof (id) == "object") {
@@ -20,6 +20,7 @@ function createChannelModel(id, name, displayName, valueType, homematicType, dis
 
         channel.id            = params.id;
         channel.name          = params.name;
+        channel.overrideName  = params.overrideName;
         channel.displayName   = params.displayName;
         channel.valueType     = params.valueType;
         channel.homematicType = params.homematicType;
@@ -42,6 +43,7 @@ function createChannelModel(id, name, displayName, valueType, homematicType, dis
     else {
         channel.id                = id;
         channel.name              = name;
+        channel.overrideName      = overrideName;
         channel.displayName       = displayName;
         channel.valueType         = valueType;
         channel.homematicType     = homematicType;
@@ -119,6 +121,7 @@ function getChannelState(datapoint, stateObject) {
     return createChannelModel({
         id: dp.chanID,
         name: dp.propName,
+        overrideName: datapoint.overrideName,
         displayName: translate(dp.propName),
         valueType: dp.valueType,
         homematicType: dp.homematicType,
@@ -138,6 +141,7 @@ function getMissingDatapointState(datapoint) {
     return createChannelModel({
         id: undefined,
         name: datapoint.datapointName,
+        overrideName: undefined,
         displayName: datapoint.datapointName,
         valueType: undefined,
         homematicType: undefined,

@@ -174,12 +174,13 @@ var ThresholdFunctions = {
 // datapoint definition
 var DeviceDataPoints = new function () {
     // datapoint constructor
-    function DataPoint_t(channelIndex, datapointName, valueConversionFn, hideIf, thresholdIf, writeable, constraints) {
+    function DataPoint_t(channelIndex, datapointName, overrideName, valueConversionFn, hideIf, thresholdIf, writeable, constraints) {
         if (typeof (channelIndex) == "object") {
             var params = channelIndex;
 
             this.channelIndex      = params.channelIndex;
             this.datapointName     = params.datapointName;
+            this.overrideName      = (typeof (params.overrideName) != "undefined") ? params.overrideName : this.datapointName;
             this.valueConversionFn = params.valueConversionFn;
             this.hideIf            = params.hideIf;
             this.thresholdIf       = params.thresholdIf;
@@ -189,6 +190,7 @@ var DeviceDataPoints = new function () {
         else {
             this.channelIndex      = channelIndex;
             this.datapointName     = datapointName;
+            this.overrideName      = (typeof (overrideName) != "undefined") ? overrideName : this.datapointName;
             this.valueConversionFn = valueConversionFn;
             this.hideIf            = hideIf;
             this.thresholdIf       = thresholdIf;
@@ -240,8 +242,9 @@ var DeviceDataPoints = new function () {
         }),
         WindowState: new DataPoint_t({
             datapointName: "STATE",
+            overrideName: "WINDOW_STATE", // overrides the datapoint name in the ui class
             valueConversionFn: getWindowOpenClosedString,
-            thresholdIf: ThresholdFunctions.trueState // window open
+            thresholdIf: ThresholdFunctions.trueState, // window open
         }),
         Error: new DataPoint_t({
             datapointName: "ERROR",
@@ -262,6 +265,7 @@ var DeviceDataPoints = new function () {
         Frequency: new DataPoint_t({ datapointName: "FREQUENCY" }),
         SwitchState: new DataPoint_t({
             datapointName: "STATE",
+            overrideName: "SWITCH_STATE", // overrides the datapoint name in the ui class
             valueConversionFn: getSwitchOnOffString,
             writeable: true
         }),

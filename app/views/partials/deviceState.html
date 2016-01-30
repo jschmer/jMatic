@@ -61,7 +61,7 @@
                         'editable': editMode
                       }"
                       ng-click="tryEditChannel(data)">
-                    <span class="channel-icon" ng-class="['jmatic_channel_'+data.name,
+                    <span class="channel-icon" ng-class="['jmatic_channel_'+data.overrideName,
                         (data.name=='STATE' && data.value==true ? 'jmatic_channel_OPEN' : ''),
                         (data.name=='STATE' && data.value==false ? 'jmatic_channel_CLOSED' : ''),
                     ]"></span>

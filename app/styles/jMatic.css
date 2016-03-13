@@ -262,6 +262,14 @@ tr.program .id {
     background-image: url("../images/WindowClosed.png");
 }
 
+.jmatic_channel_SWITCH_STATE.jmatic_channel_OPEN {
+    background-image: url("../images/SwitchOn.png");
+}
+
+.jmatic_channel_SWITCH_STATE.jmatic_channel_CLOSED {
+    background-image: url("../images/SwitchOff.png");
+}
+
 .jmatic_channel_CONTROL_MODE {
     background-image: url("../images/ControlMode.png");
 }

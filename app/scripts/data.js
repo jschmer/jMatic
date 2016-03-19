@@ -90,58 +90,67 @@ var ControlModeState = {
     Party: 2,
     Boost: 3
 }
-// TODO: translate properly with the $translate service
-var ControlModeStates = {
-    0: "Auto",
-    1: "Manuell",
-    2: "Party",
-    3: "Boost",
-}
-function getControlModeString(mode) {
-    return ControlModeStates[mode];
-}
 
-// TODO: translate properly with the $translate service
-var FaultReportingStates = {
-    0: "Kein Fehler",
-    1: "VALVE_TIGHT",
-    2: "ADJUSTING_RANGE_TOO_LARGE",
-    3: "ADJUSTING_RANGE_TOO_SMALL",
-    4: "COMMUNICATION_ERROR",
-    5: "",
-    6: "LOWBAT",
-    7: "VALVE_ERROR_POSITION",
-}
-function getFaultReportingString(state) {
-    return FaultReportingStates[state];
-}
+var ValueConversionFunctions = {
+    // TODO: translate properly with the $translate service
+    ControlModeStates: {
+        0: "Auto",
+        1: "Manuell",
+        2: "Party",
+        3: "Boost",
+    },
+    getControlModeString: function(mode) {
+        return ValueConversionFunctions.ControlModeStates[mode];
+    },
 
-var ErrorState = {
-    NoError: 0,
-    Error: 1
-}
-// TODO: translate properly with the $translate service
-var ErrorStates = {
-    0: "Nein",
-    1: "Ja",
-}
-function getErrorString(state) {
-    return ErrorStates[state];
-}
+    // TODO: translate properly with the $translate service
+    FaultReportingStates: {
+        0: "Kein Fehler",
+        1: "VALVE_TIGHT",
+        2: "ADJUSTING_RANGE_TOO_LARGE",
+        3: "ADJUSTING_RANGE_TOO_SMALL",
+        4: "COMMUNICATION_ERROR",
+        5: "",
+        6: "LOWBAT",
+        7: "VALVE_ERROR_POSITION",
+    },
+    getFaultReportingString: function(state) {
+        return ValueConversionFunctions.FaultReportingStates[state];
+    },
 
-// TODO: translate properly with the $translate service
-function getWindowOpenClosedString(state) {
-    if (state == false)
-        return "Zu";
-    else
-        return "Auf";
-}
+    ErrorState: {
+        NoError: 0,
+        Error: 1
+    },
+    // TODO: translate properly with the $translate service
+    ErrorStates: {
+        0: "Nein",
+        1: "Ja",
+    },
+    getErrorString: function(state) {
+        return ValueConversionFunctions.ErrorStates[state];
+    },
 
-function getSwitchOnOffString(state) {
-    if (state == false)
-        return "Aus";
-    else
-        return "An";
+    // TODO: translate properly with the $translate service
+    getWindowOpenClosedString: function(state) {
+        if (state == false)
+            return "Zu";
+        else
+            return "Auf";
+    },
+
+    getSwitchOnOffString: function(state) {
+        if (state == false)
+            return "Aus";
+        else
+            return "An";
+    },
+
+    roundFloat: function(precision) {
+        return function(value) {
+            return value.toFixed(precision);
+        };
+    }
 }
 
 // datapoint state functions (hide if, threshold if)
@@ -220,7 +229,7 @@ var DeviceDataPoints = new function () {
         }),
         ControlMode: new DataPoint_t({
             datapointName: "CONTROL_MODE",
-            valueConversionFn: getControlModeString,
+            valueConversionFn: ValueConversionFunctions.getControlModeString,
             thresholdIf: ThresholdFunctions.controlMode
         }),
         Humidity: new DataPoint_t({
@@ -243,18 +252,18 @@ var DeviceDataPoints = new function () {
         WindowState: new DataPoint_t({
             datapointName: "STATE",
             overrideName: "WINDOW_STATE", // overrides the datapoint name in the ui class
-            valueConversionFn: getWindowOpenClosedString,
+            valueConversionFn: ValueConversionFunctions.getWindowOpenClosedString,
             thresholdIf: ThresholdFunctions.trueState, // window open
         }),
         Error: new DataPoint_t({
             datapointName: "ERROR",
-            valueConversionFn: getErrorString,
+            valueConversionFn: ValueConversionFunctions.getErrorString,
             hideIf: HideFunctions.hideIfNoError,
             thresholdIf: ThresholdFunctions.always
         }),
         FaultReporting: new DataPoint_t({
             datapointName: "FAULT_REPORTING",
-            valueConversionFn: getFaultReportingString,
+            valueConversionFn: ValueConversionFunctions.getFaultReportingString,
             hideIf: HideFunctions.hideIfNoError,
             thresholdIf: ThresholdFunctions.always
         }),
@@ -263,10 +272,14 @@ var DeviceDataPoints = new function () {
         Current: new DataPoint_t({ datapointName: "CURRENT" }),
         Voltage: new DataPoint_t({ datapointName: "VOLTAGE" }),
         Frequency: new DataPoint_t({ datapointName: "FREQUENCY" }),
+        EnergyCounter: new DataPoint_t({
+            datapointName: "ENERGY_COUNTER",
+            valueConversionFn: ValueConversionFunctions.roundFloat(0),
+    }),
         SwitchState: new DataPoint_t({
             datapointName: "STATE",
             overrideName: "SWITCH_STATE", // overrides the datapoint name in the ui class
-            valueConversionFn: getSwitchOnOffString,
+            valueConversionFn: ValueConversionFunctions.getSwitchOnOffString,
             writeable: true
         }),
     };
@@ -340,6 +353,8 @@ var DeviceDataPoints = new function () {
             this.DataPoint.Power.inChannel(2),
             this.DataPoint.Current.inChannel(2),
             this.DataPoint.Voltage.inChannel(2),
+            this.DataPoint.Frequency.inChannel(2),
+            this.DataPoint.EnergyCounter.inChannel(2),
         ]
     };
 }

@@ -206,6 +206,50 @@ function parseStates(devices, stateObject) {
     }
 }
 
+function patchValueHistory(dataInstance, channelState, oldChannelState) {
+    if (dataInstance.keepHistory > 0) {
+        console.log("Keep history for channel " + channelState.name);
+
+        if (typeof (oldChannelState.valueHistory) == "undefined") {
+            // No history available yet, create it
+            channelState.valueHistory = [channelState.value];
+        }
+        else {
+            channelState.valueHistory = oldChannelState.valueHistory.concat([channelState.value]);
+
+            // Keep last x values, according to configuration
+            channelState.valueHistory = channelState.valueHistory.slice(Math.max(0, channelState.valueHistory.length - dataInstance.keepHistory));
+        }
+
+        // Determine value change direction (up, stay, down) based on history values
+        var direction = 0;
+        for (var i = 1; channelState.valueHistory.length > 1 && i < channelState.valueHistory.length; ++i) {
+            var val1 = channelState.valueHistory[i - 1];
+            var val2 = channelState.valueHistory[i];
+
+            if (val2 > val1) {
+                direction += 1; // going up
+            }
+            else if (val2 < val1) {
+                direction -= 1; // going down
+            }
+        }
+
+        if (direction > 0) {
+            channelState.valueDirection = "up";
+        }
+        else if (direction == 0) {
+            channelState.valueDirection = "stay";
+        }
+        else {
+            channelState.valueDirection = "down";
+        }
+    }
+    else {
+        channelState.valueDirection = "hide";
+    }
+}
+
 function parseState(device, stateObjectForDevice) {
     var oldState = device.state;
     device.state = {};
@@ -223,6 +267,8 @@ function parseState(device, stateObjectForDevice) {
             continue;
         }
         else {
+            patchValueHistory(dataInstance, channelState, oldState[channelState.name]);
+
             device.state[channelState.name] = channelState;
         }
 
@@ -273,6 +319,9 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
             }
             else {
                 var propName = channelState.name + "_" + deviceId;
+
+                patchValueHistory(dataInstance, channelState, oldState[propName]);
+
                 userdefinedGroup.state[propName] = channelState;
             }
         }

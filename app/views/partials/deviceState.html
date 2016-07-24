@@ -68,6 +68,7 @@
                     <span ui-show="showChannelNames" class="channel_title">{{data.displayName}}: </span>
                     <span class="channel_value">{{data.displayValue}}</span>
                     <span class="channel_unit">{{data.unit}}</span>
+                    <span ng-class="['value-direction', data.valueDirection]"></span>
                     <span ui-show="editMode"><i class="fa fa-edit editIcon"></i></span>
                 </span>
                 <span ng-show="device.state==null">

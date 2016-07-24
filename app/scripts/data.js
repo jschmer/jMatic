@@ -183,7 +183,7 @@ var ThresholdFunctions = {
 // datapoint definition
 var DeviceDataPoints = new function () {
     // datapoint constructor
-    function DataPoint_t(channelIndex, datapointName, overrideName, valueConversionFn, hideIf, thresholdIf, writeable, constraints) {
+    function DataPoint_t(channelIndex, datapointName, overrideName, valueConversionFn, hideIf, thresholdIf, writeable, constraints, keepHistory) {
         if (typeof (channelIndex) == "object") {
             var params = channelIndex;
 
@@ -195,6 +195,7 @@ var DeviceDataPoints = new function () {
             this.thresholdIf       = params.thresholdIf;
             this.writeable         = params.writeable;
             this.constraints       = params.constraints;
+            this.keepHistory       = (typeof (params.keepHistory) != "undefined") ? params.keepHistory : 0;
         }
         else {
             this.channelIndex      = channelIndex;
@@ -205,6 +206,7 @@ var DeviceDataPoints = new function () {
             this.thresholdIf       = thresholdIf;
             this.writeable         = writeable;
             this.constraints       = constraints;
+            this.keepHistory       = (typeof (keepHistory) != "undefined") ? keepHistory : 0;
         }
 
         if (this.channelIndex == null)
@@ -234,7 +236,8 @@ var DeviceDataPoints = new function () {
         }),
         Humidity: new DataPoint_t({
             datapointName: "ACTUAL_HUMIDITY",
-            thresholdIf: ThresholdFunctions.humidityThreshold
+            thresholdIf: ThresholdFunctions.humidityThreshold,
+            keepHistory: 3
         }),
         SetTemperature: new DataPoint_t({
             datapointName: "SET_TEMPERATURE",
@@ -243,11 +246,13 @@ var DeviceDataPoints = new function () {
             constraints: {
                 min: 4.5,
                 max: 30.5
-            }
+            },
+            keepHistory: 3
         }),
         ActualTemperature: new DataPoint_t({
             datapointName: "ACTUAL_TEMPERATURE",
-            thresholdIf: ThresholdFunctions.currentTemperatureThreshold
+            thresholdIf: ThresholdFunctions.currentTemperatureThreshold,
+            keepHistory: 3
         }),
         WindowState: new DataPoint_t({
             datapointName: "STATE",
@@ -268,14 +273,26 @@ var DeviceDataPoints = new function () {
             thresholdIf: ThresholdFunctions.always
         }),
         ValveState: new DataPoint_t({ datapointName: "VALVE_STATE" }),
-        Power: new DataPoint_t({ datapointName: "POWER" }),
-        Current: new DataPoint_t({ datapointName: "CURRENT" }),
-        Voltage: new DataPoint_t({ datapointName: "VOLTAGE" }),
-        Frequency: new DataPoint_t({ datapointName: "FREQUENCY" }),
+        Power: new DataPoint_t({
+            datapointName: "POWER",
+            keepHistory: 3
+        }),
+        Current: new DataPoint_t({
+            datapointName: "CURRENT",
+            keepHistory: 3
+        }),
+        Voltage: new DataPoint_t({
+            datapointName: "VOLTAGE",
+            keepHistory: 3
+        }),
+        Frequency: new DataPoint_t({
+            datapointName: "FREQUENCY",
+            keepHistory: 3
+        }),
         EnergyCounter: new DataPoint_t({
             datapointName: "ENERGY_COUNTER",
             valueConversionFn: ValueConversionFunctions.roundFloat(0),
-    }),
+        }),
         SwitchState: new DataPoint_t({
             datapointName: "STATE",
             overrideName: "SWITCH_STATE", // overrides the datapoint name in the ui class

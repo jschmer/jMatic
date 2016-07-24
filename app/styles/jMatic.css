@@ -218,6 +218,28 @@ tr.program .id {
     vertical-align: bottom;
 }
 
+.device-state .value-direction {
+    display: inline-block;
+    background-size: 1.5em 1.5em;
+    background-position: center center;
+    background-repeat: no-repeat;
+    width:  1.5em;
+    height: 1.5em;
+    vertical-align: bottom;
+}
+
+.value-direction.down {
+    background-image: url("../images/ValueDown.png");
+}
+
+.value-direction.up {
+    background-image: url("../images/ValueUp.png");
+}
+
+.value-direction.stay {
+    display: none !important;
+}
+
 .battery-checklist-item {
     padding: 0px 15px;
 }

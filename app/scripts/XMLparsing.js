@@ -210,7 +210,8 @@ function patchValueHistory(dataInstance, channelState, oldChannelState) {
     if (dataInstance.keepHistory > 0) {
         console.log("Keep history for channel " + channelState.name);
 
-        if (typeof (oldChannelState.valueHistory) == "undefined") {
+        if (oldChannelState == null
+            || typeof (oldChannelState.valueHistory) == "undefined") {
             // No history available yet, create it
             channelState.valueHistory = [channelState.value];
         }
@@ -267,7 +268,10 @@ function parseState(device, stateObjectForDevice) {
             continue;
         }
         else {
-            patchValueHistory(dataInstance, channelState, oldState[channelState.name]);
+            var oldChannelState = null;
+            if (oldState != null)
+                oldChannelState = oldState[channelState.name]
+            patchValueHistory(dataInstance, channelState, oldChannelState);
 
             device.state[channelState.name] = channelState;
         }
@@ -319,8 +323,10 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
             }
             else {
                 var propName = channelState.name + "_" + deviceId;
-
-                patchValueHistory(dataInstance, channelState, oldState[propName]);
+                var oldChannelState = null;
+                if (oldState != null)
+                    oldChannelState = oldState[propName]
+                patchValueHistory(dataInstance, channelState, oldChannelState);
 
                 userdefinedGroup.state[propName] = channelState;
             }

@@ -518,10 +518,20 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
 
         $scope.editChannel = dialogSysVarData;
         $scope.setKnobMinMax($scope.editChannel.constraints.min, $scope.editChannel.constraints.max);
+
+        // all except logic values work with the display value as input,
+        // the logic value works with the actual boolean value
+        if ($scope.editChannel.homematicType == HomematicType.logic)
+            $scope.editChannel.value = ($scope.editChannel.value == 'true');
     };
 
     $scope.SaveChanges = function () {
         var valueToSend = $scope.editChannel.displayValue;
+
+        // all except logic values work with the display value,
+        // the logic value works with the actual boolean value
+        if ($scope.editChannel.homematicType == HomematicType.logic)
+            valueToSend = $scope.editChannel.value.toString();
 
         // map from display value to real value
         if ($scope.editChannel.valueMapping != null) {

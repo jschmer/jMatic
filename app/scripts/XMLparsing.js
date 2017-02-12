@@ -12,7 +12,7 @@ function createDeviceModel(deviceNode) {
     return deviceObj;
 }
 
-function createChannelModel(id, name, displayName, overrideName, valueType, homematicType, displayValue, value, min, max, unit, valueMapping, hide, thresholdExceeded, writeable) {
+function createChannelModel(id, name, displayName, overrideName, valueType, homematicType, displayValue, value, min, max, unit, valueMapping, hide, thresholdExceeded, writeable, datapoint) {
     var channel = {}
 
     if (typeof (id) == "object") {
@@ -39,6 +39,8 @@ function createChannelModel(id, name, displayName, overrideName, valueType, home
             hide: params.hide,
             thresholdExceeded: params.thresholdExceeded,
         };
+        // Datapoint
+        channel.datapoint = params.datapoint;
     }
     else {
         channel.id                = id;
@@ -62,6 +64,8 @@ function createChannelModel(id, name, displayName, overrideName, valueType, home
             hide: hide,
             thresholdExceeded: thresholdExceeded,
         };
+        // Datapoint
+        channel.datapoint         = datapoint;
     }
 
     return channel;
@@ -131,9 +135,10 @@ function getChannelState(datapoint, stateObject) {
         min: constraints.min,
         max: constraints.max,
         unit: dp.unit,
-        valueMapping: undefined,
+        valueMapping: datapoint.valueMapping,
         hide: hideChannel,
         thresholdExceeded: threshold,
+        datapoint: datapoint
     });
 }
 
@@ -158,6 +163,7 @@ function getMissingDatapointState(datapoint) {
             hide: false,
             thresholdExceeded: true,
         },
+        datapoint: datapoint
     });
 }
 
@@ -202,14 +208,11 @@ function parseStates(devices, stateObject) {
             //console.log(device.config);
             parseUserdefinedVirtualGroupState(devices[i], stateObject);
         }
-
     }
 }
 
 function patchValueHistory(dataInstance, channelState, oldChannelState) {
     if (dataInstance.keepHistory > 0) {
-        console.log("Keep history for channel " + channelState.name);
-
         if (oldChannelState == null
             || typeof (oldChannelState.valueHistory) == "undefined") {
             // No history available yet, create it
@@ -274,8 +277,8 @@ function parseState(device, stateObjectForDevice) {
             patchValueHistory(dataInstance, channelState, oldChannelState);
 
             device.state[channelState.name] = channelState;
+            device.state[channelState.name].device = device;
         }
-
     }
 
     flagChangedValues(oldState, device.state);
@@ -329,6 +332,8 @@ function parseUserdefinedVirtualGroupState(userdefinedGroup, allDeviceStates) {
                 patchValueHistory(dataInstance, channelState, oldChannelState);
 
                 userdefinedGroup.state[propName] = channelState;
+                userdefinedGroup.state[propName].device = userdefinedGroup;
+                userdefinedGroup.state[propName].parentDeviceId = deviceId;
             }
         }
     }
@@ -363,7 +368,8 @@ function parseSystemVariable(syVarXMLnode) {
         valueType: variableDataType,
         homematicType: sysVarType,
         displayValue: parsedValue,
-        value: value
+        value: value,
+        datapoint: undefined
     });
 
     switch (sysVarType) {

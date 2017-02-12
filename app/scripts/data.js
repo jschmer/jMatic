@@ -91,6 +91,21 @@ var ControlModeState = {
     Boost: 3
 }
 
+function parseDisplayValue(displayValue, mapping) {
+    // map from display value to real value
+    if (mapping != null) {
+        for (var key in mapping) {
+            if (mapping.hasOwnProperty(key)) {
+                var mappedValue = mapping[key];
+                if (mappedValue == displayValue) {
+                    return key;
+                }
+            }
+        }
+    }
+    return displayValue;
+}
+
 var ValueConversionFunctions = {
     // TODO: translate properly with the $translate service
     ControlModeStates: {
@@ -101,6 +116,18 @@ var ValueConversionFunctions = {
     },
     getControlModeString: function(mode) {
         return ValueConversionFunctions.ControlModeStates[mode];
+    },
+    controlModePushInsteadOf: function (channelData, currentValue, newValue) {
+        switch (parseInt(newValue)) {
+            case ControlModeState.Auto:
+                return { newChannelName: "AUTO_MODE", newValue: "true" };
+            case ControlModeState.Manual:
+                return { newChannelName: "MANU_MODE", newValue: "18.0" };
+            case ControlModeState.Boost:
+                return { newChannelName: "BOOST_MODE", newValue: "true" };
+            default:
+                return { newChannelName: channelData.name, newValue: value };
+        }
     },
 
     // TODO: translate properly with the $translate service
@@ -155,6 +182,9 @@ var ValueConversionFunctions = {
 
 // datapoint state functions (hide if, threshold if)
 var HideFunctions = {
+    hideAlways: function (value) {
+        return true;
+    },
     hideIfFalse: function(value) {
         return value == false;
     },
@@ -183,30 +213,36 @@ var ThresholdFunctions = {
 // datapoint definition
 var DeviceDataPoints = new function () {
     // datapoint constructor
-    function DataPoint_t(channelIndex, datapointName, overrideName, valueConversionFn, hideIf, thresholdIf, writeable, constraints, keepHistory) {
+    function DataPoint_t(channelIndex, datapointName, overrideName, valueConversionFn, setValueConversionFn, hideIf, thresholdIf, writeable, constraints, keepHistory, valueMapping, pushInsteadOf) {
         if (typeof (channelIndex) == "object") {
             var params = channelIndex;
 
-            this.channelIndex      = params.channelIndex;
-            this.datapointName     = params.datapointName;
-            this.overrideName      = (typeof (params.overrideName) != "undefined") ? params.overrideName : this.datapointName;
-            this.valueConversionFn = params.valueConversionFn;
-            this.hideIf            = params.hideIf;
-            this.thresholdIf       = params.thresholdIf;
-            this.writeable         = params.writeable;
-            this.constraints       = params.constraints;
-            this.keepHistory       = (typeof (params.keepHistory) != "undefined") ? params.keepHistory : 0;
+            this.channelIndex         = params.channelIndex;
+            this.datapointName        = params.datapointName;
+            this.overrideName         = (typeof (params.overrideName) != "undefined") ? params.overrideName : this.datapointName;
+            this.valueConversionFn    = params.valueConversionFn;
+            this.setValueConversionFn = params.setValueConversionFn;
+            this.hideIf               = params.hideIf;
+            this.thresholdIf          = params.thresholdIf;
+            this.writeable            = params.writeable;
+            this.constraints          = params.constraints;
+            this.keepHistory = (typeof (params.keepHistory) != "undefined") ? params.keepHistory : 0;
+            this.valueMapping         = params.valueMapping;
+            this.pushInsteadOf        = params.pushInsteadOf;
         }
         else {
-            this.channelIndex      = channelIndex;
-            this.datapointName     = datapointName;
-            this.overrideName      = (typeof (overrideName) != "undefined") ? overrideName : this.datapointName;
-            this.valueConversionFn = valueConversionFn;
-            this.hideIf            = hideIf;
-            this.thresholdIf       = thresholdIf;
-            this.writeable         = writeable;
-            this.constraints       = constraints;
-            this.keepHistory       = (typeof (keepHistory) != "undefined") ? keepHistory : 0;
+            this.channelIndex         = channelIndex;
+            this.datapointName        = datapointName;
+            this.overrideName         = (typeof (overrideName) != "undefined") ? overrideName : this.datapointName;
+            this.valueConversionFn    = valueConversionFn;
+            this.setValueConversionFn = setValueConversionFn;
+            this.hideIf               = hideIf;
+            this.thresholdIf          = thresholdIf;
+            this.writeable            = writeable;
+            this.constraints          = constraints;
+            this.keepHistory          = (typeof (keepHistory) != "undefined") ? keepHistory : 0;
+            this.valueMapping         = valueMapping;
+            this.pushInsteadOf        = pushInsteadOf;
         }
 
         if (this.channelIndex == null)
@@ -232,7 +268,25 @@ var DeviceDataPoints = new function () {
         ControlMode: new DataPoint_t({
             datapointName: "CONTROL_MODE",
             valueConversionFn: ValueConversionFunctions.getControlModeString,
-            thresholdIf: ThresholdFunctions.controlMode
+            thresholdIf: ThresholdFunctions.controlMode,
+            writeable: true,
+            valueMapping: ValueConversionFunctions.ControlModeStates,
+            pushInsteadOf: ValueConversionFunctions.controlModePushInsteadOf
+        }),
+        AutoMode: new DataPoint_t({
+            datapointName: "AUTO_MODE",
+            writeable: true,
+            hideIf: HideFunctions.hideAlways,
+        }),
+        ManuMode: new DataPoint_t({
+            datapointName: "MANU_MODE",
+            writeable: true,
+            hideIf: HideFunctions.hideAlways,
+        }),
+        BoostMode: new DataPoint_t({
+            datapointName: "BOOST_MODE",
+            writeable: true,
+            hideIf: HideFunctions.hideAlways,
         }),
         Humidity: new DataPoint_t({
             datapointName: "ACTUAL_HUMIDITY",
@@ -324,6 +378,9 @@ var DeviceDataPoints = new function () {
         datapoints: [
             this.DataPoint.LowBat,
             this.DataPoint.ControlMode.inChannel(1),
+            this.DataPoint.AutoMode.inChannel(1),
+            this.DataPoint.ManuMode.inChannel(1),
+            this.DataPoint.BoostMode.inChannel(1),
             this.DataPoint.Humidity.inChannel(1),
             this.DataPoint.SetTemperature.inChannel(1),
             this.DataPoint.ActualTemperature.inChannel(1),
@@ -337,14 +394,17 @@ var DeviceDataPoints = new function () {
             this.DataPoint.LowBat,
             this.DataPoint.WindowState.inChannel(1),
             this.DataPoint.Error.inChannel(1),
-        ]}
-    ;
+        ]
+    };
 
     this.HeaterData = {
         forDevice: 'Heater',
         datapoints: [
             this.DataPoint.LowBat,
             this.DataPoint.ControlMode.inChannel(4),
+            this.DataPoint.AutoMode.inChannel(4),
+            this.DataPoint.ManuMode.inChannel(4),
+            this.DataPoint.BoostMode.inChannel(4),
             this.DataPoint.FaultReporting.inChannel(4),
             this.DataPoint.ValveState.inChannel(4),
             this.DataPoint.ActualTemperature.inChannel(4),
@@ -357,6 +417,9 @@ var DeviceDataPoints = new function () {
         datapoints: [
             this.DataPoint.LowBat,
             this.DataPoint.ControlMode.inChannel(2),
+            this.DataPoint.AutoMode.inChannel(2),
+            this.DataPoint.ManuMode.inChannel(2),
+            this.DataPoint.BoostMode.inChannel(2),
             this.DataPoint.Humidity.inChannel(2),
             this.DataPoint.ActualTemperature.inChannel(2),
             this.DataPoint.SetTemperature.inChannel(2),

@@ -63,30 +63,66 @@ jMaticControllers.controller('deviceStateController', ['$scope', '$http', '$loca
     }
 
     $scope.SaveChanges = function () {
+        var currentValue = $scope.editChannel.value;
         var valueToSend = $scope.editChannel.displayValue;
 
         if ($scope.editChannel.homematicType == HomematicType.option)
         {
-            // map from display value to real value
-            if ($scope.editChannel.valueMapping != null) {
-                for (var key in $scope.editChannel.valueMapping) {
-                    if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
-                        var mappingValue = $scope.editChannel.valueMapping[key];
-                        if (mappingValue == valueToSend) {
-                            valueToSend = key;
-                            break;
-                        }
-                    }
-                }
-            }
+            valueToSend = parseDisplayValue(valueToSend, $scope.editChannel.valueMapping);
         }
         else if ($scope.editChannel.homematicType == HomematicType.logic) {
             // all the values are strings in the CCU API! So stringify the value
             // so that we can check against the result correctly
-            valueToSend = ""+$scope.editChannel.value;
+            valueToSend = $scope.editChannel.value.toString();
         }
 
-        $scope.changeChannelValue($scope.editChannel.id, valueToSend);
+        var editChannelId = $scope.editChannel.id;
+
+        // process the push hook if available
+        if ($scope.editChannel.datapoint.pushInsteadOf) {
+            var newEditData = $scope.editChannel.datapoint.pushInsteadOf($scope.editChannel.name, currentValue, valueToSend);
+
+            function findNewChannelId(newChannelName, editedChannel)
+            {
+                var device = editedChannel.device;
+                if (device.type == userdefinedGroupType) {
+                    // for userdefined groups find the correct native device
+                    var allDevices = $scope.devices;
+                    for (var i = 0; i < allDevices.length; ++i)
+                    {
+                        var nextDevice = allDevices[i];
+                        if (nextDevice.id == editedChannel.parentDeviceId)
+                        {
+                            device = nextDevice;
+                            break;
+                        }
+                    }
+                }
+
+                // then find the channel id of the new channel
+                for (var channelName in device.state) {
+                    if (channelName == newEditData.newChannelName) {
+                        return device.state[channelName].id;
+                    }
+                }
+                return null;
+            }
+
+            var newChannelId = findNewChannelId(newEditData.newChannelName, $scope.editChannel);
+            if (newChannelId == null)
+            {
+                $translate('WARN_FAILEDWRITINGDATAPOINT', { value: valueToSend, id: editChannelId }).then(function (text) {
+                    Notification.error(text);
+                    console.error(text, data, status, headers, config);
+                });
+                return;
+            }
+
+            editChannelId = newChannelId;
+            valueToSend = newEditData.newValue;
+        }
+
+        $scope.changeChannelValue(editChannelId, valueToSend);
     }
 
     $scope.changeChannelValue = function (id, value) {
@@ -533,18 +569,7 @@ jMaticControllers.controller('sysVarsController', ['$scope', '$http', 'Notificat
         if ($scope.editChannel.homematicType == HomematicType.logic)
             valueToSend = $scope.editChannel.value.toString();
 
-        // map from display value to real value
-        if ($scope.editChannel.valueMapping != null) {
-            for (var key in $scope.editChannel.valueMapping) {
-                if ($scope.editChannel.valueMapping.hasOwnProperty(key)) {
-                    var mappingValue = $scope.editChannel.valueMapping[key];
-                    if (mappingValue == valueToSend) {
-                        valueToSend = key;
-                        break;
-                    }
-                }
-            }
-        }
+        valueToSend = parseDisplayValue(valueToSend, $scope.editChannel.valueMapping);
 
         $scope.changeSysVar($scope.editChannel.id, valueToSend);
     }
